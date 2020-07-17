@@ -1,0 +1,102 @@
+﻿<Window x:Class="ZoNo.Views.MainWindowV"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        xmlns:local="clr-namespace:ZoNo.Views"
+        xmlns:converters="clr-namespace:ZoNo.Converters"
+        mc:Ignorable="d"
+        Title="ZoNo"
+        Width="1200"
+        Height="900">
+  <Window.Resources>
+    <converters:MultiplyConverter x:Key="MultiplyConverter"/>
+    <sys:Double x:Key="AnimationDecelerationRatioEnter">0.3</sys:Double>
+    <sys:Double x:Key="AnimationDecelerationRatioExit">0.7</sys:Double>
+    <Duration x:Key="AnimationDuration">0:0:0.7</Duration>
+    <Style x:Key="LoginSlideAnimation"
+           TargetType="{x:Type local:LoginV}">
+      <Setter Property="Tag">
+        <Setter.Value>
+          <sys:Double>0.0</sys:Double>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="RenderTransform">
+        <Setter.Value>
+          <TranslateTransform X="0" >
+            <TranslateTransform.Y>
+              <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                <Binding Path="Tag"          ElementName="Login"/>
+                <Binding Path="ActualHeight" ElementName="Login"/>
+              </MultiBinding>
+            </TranslateTransform.Y>
+          </TranslateTransform>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsUserLoggedIn, Mode=OneWay}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetProperty="Tag"
+                                 From="0" To="-1"
+                                 BeginTime="0:0:0.7"
+                                 DecelerationRatio="{StaticResource AnimationDecelerationRatioEnter}"
+                                 Duration="{StaticResource AnimationDuration}"/>
+              </Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetProperty="Tag"
+                                 From="-1" To="0"
+                                 DecelerationRatio="{StaticResource AnimationDecelerationRatioExit}"
+                                 Duration="{StaticResource AnimationDuration}"/>
+              </Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="HomeRevealAnimation"
+           TargetType="{x:Type local:HomeV}">
+      <Setter Property="Opacity" Value="0">
+      </Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsUserLoggedIn, Mode=OneWay}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="0" To="1"
+                                 BeginTime="0:0:0.7"
+                                 DecelerationRatio="{StaticResource AnimationDecelerationRatioEnter}"
+                                 Duration="{StaticResource AnimationDuration}"/>
+              </Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="1" To="0"
+                                 DecelerationRatio="{StaticResource AnimationDecelerationRatioExit}"
+                                 Duration="{StaticResource AnimationDuration}"/>
+              </Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <Grid>
+    <local:LoginV x:Name="Login"
+                  DataContext="{Binding LoginVM}"
+                  Style="{StaticResource LoginSlideAnimation}"/>
+    <local:HomeV x:Name="Home"
+                 DataContext="{Binding HomeVM}"
+                 Style="{StaticResource HomeRevealAnimation}"/>
+  </Grid>
+</Window>
