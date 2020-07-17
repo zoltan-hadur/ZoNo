@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise", "Splitwise\Splitwise.csproj", "{663AE431-8731-4216-8452-D270667D9E45}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo", "ZoNo\ZoNo.csproj", "{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,14 @@ Global
 		{663AE431-8731-4216-8452-D270667D9E45}.Release|Any CPU.Build.0 = Release|Any CPU
 		{663AE431-8731-4216-8452-D270667D9E45}.Release|x64.ActiveCfg = Release|x64
 		{663AE431-8731-4216-8452-D270667D9E45}.Release|x64.Build.0 = Release|x64
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Debug|x64.ActiveCfg = Debug|x64
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Debug|x64.Build.0 = Debug|x64
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Release|x64.ActiveCfg = Release|x64
+		{F4C4E580-51F0-4102-9CE2-080F09D4DDFB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
