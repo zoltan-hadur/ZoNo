@@ -1,64 +1,34 @@
-﻿using Prism.Commands;
-using Prism.Events;
-using Splitwise.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
-using ZoNo.Contracts;
-using ZoNo.Contracts.ViewModels;
-using ZoNo.Events;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using System.Windows.Controls;
+using System.Windows;
+using ZoNo.Messages;
+using ZoNo.Models;
+using System.Runtime;
 
 namespace ZoNo.ViewModels
 {
-  public class HomeVM : VMBase, IHomeVM
+  public partial class HomeVM : ObservableRecipient
   {
-    private User mUser;
-    private Token mToken;
+    [ObservableProperty]
+    private User _user;
 
-    private bool mIsUserLoggedIn;
-    public bool IsUserLoggedIn
+    public HomeVM(IMessenger messenger) : base(messenger)
     {
-      get => mIsUserLoggedIn;
-      set => Set(ref mIsUserLoggedIn, value);
+      Messenger.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
     }
 
-    private ICommand mLogoutUserCommand;
-    public ICommand LogoutUserCommand
+    private void OnUserLoggedIn(object recipient, UserLoggedInMessage message)
     {
-      get => mLogoutUserCommand;
-      protected set => Set(ref mLogoutUserCommand, value);
+      User = message.Value;
     }
 
-    public HomeVM(IEventAggregator eventAggregator, ISettings settings)
+    [RelayCommand]
+    private void LogoutUser()
     {
-      EventAggregator = eventAggregator;
-      Settings = settings;
-
-      LogoutUserCommand = new DelegateCommand(() => EventAggregator.GetEvent<UserLoggedOutEvent>().Publish(new UserLoggedOutEventArgs() { User = mUser, Token = mToken }));
-
-      EventAggregator.GetEvent<UserLoggedInEvent >().Subscribe(OnUserLoggedIn );
-      EventAggregator.GetEvent<UserLoggedOutEvent>().Subscribe(OnUserLoggedOut);
-    }
-
-    ~HomeVM()
-    {
-      EventAggregator.GetEvent<UserLoggedInEvent >().Unsubscribe(OnUserLoggedIn );
-      EventAggregator.GetEvent<UserLoggedOutEvent>().Unsubscribe(OnUserLoggedOut);
-    }
-
-    private void OnUserLoggedIn(UserLoggedInEventArgs e)
-    {
-      IsUserLoggedIn = true;
-      mUser = e.User;
-      mToken = e.Token;
-    }
-
-    private void OnUserLoggedOut(UserLoggedOutEventArgs e)
-    {
-      IsUserLoggedIn = false;
-      mUser = null;
-      mToken = null;
+      User = null;
+      Messenger.Send(new UserLoggedOutMessage(User));
     }
   }
 }

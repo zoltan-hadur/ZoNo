@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
@@ -11,26 +9,26 @@ namespace ZoNo.Converters
   {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-      if (value is bool wValue)
+      if (value is bool visible)
       {
         if (parameter is "inverse")
         {
-          return wValue ? Visibility.Collapsed : Visibility.Visible;
+          visible = !visible;
         }
-        return wValue ? Visibility.Visible : Visibility.Collapsed;
+        return visible ? Visibility.Visible : Visibility.Collapsed;
       }
       return DependencyProperty.UnsetValue;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-      if (value is Visibility wValue)
+      if (value is Visibility visible)
       {
         if (parameter is "inverse")
         {
-          return wValue != Visibility.Visible;
+          return visible != Visibility.Visible;
         }
-        return wValue == Visibility.Visible;
+        return visible == Visibility.Visible;
       }
       return DependencyProperty.UnsetValue;
     }

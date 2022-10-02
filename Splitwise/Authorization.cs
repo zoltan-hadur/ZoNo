@@ -1,7 +1,9 @@
 ﻿using RestSharp;
+using RestSharp.Serializers.Json;
 using Splitwise.Models;
 using System;
-using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Splitwise
@@ -11,30 +13,18 @@ namespace Splitwise
   /// </summary>
   public class Authorization
   {
-    /// <summary>
-    /// URL used to request token from Splitwise.
-    /// </summary>
-    public static string TokenURL     => "https://secure.splitwise.com/oauth/token";
+    private static readonly string _baseURL = "https://secure.splitwise.com";
+    private static readonly string _tokenResource = "oauth/token";
+    private static readonly string _authorizeResource = "oauth/authorize";
 
-    /// <summary>
-    /// URL used in authorization flow.
-    /// </summary>
-    public static string AuthorizeURL => "https://secure.splitwise.com/oauth/authorize";
-
-    /// <summary>
-    /// Consumer Key after registering as developer on Splitwise.
-    /// </summary>
-    public string ConsumerKey { get; }
-
-    /// <summary>
-    /// Consumer Secret after registering as developer on Splitwise.
-    /// </summary>
-    public string ConsumerSecret { get; }
+    private readonly string _consumerKey;
+    private readonly string _consumerSecret;
+    private readonly string _state;
 
     /// <summary>
     /// URL that will be used to logon the user and authorize.
     /// </summary>
-    public string LoginURL => $"{AuthorizeURL}?response_type=code&client_id={ConsumerKey}";
+    public string LoginURL => $"{_baseURL}/{_authorizeResource}?response_type=code&client_id={_consumerKey}&state={_state}";
 
     /// <summary>
     /// Creates an object of type <see cref="Authorization"/> which can be used to authorize the user and get a <see cref="Token"/>.
@@ -43,38 +33,68 @@ namespace Splitwise
     /// <param name="consumerSecret">Consumer Secret from Splitwise.</param>
     public Authorization(string consumerKey, string consumerSecret)
     {
-      ConsumerKey = consumerKey;
-      ConsumerSecret = consumerSecret;
+      _consumerKey = consumerKey;
+      _consumerSecret = consumerSecret;
+      _state = Guid.NewGuid().ToString("N");
     }
 
     /// <summary>
     /// Extracts the authorization code from the URL where the user got redirected after successful authentication and consent.
     /// </summary>
     /// <param name="url">The URL where the user gots redirected after successful authentication and consent.</param>
-    /// <returns></returns>
-    public string ExtractAuthorizationCode(string url)
+    /// <param name="authorizationCode">The extracted authorization code.</param>
+    /// <returns>True if the extraction was successful, otherwise false.</returns>
+    public bool IsAccessGranted(string url, out string authorizationCode)
     {
-      var wMatch = Regex.Match(url, @"https:\/\/secure\.splitwise\.com\/\?code=(?<code>.*)&state=.*");
-      return wMatch.Success ? wMatch.Groups["code"].Value : null;
+      if (url.StartsWith(_baseURL))
+      {
+        var match = Regex.Match(url, "state=(?<state>[^&]*)");
+        if (match.Success && match.Groups["state"].Success && match.Groups["state"].Value == _state)
+        {
+          match = Regex.Match(url, "code=(?<code>[^&]*)");
+          if (match.Success && match.Groups["code"].Success)
+          {
+            authorizationCode = match.Groups["code"].Value;
+            return true;
+          }
+        }
+      }
+      authorizationCode = null;
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if access was denied according to the redirected URL.
+    /// </summary>
+    /// <param name="url">The URL where the user gots redirected after successful authentication but did not give consent.</param>
+    /// <returns>True if the user clicked on the cancel button.</returns>
+    public bool IsAccessDenied(string url)
+    {
+      return url == $"{_baseURL}/?error=access_denied&state={_state}";
     }
 
     /// <summary>
     /// Requests token from Splitwise with the given authorization code.
     /// </summary>
     /// <param name="authorizationCode">Authorization code from Splitwise.</param>
-    /// <returns></returns>
+    /// <returns>The bearer token.</returns>
     public Token GetToken(string authorizationCode)
     {
-      var wClient = new RestClient(TokenURL);
-      var wRequest = new RestRequest(Method.POST);
-      wRequest.AddHeaders(new Dictionary<string, string>()
+      using (var client = new RestClient(_baseURL)
+        .UseSystemTextJson(new JsonSerializerOptions()
+        {
+          PropertyNamingPolicy = new SnakeCasePolicy(),
+          Converters = { new JsonStringEnumConverter() }
+        }))
       {
-        { "cache-control", "no-cache"                          },
-        { "content-type" , "application/x-www-form-urlencoded" }
-      });
-      wRequest.AddParameter("application/x-www-form-urlencoded", $"grant_type=authorization_code&code={authorizationCode}&redirect_uri=&client_id={ConsumerKey}&client_secret={ConsumerSecret}", ParameterType.RequestBody);
-      var wResponse = wClient.Execute<Token>(wRequest);
-      return wResponse.Data;
+        var request = new RestRequest(_tokenResource)
+          .AddParameter("client_id", _consumerKey)
+          .AddParameter("client_secret", _consumerSecret)
+          .AddParameter("grant_type", "authorization_code")
+          .AddParameter("code", authorizationCode)
+          .AddParameter("redirect_uri", string.Empty);
+        return client.Post<Token>(request);
+      }
     }
   }
 }

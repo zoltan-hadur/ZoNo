@@ -61,7 +61,7 @@ namespace ZoNo.Resources.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login.
+        ///   Looks up a localized string similar to Log in.
         /// </summary>
         public static string LoginPage_Login {
             get {

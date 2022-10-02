@@ -1,27 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Unity;
-using ZoNo.Contracts.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using System;
+using ZoNo.Messages;
 
 namespace ZoNo.ViewModels
 {
-  public class MainWindowVM : VMBase, IMainWindowVM
+  public partial class MainWindowVM : ObservableRecipient
   {
-    private ILoginVM mLoginVM;
-    [Dependency]
-    public ILoginVM LoginVM
+    [ObservableProperty]
+    private LoginVM _loginVM;
+
+    [ObservableProperty]
+    private HomeVM _homeVM;
+
+    [ObservableProperty]
+    private bool _userLoggedIn;
+
+    public MainWindowVM(LoginVM loginVM, HomeVM homeVM, IMessenger messenger) : base(messenger)
     {
-      get => mLoginVM;
-      set => Set(ref mLoginVM, value);
+      LoginVM = loginVM;
+      HomeVM = homeVM;
+
+      Messenger.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+      Messenger.Register<UserLoggedOutMessage>(this, OnUserLoggedOut);
     }
 
-    private IHomeVM mHomeVM;
-    [Dependency]
-    public IHomeVM HomeVM
+    private void OnUserLoggedIn(object recipient, UserLoggedInMessage message)
     {
-      get => mHomeVM;
-      set => Set(ref mHomeVM, value);
+      UserLoggedIn = true;
+    }
+
+    private void OnUserLoggedOut(object recipient, UserLoggedOutMessage message)
+    {
+      UserLoggedIn = false;
     }
   }
 }

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LoginPage_Login" xml:space="preserve">
-    <value>Login</value>
+    <value>Log in</value>
   </data>
   <data name="LoginPage_ToZoNo" xml:space="preserve">
     <value>to ZoNo!</value>

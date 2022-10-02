@@ -1,172 +1,91 @@
-﻿using CefSharp.Wpf;
-using Prism.Commands;
-using Prism.Events;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Web.WebView2.Wpf;
 using Splitwise;
-using Splitwise.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Security.Policy;
 using System.Windows;
-using System.Windows.Input;
-using ZoNo.Contracts;
-using ZoNo.Contracts.ViewModels;
-using ZoNo.Events;
+using System.Windows.Controls;
+using ZoNo.Messages;
+using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public class LoginVM : VMBase, ILoginVM
+  public partial class LoginVM : ObservableRecipient
   {
-    private Authorization mAuthorization;
-    private User mUser;
-    private Token mToken;
+    private Authorization _authorization;
 
-    private bool mIsUserAuthenticated;
-    public bool IsUserAuthenticated
-    {
-      get => mIsUserAuthenticated;
-      protected set => Set(ref mIsUserAuthenticated, value);
-    }
+    [ObservableProperty]
+    private User _user;
 
-    private string mUserFirstName;
-    public string UserFirstName
-    {
-      get => mUserFirstName;
-      protected set => Set(ref mUserFirstName, value);
-    }
+    private ISettings _settings;
 
-    private string mUserProfilePicture;
-    public string UserProfilePicture
+    public LoginVM(ISettings settings, IMessenger messenger) : base(messenger)
     {
-      get => mUserProfilePicture;
-      protected set => Set(ref mUserProfilePicture, value);
-    }
-
-    private bool mIsUserLoggedIn;
-    public bool IsUserLoggedIn
-    {
-      get => mIsUserLoggedIn;
-      set => Set(ref mIsUserLoggedIn, value);
-    }
-
-    private ICommand mLoginUserCommand;
-    public ICommand LoginUserCommand
-    {
-      get => mLoginUserCommand;
-      protected set => Set(ref mLoginUserCommand, value);
-    }
-
-    public LoginVM(IEventAggregator eventAggregator, ISettings settings)
-    {
-      mAuthorization = new Authorization(consumerKey   : Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"   ),
+      _authorization = new Authorization(consumerKey   : Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"   ),
                                          consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret"));
 
-      EventAggregator = eventAggregator;
-      Settings = settings;
-
-      LoginUserCommand = new DelegateCommand(OnLoginUser);
-
-      EventAggregator.GetEvent<UserLoggedInEvent >().Subscribe(OnUserLoggedIn );
-      EventAggregator.GetEvent<UserLoggedOutEvent>().Subscribe(OnUserLoggedOut);
-
-      if (Settings.Get<Token>("Token", out var wToken))
+      _settings = settings;
+      if (_settings.Get<User>(nameof(User), out var user))
       {
-        mToken = wToken;
-        IsUserAuthenticated = true;
+        User = user;
       }
-      if (Settings.Get<Dictionary<string, string>>("UserData", out var wUserData))
+
+      Messenger.Register<UserLoggedOutMessage>(this, OnUserLoggedOut);
+    }
+
+    private void OnUserLoggedOut(object recipient, UserLoggedOutMessage message)
+    {
+      User = null;
+      //_settings.Remove(nameof(User));
+    }
+
+    [RelayCommand]
+    private void LoginUser()
+    {
+      if (User == null)
       {
-        UserFirstName = wUserData["FirstName"];
-        UserProfilePicture = wUserData["ProfilePicture"];
-      }
-    }
-
-    ~LoginVM()
-    {
-      EventAggregator.GetEvent<UserLoggedInEvent >().Unsubscribe(OnUserLoggedIn );
-      EventAggregator.GetEvent<UserLoggedOutEvent>().Unsubscribe(OnUserLoggedOut);
-    }
-
-    private void OnUserLoggedIn(UserLoggedInEventArgs e)
-    {
-      IsUserLoggedIn = true;
-    }
-
-    private void OnUserLoggedOut(UserLoggedOutEventArgs e)
-    {
-      IsUserLoggedIn = false;
-      mUser = null;
-      mToken = null;
-      IsUserAuthenticated = false;
-      UserFirstName = null;
-      UserProfilePicture = null;
-      Settings.Remove("Token");
-      Settings.Remove("UserData");
-    }
-
-    public bool AuthorizeUser(string url)
-    {
-      var wAuthorizationCode = mAuthorization.ExtractAuthorizationCode(url);
-      if (!string.IsNullOrEmpty(wAuthorizationCode))
-      {
-        mToken = mAuthorization.GetToken(wAuthorizationCode);
-        Settings.Set("Token", mToken);
-        mUser = new Client(mToken).GetCurrentUser();
-        UserFirstName = mUser.FirstName;
-        UserProfilePicture = mUser.Picture.Large;
-        Settings.Set("UserData", new Dictionary<string, string>()
+        using(var webView = new WebView2() { Source = new Uri(_authorization.LoginURL) })
         {
-          { "FirstName"     , UserFirstName      },
-          { "ProfilePicture", UserProfilePicture }
-        });
-        IsUserAuthenticated = true;
-        return true;
-      }
-      return false;
-    }
-
-    private void OnLoginUser()
-    {
-      // If user is already logged in (i.e. have access token from previous session), navigate to the home page
-      if (IsUserAuthenticated)
-      {
-        EventAggregator.GetEvent<UserLoggedInEvent>().Publish(new UserLoggedInEventArgs() { User = mUser, Token = mToken });
-        return;
-      }
-
-      // Use CefSharp webbrowser
-      using (var wWebBrowser = new ChromiumWebBrowser(mAuthorization.LoginURL))
-      {
-        var wSplitwiseLoginWindow = new Window()
-        {
-          Owner = Application.Current.MainWindow,
-          WindowStartupLocation = WindowStartupLocation.CenterOwner,
-          ResizeMode = ResizeMode.NoResize,
-          Title = "Splitwise Login",
-          Width = 1000,
-          Height = 600,
-          Content = wWebBrowser
-        };
-
-        wWebBrowser.AddressChanged += (s, e) =>
-        {
-          if (e.NewValue is string wAddress)
+          var window = new Window()
           {
-            System.Diagnostics.Debug.WriteLine(wAddress);
-            // If the user clicked the cancel button or successfully authorized access to the application, close the window
-            if (wAddress == "https://secure.splitwise.com/?error=access_denied&state=" ||
-                AuthorizeUser(wAddress))
-            {
-              wSplitwiseLoginWindow.Close();
-            }
-          }
-        };
+            Owner = Application.Current.MainWindow,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            ResizeMode = ResizeMode.NoResize,
+            Title = "Splitwise Login",
+            Width = 600,
+            Height = 670,
+            Content = webView
+          };
 
-        wSplitwiseLoginWindow.ShowDialog();
+          webView.NavigationStarting += (s, e) =>
+          {
+            if (_authorization.IsAccessDenied(e.Uri))
+            {
+              window.Close();
+            }
+            else if (_authorization.IsAccessGranted(e.Uri, out var wAuthorizationCode))
+            {
+              var token = _authorization.GetToken(wAuthorizationCode);
+              using (var client = new Client(token))
+              {
+                var user = client.GetCurrentUser();
+                User = new User(token, user.FirstName, user.Picture.Large);
+                _settings.Set(nameof(User), User);
+              }
+              window.Close();
+            }
+          };
+
+          window.ShowDialog();
+        }
       }
 
-      if (IsUserAuthenticated)
+      if (User != null)
       {
-        EventAggregator.GetEvent<UserLoggedInEvent>().Publish(new UserLoggedInEventArgs() { User = mUser, Token = mToken });
+        Messenger.Send(new UserLoggedInMessage(User));
+        return;
       }
     }
   }
