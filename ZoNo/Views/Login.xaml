@@ -10,18 +10,19 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Resources.xaml"/>
+        <ResourceDictionary Source="/ZoNo;component/Resources/Resources.xaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </UserControl.Resources>
   <StackPanel Orientation="Vertical"
               HorizontalAlignment="Center"
               VerticalAlignment="Center">
-    <Image Width="200" Height="200"
+    <Image Width="200"
+           Height="200"
            Stretch="Uniform"
-           Source="{Binding User.Picture,
-                    FallbackValue={StaticResource GuestImage},
-                    TargetNullValue={StaticResource GuestImage}}"/>
+           Source="{Binding Path=User.Picture,
+                            FallbackValue={StaticResource GuestImage},
+                            TargetNullValue={StaticResource GuestImage}}"/>
     <TextBlock Margin="10,10,10,10"
                HorizontalAlignment="Center">
       <TextBlock.Text>

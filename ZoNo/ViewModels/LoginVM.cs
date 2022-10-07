@@ -38,7 +38,7 @@ namespace ZoNo.ViewModels
     private void OnUserLoggedOut(object recipient, UserLoggedOutMessage message)
     {
       User = null;
-      //_settings.Remove(nameof(User));
+      _settings.Remove(nameof(User));
     }
 
     [RelayCommand]
@@ -46,7 +46,7 @@ namespace ZoNo.ViewModels
     {
       if (User == null)
       {
-        using(var webView = new WebView2() { Source = new Uri(_authorization.LoginURL) })
+        using (var webView = new WebView2() { Source = new Uri(_authorization.LoginURL) })
         {
           var window = new Window()
           {

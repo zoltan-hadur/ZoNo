@@ -7,8 +7,8 @@ using System.Text.Json;
 
 namespace ZoNo
 {
-    /// <inheritdoc cref="ISettings"/>
-    public class Settings : ISettings
+  /// <inheritdoc cref="ISettings"/>
+  public class Settings : ISettings
   {
     private readonly IFileSystem _fileSystem;
     private readonly string _path;

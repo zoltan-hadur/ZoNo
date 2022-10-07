@@ -1,7 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:ZoNo.Views"
-                    xmlns:converters="clr-namespace:ZoNo.Converters">
-  <converters:MultiplyConverter x:Key="MultiplyConverter"/>
-  <BitmapImage x:Key="GuestImage" UriSource="/ZoNo;component/Resources/Images/Guest.png"/>
-</ResourceDictionary>

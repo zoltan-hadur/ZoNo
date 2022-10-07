@@ -3,113 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:local="clr-namespace:ZoNo.Views"
         mc:Ignorable="d"
         x:Name="ZoNo"
         Title="ZoNo"
         Width="900"
-        Height="750">
+        Height="750"
+        Background="DeepSkyBlue">
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Resources.xaml" />
+        <ResourceDictionary Source="/ZoNo;component/Resources/Resources.xaml"/>
       </ResourceDictionary.MergedDictionaries>
-      <!--<sys:Double x:Key="AnimationDecelerationRatioEnter">0.3</sys:Double>
-      <sys:Double x:Key="AnimationDecelerationRatioExit">0.7</sys:Double>
-      <Duration x:Key="AnimationDuration">0:0:0.7</Duration>
-      <Style x:Key="LoginSlideAnimation"
-             TargetType="{x:Type local:Login}">
-        <Setter Property="Tag">
-          <Setter.Value>
-            <sys:Double>0.0</sys:Double>
-          </Setter.Value>
-        </Setter>
-        <Setter Property="RenderTransform">
-          <Setter.Value>
-            <TranslateTransform X="0" >
-              <TranslateTransform.Y>
-                <MultiBinding Converter="{StaticResource MultiplyConverter}">
-                  <Binding Path="Tag"
-                           ElementName="Login"/>
-                  <Binding Path="ActualHeight"
-                           ElementName="Login"/>
-                </MultiBinding>
-              </TranslateTransform.Y>
-            </TranslateTransform>
-          </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-          <DataTrigger Binding="{Binding IsUserLoggedIn, Mode=OneWay}"
-                       Value="True">
-            <DataTrigger.EnterActions>
-              <BeginStoryboard>
-                <Storyboard>
-                  <DoubleAnimation Storyboard.TargetProperty="Tag"
-                                   From="0"
-                                   To="-1"
-                                   BeginTime="0:0:0.3"
-                                   DecelerationRatio="{StaticResource AnimationDecelerationRatioEnter}"
-                                   Duration="{StaticResource AnimationDuration}"/>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.EnterActions>
-            <DataTrigger.ExitActions>
-              <BeginStoryboard>
-                <Storyboard>
-                  <DoubleAnimation Storyboard.TargetProperty="Tag"
-                                   From="-1"
-                                   To="0"
-                                   DecelerationRatio="{StaticResource AnimationDecelerationRatioExit}"
-                                   Duration="{StaticResource AnimationDuration}"/>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.ExitActions>
-          </DataTrigger>
-        </Style.Triggers>
-      </Style>
-      <Style x:Key="HomeRevealAnimation"
-             TargetType="{x:Type local:Home}">
-        <Setter Property="Opacity"
-                Value="0">
-        </Setter>
-        <Style.Triggers>
-          <DataTrigger Binding="{Binding ViewModel.IsUserLoggedIn, ElementName=ZoNo, Mode=OneWay}"
-                       Value="True">
-            <DataTrigger.EnterActions>
-              <BeginStoryboard>
-                <Storyboard>
-                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                   From="0"
-                                   To="1"
-                                   BeginTime="0:0:0.3"
-                                   DecelerationRatio="{StaticResource AnimationDecelerationRatioEnter}"
-                                   Duration="{StaticResource AnimationDuration}"/>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.EnterActions>
-            <DataTrigger.ExitActions>
-              <BeginStoryboard>
-                <Storyboard>
-                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                   From="1"
-                                   To="0"
-                                   DecelerationRatio="{StaticResource AnimationDecelerationRatioExit}"
-                                   Duration="{StaticResource AnimationDuration}"/>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.ExitActions>
-          </DataTrigger>
-        </Style.Triggers>
-      </Style>-->
     </ResourceDictionary>
   </Window.Resources>
-  <Window.Triggers>
-    
-  </Window.Triggers>
   <Grid>
-    <local:Login x:Name="Login"
-                 DataContext="{Binding LoginVM}"/>
-    <local:Home DataContext="{Binding HomeVM}"/>
+    <local:Home DataContext="{Binding HomeVM}">
+      <local:Home.Style>
+        <Style BasedOn="{StaticResource RevealAnimationStyle}"
+               TargetType="{x:Type local:Home}">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=DataContext.UserLoggedIn,
+                                           ElementName=ZoNo}"
+                         Value="True">
+              <DataTrigger.EnterActions>
+                <BeginStoryboard Storyboard="{StaticResource RevealAnimationEnter}"/>
+              </DataTrigger.EnterActions>
+              <DataTrigger.ExitActions>
+                <BeginStoryboard Storyboard="{StaticResource RevealAnimationExit}"/>
+              </DataTrigger.ExitActions>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </local:Home.Style>
+    </local:Home>
+    <local:Login DataContext="{Binding LoginVM}">
+      <local:Login.Style>
+        <Style BasedOn="{StaticResource SlideUpAnimationStyle}"
+               TargetType="{x:Type local:Login}">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=DataContext.UserLoggedIn,
+                                           ElementName=ZoNo}"
+                         Value="True">
+              <DataTrigger.EnterActions>
+                <BeginStoryboard Storyboard="{StaticResource SlideUpAnimationEnter}">
+                </BeginStoryboard>
+              </DataTrigger.EnterActions>
+              <DataTrigger.ExitActions>
+                <BeginStoryboard Storyboard="{StaticResource SlideUpAnimationExit}">
+                </BeginStoryboard>
+              </DataTrigger.ExitActions>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </local:Login.Style>
+    </local:Login>
   </Grid>
 </Window>
