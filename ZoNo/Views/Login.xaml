@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ZoNo.Views"
-             xmlns:locale="clr-namespace:ZoNo.Resources.Localization"
              mc:Ignorable="d" 
              d:DesignHeight="750" d:DesignWidth="900">
   <UserControl.Resources>
@@ -23,18 +22,13 @@
            Source="{Binding Path=User.Picture,
                             FallbackValue={StaticResource GuestImage},
                             TargetNullValue={StaticResource GuestImage}}"/>
-    <TextBlock Margin="10,10,10,10"
-               HorizontalAlignment="Center">
-      <TextBlock.Text>
-        <MultiBinding StringFormat="{}{0}{1}">
-          <Binding Source="{x:Static locale:Locale.LoginPage_Welcome}"/>
-          <Binding Path="User.FirstName"
-                   FallbackValue="{x:Static locale:Locale.LoginPage_ToZoNo}"
-                   TargetNullValue="{x:Static locale:Locale.LoginPage_ToZoNo}"/>
-        </MultiBinding>
-      </TextBlock.Text>
-    </TextBlock>
-    <Button Content="{x:Static locale:Locale.LoginPage_Login}"
+    <TextBlock Margin="10"
+               HorizontalAlignment="Center"
+               Text="{Binding Path=User.FirstName,
+                              FallbackValue=Welcome To Zono!,
+                              TargetNullValue=Welcome To Zono!,
+                              StringFormat=Welcome {0}!}"/>
+    <Button Content="Login"
             Command="{Binding LoginUserCommand}"/>
   </StackPanel>
 </UserControl>
