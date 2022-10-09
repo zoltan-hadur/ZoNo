@@ -1,0 +1,62 @@
+﻿<Window x:Class="ZoNo.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ZoNo.Views"
+        mc:Ignorable="d"
+        x:Name="ZoNo"
+        Title="ZoNo"
+        Width="900"
+        Height="750"
+        Background="DeepSkyBlue">
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/ZoNo;component/Resources/Resources.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+  <Grid>
+    <local:Home DataContext="{Binding HomeVM}">
+      <local:Home.Style>
+        <Style BasedOn="{StaticResource RevealAnimationStyle}"
+               TargetType="{x:Type local:Home}">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=DataContext.UserLoggedIn,
+                                           ElementName=ZoNo}"
+                         Value="True">
+              <DataTrigger.EnterActions>
+                <BeginStoryboard Storyboard="{StaticResource RevealAnimationEnter}"/>
+              </DataTrigger.EnterActions>
+              <DataTrigger.ExitActions>
+                <BeginStoryboard Storyboard="{StaticResource RevealAnimationExit}"/>
+              </DataTrigger.ExitActions>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </local:Home.Style>
+    </local:Home>
+    <local:Login DataContext="{Binding LoginVM}">
+      <local:Login.Style>
+        <Style BasedOn="{StaticResource SlideUpAnimationStyle}"
+               TargetType="{x:Type local:Login}">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=DataContext.UserLoggedIn,
+                                           ElementName=ZoNo}"
+                         Value="True">
+              <DataTrigger.EnterActions>
+                <BeginStoryboard Storyboard="{StaticResource SlideUpAnimationEnter}">
+                </BeginStoryboard>
+              </DataTrigger.EnterActions>
+              <DataTrigger.ExitActions>
+                <BeginStoryboard Storyboard="{StaticResource SlideUpAnimationExit}">
+                </BeginStoryboard>
+              </DataTrigger.ExitActions>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </local:Login.Style>
+    </local:Login>
+  </Grid>
+</Window>
