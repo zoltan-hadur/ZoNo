@@ -1,8 +1,6 @@
 ﻿using Windows.Storage;
 using Windows.Storage.Streams;
 
-using ZoNo2.Core.Helpers;
-
 namespace ZoNo2.Helpers;
 
 // Use these extension methods to store and retrieve local and roaming app data

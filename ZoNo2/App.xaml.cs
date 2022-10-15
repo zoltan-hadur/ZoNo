@@ -4,8 +4,6 @@ using Microsoft.UI.Xaml;
 
 using ZoNo2.Activation;
 using ZoNo2.Contracts.Services;
-using ZoNo2.Core.Contracts.Services;
-using ZoNo2.Core.Services;
 using ZoNo2.Helpers;
 using ZoNo2.Models;
 using ZoNo2.Services;

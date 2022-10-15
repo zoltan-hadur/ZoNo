@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ZoNo2.Core.Helpers;
+namespace ZoNo2.Helpers;
 
 public static class Json
 {

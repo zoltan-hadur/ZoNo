@@ -2,9 +2,9 @@
 
 using Newtonsoft.Json;
 
-using ZoNo2.Core.Contracts.Services;
+using ZoNo2.Contracts.Services;
 
-namespace ZoNo2.Core.Services;
+namespace ZoNo2.Services;
 
 public class FileService : IFileService
 {

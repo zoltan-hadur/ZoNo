@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo", "ZoNo\ZoNo.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo2", "ZoNo2\ZoNo2.csproj", "{DB7F68B2-E044-48E5-8FE5-2622109707C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo2.Core", "ZoNo2.Core\ZoNo2.Core.csproj", "{82BAD623-50BF-4882-AF76-AFFEAA941F80}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,10 +29,6 @@ Global
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.ActiveCfg = Release|x64
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.Build.0 = Release|x64
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.Deploy.0 = Release|x64
-		{82BAD623-50BF-4882-AF76-AFFEAA941F80}.Debug|x64.ActiveCfg = Debug|x64
-		{82BAD623-50BF-4882-AF76-AFFEAA941F80}.Debug|x64.Build.0 = Debug|x64
-		{82BAD623-50BF-4882-AF76-AFFEAA941F80}.Release|x64.ActiveCfg = Release|x64
-		{82BAD623-50BF-4882-AF76-AFFEAA941F80}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

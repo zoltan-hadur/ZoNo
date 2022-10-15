@@ -4,8 +4,6 @@ using Windows.ApplicationModel;
 using Windows.Storage;
 
 using ZoNo2.Contracts.Services;
-using ZoNo2.Core.Contracts.Services;
-using ZoNo2.Core.Helpers;
 using ZoNo2.Helpers;
 using ZoNo2.Models;
 

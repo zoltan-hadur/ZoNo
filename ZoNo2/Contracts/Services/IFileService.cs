@@ -1,4 +1,4 @@
-﻿namespace ZoNo2.Core.Contracts.Services;
+﻿namespace ZoNo2.Contracts.Services;
 
 public interface IFileService
 {
