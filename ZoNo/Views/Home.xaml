@@ -14,58 +14,26 @@
     </ResourceDictionary>
   </UserControl.Resources>
   <Grid>
-    <StackPanel Orientation="Vertical"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="5,5,5,5">
-      <StackPanel x:Name="UserDropDown"
-                  Orientation="Horizontal"
-                  Background="Transparent"
-                  MouseLeftButtonDown="UserDropDown_MouseDown">
-        <Ellipse Width="35"
-                 Height="35">
-          <Ellipse.Fill>
-            <ImageBrush Stretch="Uniform"
-                        ImageSource="{Binding Path=User.Picture,
-                                              FallbackValue={StaticResource GuestImage},
-                                              TargetNullValue={StaticResource GuestImage}}"/>
-          </Ellipse.Fill>
-        </Ellipse>
-        <TextBlock Margin="5,0,5,0"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Text="{Binding Path=User.FirstName,
-                                  TargetNullValue=FirstName,
-                                  FallbackValue=FirstName}"/>
-        <TextBlock Text="▼"
-                   Margin="5,0,0,0"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center">
-          <TextBlock.Style>
-            <Style TargetType="{x:Type TextBlock}">
-              <Setter Property="Foreground"
-                      Value="Gray"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding Path=IsMouseOver,
-                                               ElementName=UserDropDown}"
-                             Value="True">
-                  <Setter Property="Foreground"
-                          Value="Black"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-      </StackPanel>
-      <Popup x:Name="UserDropDownPopUp"
-             StaysOpen="True">
-        <StackPanel Orientation="Vertical">
-          <Button Content="My Account"/>
-          <Button Content="Log out"/>
-        </StackPanel>
-      </Popup>
-    </StackPanel>
-    <Button Content="Logout"
+    <Grid.RowDefinitions>
+      <RowDefinition Height="50"/>
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition/>
+      <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+    <Button Grid.Row="0"
+            Grid.Column="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Padding="5,0,5,0"
+            Margin="0"
+            Content="☰"
+            FontSize="24"/>
+    <Button Grid.Row="1"
+            Grid.Column="1"
+            Content="Logout"
             Command="{Binding LogoutUserCommand}"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"/>

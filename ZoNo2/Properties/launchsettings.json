@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "ZoNo2 (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "ZoNo2 (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}

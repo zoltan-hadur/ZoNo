@@ -18,11 +18,5 @@ namespace ZoNo.Views
     {
       InitializeComponent();
     }
-
-    private void UserDropDown_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-      e.Handled = true;
-      UserDropDownPopUp.IsOpen = true;
-    }
   }
 }
