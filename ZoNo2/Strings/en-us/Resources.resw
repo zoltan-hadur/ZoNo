@@ -67,6 +67,9 @@
   <data name="Shell_Main.Content" xml:space="preserve">
     <value>Main</value>
   </data>
+  <data name="Shell_Query.Content" xml:space="preserve">
+    <value>Query</value>
+  </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
     <value>Personalization</value>
   </data>
