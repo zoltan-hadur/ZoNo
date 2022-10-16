@@ -4,7 +4,10 @@ namespace ZoNo2.Helpers;
 
 public static class ResourceExtensions
 {
-    private static readonly ResourceLoader _resourceLoader = new();
+  private static readonly ResourceLoader _resourceLoader = new ResourceLoader();
 
-    public static string GetLocalized(this string resourceKey) => _resourceLoader.GetString(resourceKey);
+  public static string GetLocalized(this string resourceKey)
+  {
+    return _resourceLoader.GetString(resourceKey);
+  }
 }

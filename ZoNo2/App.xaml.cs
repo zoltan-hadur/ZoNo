@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml;
 
 using ZoNo2.Activation;
 using ZoNo2.Contracts.Services;
-using ZoNo2.Helpers;
 using ZoNo2.Models;
 using ZoNo2.Services;
 using ZoNo2.ViewModels;
@@ -20,13 +19,9 @@ public partial class App : Application
   // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
   // https://docs.microsoft.com/dotnet/core/extensions/configuration
   // https://docs.microsoft.com/dotnet/core/extensions/logging
-  public IHost Host
-  {
-    get;
-  }
+  public IHost Host { get; }
 
-  public static T GetService<T>()
-      where T : class
+  public static T GetService<T>() where T : class
   {
     if ((App.Current as App)!.Host.Services.GetService(typeof(T)) is not T service)
     {
@@ -42,40 +37,40 @@ public partial class App : Application
   {
     InitializeComponent();
 
-    Host = Microsoft.Extensions.Hosting.Host.
-    CreateDefaultBuilder().
-    UseContentRoot(AppContext.BaseDirectory).
-    ConfigureServices((context, services) =>
-    {
-      // Default Activation Handler
-      services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+    Host = Microsoft.Extensions.Hosting.Host
+      .CreateDefaultBuilder()
+      .UseContentRoot(AppContext.BaseDirectory)
+      .ConfigureServices((context, services) =>
+      {
+        // Default Activation Handler
+        services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
-      // Other Activation Handlers
+        // Other Activation Handlers
 
-      // Services
-      services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-      services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-      services.AddTransient<INavigationViewService, NavigationViewService>();
+        // Services
+        services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+        services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+        services.AddTransient<INavigationViewService, NavigationViewService>();
 
-      services.AddSingleton<IActivationService, ActivationService>();
-      services.AddSingleton<IPageService, PageService>();
-      services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IActivationService, ActivationService>();
+        services.AddSingleton<IPageService, PageService>();
+        services.AddSingleton<INavigationService, NavigationService>();
 
-      // Core Services
-      services.AddSingleton<IFileService, FileService>();
+        // Core Services
+        services.AddSingleton<IFileService, FileService>();
 
-      // Views and ViewModels
-      services.AddTransient<SettingsViewModel>();
-      services.AddTransient<SettingsPage>();
-      services.AddTransient<MainViewModel>();
-      services.AddTransient<MainPage>();
-      services.AddTransient<ShellPage>();
-      services.AddTransient<ShellViewModel>();
+        // Views and ViewModels
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<SettingsPage>();
+        services.AddTransient<MainViewModel>();
+        services.AddTransient<MainPage>();
+        services.AddTransient<ShellPage>();
+        services.AddTransient<ShellViewModel>();
 
-      // Configuration
-      services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
-    }).
-    Build();
+        // Configuration
+        services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+      })
+      .Build();
 
     UnhandledException += App_UnhandledException;
   }

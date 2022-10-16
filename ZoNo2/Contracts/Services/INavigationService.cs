@@ -5,19 +5,11 @@ namespace ZoNo2.Contracts.Services;
 
 public interface INavigationService
 {
-    event NavigatedEventHandler Navigated;
+  event NavigatedEventHandler Navigated;
 
-    bool CanGoBack
-    {
-        get;
-    }
+  bool CanGoBack { get; }
+  Frame? Frame { get; set; }
 
-    Frame? Frame
-    {
-        get; set;
-    }
-
-    bool NavigateTo(string pageKey, object? parameter = null, bool clearNavigation = false);
-
-    bool GoBack();
+  bool NavigateTo(string pageKey, object? parameter = null, bool clearNavigation = false);
+  bool GoBack();
 }

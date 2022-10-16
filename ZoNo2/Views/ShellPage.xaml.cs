@@ -14,10 +14,7 @@ namespace ZoNo2.Views;
 // TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page
 {
-  public ShellViewModel ViewModel
-  {
-    get;
-  }
+  public ShellViewModel ViewModel { get; }
 
   public ShellPage(ShellViewModel viewModel)
   {
@@ -46,7 +43,9 @@ public sealed partial class ShellPage : Page
 
   private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
   {
-    var resource = args.WindowActivationState == WindowActivationState.Deactivated ? "WindowCaptionForegroundDisabled" : "WindowCaptionForeground";
+    var resource = args.WindowActivationState == WindowActivationState.Deactivated ?
+      "WindowCaptionForegroundDisabled" :
+      "WindowCaptionForeground";
 
     AppTitleBarText.Foreground = (SolidColorBrush)App.Current.Resources[resource];
   }
@@ -64,7 +63,10 @@ public sealed partial class ShellPage : Page
 
   private static KeyboardAccelerator BuildKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers? modifiers = null)
   {
-    var keyboardAccelerator = new KeyboardAccelerator() { Key = key };
+    var keyboardAccelerator = new KeyboardAccelerator()
+    {
+      Key = key
+    };
 
     if (modifiers.HasValue)
     {

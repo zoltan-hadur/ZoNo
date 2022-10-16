@@ -5,16 +5,16 @@ namespace ZoNo2.Helpers;
 
 public class RuntimeHelper
 {
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
+  [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+  private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
 
-    public static bool IsMSIX
+  public static bool IsMSIX
+  {
+    get
     {
-        get
-        {
-            var length = 0;
+      var length = 0;
 
-            return GetCurrentPackageFullName(ref length, null) != 15700L;
-        }
+      return GetCurrentPackageFullName(ref length, null) != 15700L;
     }
+  }
 }
