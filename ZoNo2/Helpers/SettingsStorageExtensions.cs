@@ -16,6 +16,8 @@ public static class SettingsStorageExtensions
 
   public static async Task SaveAsync<T>(this StorageFolder folder, string name, T content)
   {
+    ArgumentNullException.ThrowIfNull(content);
+
     var file = await folder.CreateFileAsync(GetFileName(name), CreationCollisionOption.ReplaceExisting);
     var fileContent = await Json.StringifyAsync(content);
 
@@ -37,6 +39,8 @@ public static class SettingsStorageExtensions
 
   public static async Task SaveAsync<T>(this ApplicationDataContainer settings, string key, T value)
   {
+    ArgumentNullException.ThrowIfNull(value);
+
     settings.SaveString(key, await Json.StringifyAsync(value));
   }
 
