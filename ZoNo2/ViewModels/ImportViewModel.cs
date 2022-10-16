@@ -2,9 +2,9 @@
 
 namespace ZoNo2.ViewModels;
 
-public class MainViewModel : ObservableRecipient
+public class ImportViewModel : ObservableRecipient
 {
-  public MainViewModel()
+  public ImportViewModel()
   {
 
   }

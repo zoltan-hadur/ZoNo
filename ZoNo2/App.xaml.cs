@@ -60,8 +60,8 @@ public partial class App : Application
         services.AddSingleton<IFileService, FileService>();
 
         // Views and ViewModels
-        services.AddTransient<MainViewModel>();
-        services.AddTransient<MainPage>();
+        services.AddTransient<ImportViewModel>();
+        services.AddTransient<ImportPage>();
         services.AddTransient<QueryViewModel>();
         services.AddTransient<QueryPage>();
         services.AddTransient<SettingsViewModel>();

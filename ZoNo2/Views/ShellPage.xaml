@@ -46,12 +46,12 @@
                 https://docs.microsoft.com/windows/apps/design/style/segoe-fluent-icons-font#icon-list
                 -->
         <NavigationViewItem
-          x:Uid="Shell_Main"
-          helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.MainViewModel">
+          x:Uid="Shell_Import"
+          helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.ImportViewModel">
           <NavigationViewItem.Icon>
             <FontIcon
               FontFamily="{StaticResource SymbolThemeFontFamily}"
-              Glyph="&#xe7c3;"/>
+              Glyph="&#xEA52;"/>
           </NavigationViewItem.Icon>
         </NavigationViewItem>
         <NavigationViewItem
