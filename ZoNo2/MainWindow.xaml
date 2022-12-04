@@ -13,4 +13,7 @@
   <windowex:WindowEx.Backdrop>
     <windowex:MicaSystemBackdrop/>
   </windowex:WindowEx.Backdrop>
+  <windowex:WindowEx.Content>
+    <Frame IsNavigationStackEnabled="False"/>
+  </windowex:WindowEx.Content>
 </windowex:WindowEx>

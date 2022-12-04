@@ -12,10 +12,13 @@
   </Page.Resources>
   <Grid>
     <StackPanel x:Name="ContentArea">
+      <Button
+        x:Uid="Settings_Logout"
+        Command="{x:Bind ViewModel.LogoutCommand}"/>
       <TextBlock
         x:Uid="Settings_Personalization"
         Style="{ThemeResource SubtitleTextBlockStyle}"/>
-      <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
+      <!--<StackPanel Margin="{StaticResource SmallTopBottomMargin}">
         <TextBlock x:Uid="Settings_Theme"/>
         <StackPanel Margin="{StaticResource XSmallTopMargin}">
           <RadioButton
@@ -49,7 +52,7 @@
             </RadioButton.CommandParameter>
           </RadioButton>
         </StackPanel>
-      </StackPanel>
+      </StackPanel>-->
       <TextBlock
         x:Uid="Settings_About"
         Style="{ThemeResource SubtitleTextBlockStyle}"/>

@@ -6,6 +6,6 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d">
   <Grid x:Name="ContentArea">
-    <TextBlock Text="{x:Bind ViewModel.GUID}"/>
+    <TextBlock Text="{x:Bind ViewModel.Id}"/>
   </Grid>
 </Page>

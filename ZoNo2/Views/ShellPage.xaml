@@ -9,7 +9,7 @@
   xmlns:i="using:Microsoft.Xaml.Interactivity"
   Loaded="OnLoaded">
   <Grid>
-    <Grid
+    <!--<Grid
       x:Name="AppTitleBar"
       Canvas.ZIndex="1"
       Height="{Binding ElementName=NavigationViewControl, Path=CompactPaneLength}"
@@ -26,25 +26,18 @@
         TextWrapping="NoWrap"
         Style="{StaticResource CaptionTextBlockStyle}"
         Margin="28,0,0,0"/>
-    </Grid>
+    </Grid>-->
     <NavigationView
       x:Name="NavigationViewControl"
       Canvas.ZIndex="0"
-      IsBackButtonVisible="Visible"
-      IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}"
+      IsBackButtonVisible="Collapsed"
+      IsBackEnabled="False"
       SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}"
       IsSettingsVisible="True"
       ExpandedModeThresholdWidth="1280"
       DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
       Header="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}">
       <NavigationView.MenuItems>
-        <!--
-                TODO: Update item titles by updating <x:Uid>.Content entries in Strings/en-us/Resources.resw.
-                https://docs.microsoft.com/windows/uwp/app-resources/localize-strings-ui-manifest#refer-to-a-string-resource-identifier-from-xaml
-            
-                TODO: Update item icons by updating FontIcon.Glyph properties.
-                https://docs.microsoft.com/windows/apps/design/style/segoe-fluent-icons-font#icon-list
-                -->
         <NavigationViewItem
           x:Uid="Shell_Import"
           helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.ImportViewModel">
@@ -64,7 +57,7 @@
           </NavigationViewItem.Icon>
         </NavigationViewItem>
       </NavigationView.MenuItems>
-      <NavigationView.HeaderTemplate>
+      <!--<NavigationView.HeaderTemplate>
         <DataTemplate>
           <Grid>
             <TextBlock
@@ -72,7 +65,7 @@
               Style="{ThemeResource TitleTextBlockStyle}"/>
           </Grid>
         </DataTemplate>
-      </NavigationView.HeaderTemplate>
+      </NavigationView.HeaderTemplate>-->
       <i:Interaction.Behaviors>
         <behaviors:NavigationViewHeaderBehavior DefaultHeader="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}">
           <behaviors:NavigationViewHeaderBehavior.DefaultHeaderTemplate>
@@ -87,7 +80,9 @@
         </behaviors:NavigationViewHeaderBehavior>
       </i:Interaction.Behaviors>
       <Grid Margin="{StaticResource NavigationViewPageContentMargin}">
-        <Frame x:Name="NavigationFrame"/>
+        <Frame
+          x:Name="NavigationFrame"
+          IsNavigationStackEnabled="False"/>
       </Grid>
     </NavigationView>
   </Grid>

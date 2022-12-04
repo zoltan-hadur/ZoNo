@@ -1,22 +1,23 @@
 ﻿using Newtonsoft.Json;
 
-namespace ZoNo2.Helpers;
-
-public static class Json
+namespace ZoNo2.Helpers
 {
-  public static async Task<T?> ToObjectAsync<T>(string value)
+  public static class Json
   {
-    return await Task.Run(() =>
+    public static async Task<T?> ToObjectAsync<T>(string value)
     {
-      return JsonConvert.DeserializeObject<T>(value);
-    });
-  }
+      return await Task.Run(() =>
+      {
+        return JsonConvert.DeserializeObject<T>(value);
+      });
+    }
 
-  public static async Task<string> StringifyAsync(object value)
-  {
-    return await Task.Run(() =>
+    public static async Task<string> StringifyAsync(object value)
     {
-      return JsonConvert.SerializeObject(value);
-    });
+      return await Task.Run(() =>
+      {
+        return JsonConvert.SerializeObject(value);
+      });
+    }
   }
 }

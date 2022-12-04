@@ -1,6 +1,12 @@
-﻿namespace ZoNo2.Contracts.Services;
-
-public interface IPageService
+﻿namespace ZoNo2.Contracts.Services
 {
-  Type GetPageType(string key);
+  public interface IPageService
+  {
+    Type GetPageType(string key);
+  }
+
+  public interface ITopLevelPageService : IPageService
+  {
+
+  }
 }

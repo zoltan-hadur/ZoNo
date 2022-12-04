@@ -1,7 +1,8 @@
-﻿namespace ZoNo2.Activation;
-
-public interface IActivationHandler
+﻿namespace ZoNo2.Activation
 {
-  bool CanHandle(object args);
-  Task HandleAsync(object args);
+  public interface IActivationHandler
+  {
+    bool CanHandle(object args);
+    Task HandleAsync(object args);
+  }
 }

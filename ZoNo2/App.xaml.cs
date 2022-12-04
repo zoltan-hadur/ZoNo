@@ -1,95 +1,125 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-
+using Microsoft.UI.Xaml.Controls;
 using ZoNo2.Activation;
 using ZoNo2.Contracts.Services;
+using ZoNo2.Messages;
 using ZoNo2.Models;
 using ZoNo2.Services;
 using ZoNo2.ViewModels;
 using ZoNo2.Views;
 
-namespace ZoNo2;
-
-// To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
-public partial class App : Application
+namespace ZoNo2
 {
-  private new static App Current => (App)Application.Current;
-  private IServiceProvider Services { get; set; }
-
-  public static WindowEx MainWindow { get; } = new MainWindow();
-
-  public static T GetService<T>() where T : class
+  // To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
+  public partial class App : Application
   {
-    // TODO create new scope upon logging off
-    if (typeof(T) == typeof(SettingsViewModel))
+    private new static App Current => (App)Application.Current;
+    private IServiceScope ServiceScope { get; set; }
+
+    public static WindowEx MainWindow { get; } = new MainWindow();
+
+    public static T GetService<T>() where T : class
     {
-      Current.Services = Current.Services.CreateScope().ServiceProvider;
+      if (Current.ServiceScope.ServiceProvider.GetService<T>() is not T service)
+      {
+        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      }
+      return service;
     }
-    if (Current.Services.GetService<T>() is not T service)
+
+    public App()
     {
-      throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      InitializeComponent();
+
+      var configuration = new ConfigurationBuilder()
+        .SetBasePath(AppContext.BaseDirectory)
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+      var services = new ServiceCollection();
+
+      // Default Activation Handler
+      services.AddSingleton<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+
+      // Other Activation Handlers
+
+      // Services
+      services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
+      services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+      services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+      services.AddScoped<INavigationViewService, NavigationViewService>();
+
+      services.AddSingleton<IActivationService, ActivationService>();
+      services.AddSingleton<ITopLevelPageService, PageService>(provider =>
+      {
+        return new PageService.Builder()
+          .Configure<LoginViewModel, LoginPage>()
+          .Configure<ShellViewModel, ShellPage>()
+          .Build();
+      });
+      services.AddSingleton<IPageService, PageService>(provider =>
+      {
+        return new PageService.Builder()
+          .Configure<ImportViewModel, ImportPage>()
+          .Configure<QueryViewModel, QueryPage>()
+          .Configure<SettingsViewModel, SettingsPage>()
+          .Build();
+      });
+      services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
+      {
+        return new NavigationService(provider.GetService<ITopLevelPageService>()!)
+        {
+          Frame = MainWindow.Content as Frame
+        };
+      });
+      services.AddScoped<INavigationService, NavigationService>();
+
+      // Core Services
+      services.AddSingleton<IFileService, FileService>();
+
+      // Views and ViewModels
+      services.AddScoped<LoginViewModel>();
+      services.AddScoped<ImportViewModel>();
+      services.AddScoped<QueryViewModel>();
+      services.AddScoped<SettingsViewModel>();
+      services.AddScoped<ShellViewModel>();
+
+      // Configuration
+      services.Configure<LocalSettingsOptions>(configuration.GetSection(nameof(LocalSettingsOptions)));
+
+      ServiceScope = services.BuildServiceProvider().CreateScope();
+
+      UnhandledException += App_UnhandledException;
+
+      ServiceScope.ServiceProvider.GetService<IMessenger>()!.Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
     }
-    return service;
-  }
 
-  public App()
-  {
-    InitializeComponent();
+    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+      // TODO: Log and handle exceptions as appropriate.
+      // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+    }
 
-    var configuration = new ConfigurationBuilder()
-      .SetBasePath(AppContext.BaseDirectory)
-      .AddJsonFile("appsettings.json")
-      .Build();
+    private void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
+    {
+      ReplaceServiceScope();
+    }
 
-    var services = new ServiceCollection();
+    private void ReplaceServiceScope()
+    {
+      var newScope = ServiceScope.ServiceProvider.CreateScope();
+      ServiceScope?.Dispose();
+      ServiceScope = newScope;
+    }
 
-    // Default Activation Handler
-    services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+      base.OnLaunched(args);
 
-    // Other Activation Handlers
-
-    // Services
-    services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-    services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-    services.AddSingleton<INavigationViewService, NavigationViewService>();
-
-    services.AddSingleton<IActivationService, ActivationService>();
-    services.AddSingleton<IPageService, PageService>();
-    services.AddSingleton<INavigationService, NavigationService>();
-
-    // Core Services
-    services.AddSingleton<IFileService, FileService>();
-
-    // Views and ViewModels
-    services.AddScoped<ImportViewModel>();
-    //services.AddScoped<ImportPage>();
-    services.AddScoped<QueryViewModel>();
-    //services.AddScoped<QueryPage>();
-    services.AddScoped<SettingsViewModel>();
-    //services.AddTransient<SettingsPage>();
-    services.AddTransient<ShellViewModel>();
-    services.AddTransient<ShellPage>();
-
-    // Configuration
-    services.Configure<LocalSettingsOptions>(configuration.GetSection(nameof(LocalSettingsOptions)));
-
-    Services = services.BuildServiceProvider();
-
-    UnhandledException += App_UnhandledException;
-  }
-
-  private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
-  {
-    // TODO: Log and handle exceptions as appropriate.
-    // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
-  }
-
-  protected async override void OnLaunched(LaunchActivatedEventArgs args)
-  {
-    base.OnLaunched(args);
-
-    await App.GetService<IActivationService>().ActivateAsync(args);
+      await App.GetService<IActivationService>().ActivateAsync(args);
+    }
   }
 }

@@ -1,55 +1,71 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-
 using Microsoft.UI.Xaml.Controls;
-
 using ZoNo2.Contracts.Services;
-using ZoNo2.ViewModels;
-using ZoNo2.Views;
 
-namespace ZoNo2.Services;
-
-public class PageService : IPageService
+namespace ZoNo2.Services
 {
-  private readonly Dictionary<string, Type> _pages = new Dictionary<string, Type>();
-
-  public PageService()
+  public class PageService : IPageService, ITopLevelPageService
   {
-    Configure<ImportViewModel, ImportPage>();
-    Configure<QueryViewModel, QueryPage>();
-    Configure<SettingsViewModel, SettingsPage>();
-  }
-
-  public Type GetPageType(string key)
-  {
-    Type? pageType;
-    lock (_pages)
+    public class Builder
     {
-      if (!_pages.TryGetValue(key, out pageType))
+      private readonly PageService _pageService;
+
+      public Builder()
       {
-        throw new ArgumentException($"Page not found: {key}. Did you forget to call PageService.Configure?");
+        _pageService = new PageService();
+      }
+
+      public Builder Configure<VM, V>() where VM : ObservableObject where V : Page
+      {
+        _pageService.Configure<VM, V>();
+        return this;
+      }
+
+      public PageService Build()
+      {
+        return _pageService;
       }
     }
 
-    return pageType;
-  }
+    private readonly Dictionary<string, Type> _pages = new Dictionary<string, Type>();
 
-  private void Configure<VM, V>() where VM : ObservableObject where V : Page
-  {
-    lock (_pages)
+    private PageService()
     {
-      var key = typeof(VM).FullName!;
-      if (_pages.ContainsKey(key))
+
+    }
+
+    public Type GetPageType(string key)
+    {
+      Type? pageType;
+      lock (_pages)
       {
-        throw new ArgumentException($"The key {key} is already configured in PageService");
+        if (!_pages.TryGetValue(key, out pageType))
+        {
+          throw new ArgumentException($"Page not found: {key}. Did you forget to call PageService.Configure?");
+        }
       }
 
-      var type = typeof(V);
-      if (_pages.Any(p => p.Value == type))
-      {
-        throw new ArgumentException($"This type is already configured with key {_pages.First(p => p.Value == type).Key}");
-      }
+      return pageType;
+    }
 
-      _pages.Add(key, type);
+    private void Configure<VM, V>() where VM : ObservableObject where V : Page
+    {
+      lock (_pages)
+      {
+        var key = typeof(VM).FullName!;
+        if (_pages.ContainsKey(key))
+        {
+          throw new ArgumentException($"The key {key} is already configured in PageService");
+        }
+
+        var type = typeof(V);
+        if (_pages.Any(p => p.Value == type))
+        {
+          throw new ArgumentException($"This type is already configured with key {_pages.First(p => p.Value == type).Key}");
+        }
+
+        _pages.Add(key, type);
+      }
     }
   }
 }

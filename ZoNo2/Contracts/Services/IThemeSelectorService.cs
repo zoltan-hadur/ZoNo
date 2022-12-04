@@ -1,11 +1,12 @@
 ﻿using Microsoft.UI.Xaml;
 
-namespace ZoNo2.Contracts.Services;
-
-public interface IThemeSelectorService
+namespace ZoNo2.Contracts.Services
 {
-  ElementTheme Theme { get; }
-  Task InitializeAsync();
-  Task SetThemeAsync(ElementTheme theme);
-  Task SetRequestedThemeAsync();
+  public interface IThemeSelectorService
+  {
+    ElementTheme Theme { get; }
+    Task InitializeAsync();
+    Task SetThemeAsync(ElementTheme theme);
+    Task SetRequestedThemeAsync();
+  }
 }

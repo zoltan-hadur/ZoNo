@@ -1,54 +1,44 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-
 using Microsoft.UI.Xaml.Navigation;
-
 using ZoNo2.Contracts.Services;
 using ZoNo2.Views;
 
-namespace ZoNo2.ViewModels;
-
-public class ShellViewModel : ObservableRecipient
+namespace ZoNo2.ViewModels
 {
-  private bool _isBackEnabled;
-  private object? _selected;
-
-  public INavigationService NavigationService { get; }
-
-  public INavigationViewService NavigationViewService { get; }
-
-  public bool IsBackEnabled
+  public class ShellViewModel : ObservableRecipient
   {
-    get => _isBackEnabled;
-    set => SetProperty(ref _isBackEnabled, value);
-  }
+    private object? _selected;
 
-  public object? Selected
-  {
-    get => _selected;
-    set => SetProperty(ref _selected, value);
-  }
+    public INavigationService NavigationService { get; }
 
-  public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
-  {
-    NavigationService = navigationService;
-    NavigationService.Navigated += OnNavigated;
-    NavigationViewService = navigationViewService;
-  }
+    public INavigationViewService NavigationViewService { get; }
 
-  private void OnNavigated(object sender, NavigationEventArgs e)
-  {
-    IsBackEnabled = NavigationService.CanGoBack;
-
-    if (e.SourcePageType == typeof(SettingsPage))
+    public object? Selected
     {
-      Selected = NavigationViewService.SettingsItem;
-      return;
+      get => _selected;
+      set => SetProperty(ref _selected, value);
     }
 
-    var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
-    if (selectedItem != null)
+    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
     {
-      Selected = selectedItem;
+      NavigationService = navigationService;
+      NavigationService.Navigated += OnNavigated;
+      NavigationViewService = navigationViewService;
+    }
+
+    private void OnNavigated(object sender, NavigationEventArgs e)
+    {
+      if (e.SourcePageType == typeof(SettingsPage))
+      {
+        Selected = NavigationViewService.SettingsItem;
+        return;
+      }
+
+      var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
+      if (selectedItem != null)
+      {
+        Selected = selectedItem;
+      }
     }
   }
 }

@@ -1,7 +1,8 @@
-﻿namespace ZoNo2.Contracts.Services;
-
-public interface ILocalSettingsService
+﻿namespace ZoNo2.Contracts.Services
 {
-  Task<T?> ReadSettingAsync<T>(string key);
-  Task SaveSettingAsync<T>(string key, T value);
+  public interface ILocalSettingsService
+  {
+    Task<T?> ReadSettingAsync<T>(string key);
+    Task SaveSettingAsync<T>(string key, T value);
+  }
 }

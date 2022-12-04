@@ -1,7 +1,8 @@
-﻿namespace ZoNo2.Models;
-
-public class LocalSettingsOptions
+﻿namespace ZoNo2.Models
 {
-  public string? ApplicationDataFolder { get; set; }
-  public string? LocalSettingsFile { get; set; }
+  public class LocalSettingsOptions
+  {
+    public string? ApplicationDataFolder { get; set; }
+    public string? LocalSettingsFile { get; set; }
+  }
 }

@@ -1,62 +1,62 @@
 ﻿using Microsoft.UI.Xaml;
-
 using ZoNo2.Contracts.Services;
 using ZoNo2.Helpers;
 
-namespace ZoNo2.Services;
-
-public class ThemeSelectorService : IThemeSelectorService
+namespace ZoNo2.Services
 {
-  private const string SettingsKey = "AppBackgroundRequestedTheme";
-  private readonly ILocalSettingsService _localSettingsService;
-
-  public ElementTheme Theme { get; set; } = ElementTheme.Default;
-
-  public ThemeSelectorService(ILocalSettingsService localSettingsService)
+  public class ThemeSelectorService : IThemeSelectorService
   {
-    _localSettingsService = localSettingsService;
-  }
+    private const string SettingsKey = "AppBackgroundRequestedTheme";
+    private readonly ILocalSettingsService _localSettingsService;
 
-  public async Task InitializeAsync()
-  {
-    Theme = await LoadThemeFromSettingsAsync();
-    await Task.CompletedTask;
-  }
+    public ElementTheme Theme { get; set; } = ElementTheme.Default;
 
-  public async Task SetThemeAsync(ElementTheme theme)
-  {
-    Theme = theme;
-
-    await SetRequestedThemeAsync();
-    await SaveThemeInSettingsAsync(Theme);
-  }
-
-  public async Task SetRequestedThemeAsync()
-  {
-    if (App.MainWindow.Content is FrameworkElement rootElement)
+    public ThemeSelectorService(ILocalSettingsService localSettingsService)
     {
-      rootElement.RequestedTheme = Theme;
-
-      TitleBarHelper.UpdateTitleBar(Theme);
+      _localSettingsService = localSettingsService;
     }
 
-    await Task.CompletedTask;
-  }
-
-  private async Task<ElementTheme> LoadThemeFromSettingsAsync()
-  {
-    var themeName = await _localSettingsService.ReadSettingAsync<string>(SettingsKey);
-
-    if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
+    public async Task InitializeAsync()
     {
-      return cacheTheme;
+      Theme = await LoadThemeFromSettingsAsync();
+      await Task.CompletedTask;
     }
 
-    return ElementTheme.Default;
-  }
+    public async Task SetThemeAsync(ElementTheme theme)
+    {
+      Theme = theme;
 
-  private async Task SaveThemeInSettingsAsync(ElementTheme theme)
-  {
-    await _localSettingsService.SaveSettingAsync(SettingsKey, theme.ToString());
+      await SetRequestedThemeAsync();
+      await SaveThemeInSettingsAsync(Theme);
+    }
+
+    public async Task SetRequestedThemeAsync()
+    {
+      if (App.MainWindow.Content is FrameworkElement rootElement)
+      {
+        rootElement.RequestedTheme = Theme;
+
+        //TitleBarHelper.UpdateTitleBar(Theme);
+      }
+
+      await Task.CompletedTask;
+    }
+
+    private async Task<ElementTheme> LoadThemeFromSettingsAsync()
+    {
+      var themeName = await _localSettingsService.ReadSettingAsync<string>(SettingsKey);
+
+      if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
+      {
+        return cacheTheme;
+      }
+
+      return ElementTheme.Default;
+    }
+
+    private async Task SaveThemeInSettingsAsync(ElementTheme theme)
+    {
+      await _localSettingsService.SaveSettingAsync(SettingsKey, theme.ToString());
+    }
   }
 }

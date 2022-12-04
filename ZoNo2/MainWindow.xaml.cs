@@ -1,15 +1,15 @@
 ﻿using ZoNo2.Helpers;
 
-namespace ZoNo2;
-
-public sealed partial class MainWindow : WindowEx
+namespace ZoNo2
 {
-  public MainWindow()
+  public sealed partial class MainWindow : WindowEx
   {
-    InitializeComponent();
+    public MainWindow()
+    {
+      InitializeComponent();
 
-    AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
-    Content = null;
-    Title = "AppDisplayName".GetLocalized();
+      AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
+      Title = "AppDisplayName".GetLocalized();
+    }
   }
 }

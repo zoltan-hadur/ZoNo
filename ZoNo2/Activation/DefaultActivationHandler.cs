@@ -1,29 +1,33 @@
 ﻿using Microsoft.UI.Xaml;
-
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using ZoNo2.Contracts.Services;
 using ZoNo2.ViewModels;
 
-namespace ZoNo2.Activation;
-
-public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
+namespace ZoNo2.Activation
 {
-  private readonly INavigationService _navigationService;
-
-  public DefaultActivationHandler(INavigationService navigationService)
+  public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
   {
-    _navigationService = navigationService;
-  }
+    private readonly ITopLevelNavigationService _topLevelNavigationService;
 
-  protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
-  {
-    // None of the ActivationHandlers has handled the activation.
-    return _navigationService.Frame?.Content == null;
-  }
+    // TODO: inject settings to determine if user is already logged
+    public DefaultActivationHandler(ITopLevelNavigationService topLevelNavigationService)
+    {
+      _topLevelNavigationService = topLevelNavigationService;
+    }
 
-  protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
-  {
-    _navigationService.NavigateTo(typeof(ImportViewModel).FullName!, args.Arguments);
+    protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
+    {
+      // None of the ActivationHandlers has handled the activation.
+      return (App.MainWindow.Content as Frame)!.Content == null;
+    }
 
-    await Task.CompletedTask;
+    protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
+    {
+      // TODO: navigate to ShellPage when logged in, otherwise navigate to LoginPage
+      _topLevelNavigationService.NavigateTo(typeof(LoginViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+
+      await Task.CompletedTask;
+    }
   }
 }

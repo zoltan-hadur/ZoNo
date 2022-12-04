@@ -156,4 +156,10 @@
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://YourPrivacyUrlGoesHere/</value>
   </data>
+  <data name="Login_Login.Content" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Settings_Logout.Content" xml:space="preserve">
+    <value>Logout</value>
+  </data>
 </root>

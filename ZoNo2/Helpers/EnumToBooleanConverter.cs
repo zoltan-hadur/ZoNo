@@ -1,34 +1,35 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace ZoNo2.Helpers;
-
-public class EnumToBooleanConverter : IValueConverter
+namespace ZoNo2.Helpers
 {
-  public object Convert(object value, Type targetType, object parameter, string language)
+  public class EnumToBooleanConverter : IValueConverter
   {
-    if (parameter is string enumString)
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-      if (!Enum.IsDefined(typeof(ElementTheme), value))
+      if (parameter is string enumString)
       {
-        throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
+        if (!Enum.IsDefined(typeof(ElementTheme), value))
+        {
+          throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
+        }
+
+        var enumValue = Enum.Parse(typeof(ElementTheme), enumString);
+
+        return enumValue.Equals(value);
       }
 
-      var enumValue = Enum.Parse(typeof(ElementTheme), enumString);
-
-      return enumValue.Equals(value);
+      throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
     }
 
-    throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
-  }
-
-  public object ConvertBack(object value, Type targetType, object parameter, string language)
-  {
-    if (parameter is string enumString)
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-      return Enum.Parse(typeof(ElementTheme), enumString);
-    }
+      if (parameter is string enumString)
+      {
+        return Enum.Parse(typeof(ElementTheme), enumString);
+      }
 
-    throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
+      throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
+    }
   }
 }

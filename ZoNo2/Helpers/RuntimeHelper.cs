@@ -1,20 +1,21 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ZoNo2.Helpers;
-
-public class RuntimeHelper
+namespace ZoNo2.Helpers
 {
-  [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-  private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
-
-  public static bool IsMSIX
+  public class RuntimeHelper
   {
-    get
-    {
-      var length = 0;
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
 
-      return GetCurrentPackageFullName(ref length, null) != 15700L;
+    public static bool IsMSIX
+    {
+      get
+      {
+        var length = 0;
+
+        return GetCurrentPackageFullName(ref length, null) != 15700L;
+      }
     }
   }
 }

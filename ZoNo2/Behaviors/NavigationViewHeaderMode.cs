@@ -1,8 +1,9 @@
-﻿namespace ZoNo2.Behaviors;
-
-public enum NavigationViewHeaderMode
+﻿namespace ZoNo2.Behaviors
 {
-  Always,
-  Never,
-  Minimal
+  public enum NavigationViewHeaderMode
+  {
+    Always,
+    Never,
+    Minimal
+  }
 }

@@ -1,6 +1,7 @@
-﻿namespace ZoNo2.Contracts.Services;
-
-public interface IActivationService
+﻿namespace ZoNo2.Contracts.Services
 {
-  Task ActivateAsync(object activationArgs);
+  public interface IActivationService
+  {
+    Task ActivateAsync(object activationArgs);
+  }
 }

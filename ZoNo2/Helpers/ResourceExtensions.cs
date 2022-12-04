@@ -1,13 +1,14 @@
 ﻿using Microsoft.Windows.ApplicationModel.Resources;
 
-namespace ZoNo2.Helpers;
-
-public static class ResourceExtensions
+namespace ZoNo2.Helpers
 {
-  private static readonly ResourceLoader _resourceLoader = new ResourceLoader();
-
-  public static string GetLocalized(this string resourceKey)
+  public static class ResourceExtensions
   {
-    return _resourceLoader.GetString(resourceKey);
+    private static readonly ResourceLoader _resourceLoader = new ResourceLoader();
+
+    public static string GetLocalized(this string resourceKey)
+    {
+      return _resourceLoader.GetString(resourceKey);
+    }
   }
 }
