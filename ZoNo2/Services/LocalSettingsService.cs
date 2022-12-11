@@ -82,5 +82,20 @@ namespace ZoNo2.Services
         await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
       }
     }
+
+    public async Task<bool> RemoveSettingAsync(string key)
+    {
+      if (RuntimeHelper.IsMSIX)
+      {
+        return ApplicationData.Current.LocalSettings.Values.Remove(key);
+      }
+      else
+      {
+        await InitializeAsync();
+        var result = _settings.Remove(key);
+        await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
+        return result;
+      }
+    }
   }
 }

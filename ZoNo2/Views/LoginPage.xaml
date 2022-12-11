@@ -4,13 +4,53 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  mc:Ignorable="d">
+  xmlns:helpers="using:ZoNo2.Helpers"
+  mc:Ignorable="d"
+  Loading="Page_Loading">
+  <Page.Resources>
+    <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+  </Page.Resources>
   <Grid x:Name="ContentArea">
-    <StackPanel>
-      <TextBlock Text="{x:Bind ViewModel.Id}"/>
-      <Button
-        x:Uid="Login_Login"
-        Command="{x:Bind ViewModel.LoginCommand}"/>
-    </StackPanel>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <InfoBar
+      x:Uid="Login_InfoBar"
+      Grid.Row="0"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Bottom"
+      Width="350"
+      Severity="Error"
+      IsOpen="{x:Bind ViewModel.IsWrongCredentials, Mode=OneWay}"/>
+    <ContentControl
+      Grid.Row="1"
+      IsEnabled="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+      <StackPanel Width="200">
+        <TextBox
+          x:Uid="Login_Email"
+          Margin="0,0,0,15"
+          Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
+        <PasswordBox
+          x:Uid="Login_Password"
+          Margin="0,0,0,15"
+          Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
+        <CheckBox
+          x:Uid="Login_RememberMe"
+          IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
+        <Button
+          x:Uid="Login_Login"
+          HorizontalAlignment="Stretch"
+          Command="{x:Bind ViewModel.LoginCommand}"/>
+      </StackPanel>
+    </ContentControl>
+    <ProgressRing
+      Grid.Row="1"
+      Width="100"
+      Height="100"
+      IsActive="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}"/>
   </Grid>
 </Page>

@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using ZoNo2.ViewModels;
 
 namespace ZoNo2.Views
@@ -11,6 +12,11 @@ namespace ZoNo2.Views
     {
       ViewModel = App.GetService<LoginViewModel>();
       InitializeComponent();
+    }
+
+    private async void Page_Loading(FrameworkElement sender, object args)
+    {
+      await ViewModel.Load();
     }
   }
 }

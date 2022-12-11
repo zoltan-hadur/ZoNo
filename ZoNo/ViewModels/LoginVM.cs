@@ -23,7 +23,7 @@ namespace ZoNo.ViewModels
 
     public LoginVM(ISettings settings, IMessenger messenger) : base(messenger)
     {
-      _authorization = new Authorization(consumerKey   : Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"   ),
+      _authorization = new Authorization(consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
                                          consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret"));
 
       _settings = settings;
@@ -46,7 +46,7 @@ namespace ZoNo.ViewModels
     {
       if (User == null)
       {
-        using (var webView = new WebView2() { Source = new Uri(_authorization.LoginURL) })
+        using (var webView = new WebView2() { Source = new Uri(_authorization.AuthorizationURL) })
         {
           var window = new Window()
           {
@@ -59,7 +59,7 @@ namespace ZoNo.ViewModels
             Content = webView
           };
 
-          webView.NavigationStarting += (s, e) =>
+          webView.NavigationStarting += async (s, e) =>
           {
             if (_authorization.IsAccessDenied(e.Uri))
             {
@@ -67,7 +67,7 @@ namespace ZoNo.ViewModels
             }
             else if (_authorization.IsAccessGranted(e.Uri, out var wAuthorizationCode))
             {
-              var token = _authorization.GetToken(wAuthorizationCode);
+              var token = await _authorization.GetTokenAsync(wAuthorizationCode);
               using (var client = new Client(token))
               {
                 var user = client.GetCurrentUser();

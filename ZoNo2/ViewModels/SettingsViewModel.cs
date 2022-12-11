@@ -2,19 +2,16 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media.Animation;
 using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel;
 using ZoNo2.Contracts.Services;
 using ZoNo2.Helpers;
-using ZoNo2.Messages;
 
 namespace ZoNo2.ViewModels
 {
   public partial class SettingsViewModel : ObservableRecipient
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService;
     private readonly IThemeSelectorService _themeSelectorService;
     private ElementTheme _elementTheme;
     private string _versionDescription;
@@ -33,9 +30,8 @@ namespace ZoNo2.ViewModels
 
     public ICommand SwitchThemeCommand { get; }
 
-    public SettingsViewModel(ITopLevelNavigationService topLevelNavigationService, IThemeSelectorService themeSelectorService, IMessenger messenger) : base(messenger)
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, IMessenger messenger) : base(messenger)
     {
-      _topLevelNavigationService = topLevelNavigationService;
       _themeSelectorService = themeSelectorService;
       _elementTheme = _themeSelectorService.Theme;
       _versionDescription = GetVersionDescription();
@@ -65,13 +61,6 @@ namespace ZoNo2.ViewModels
       }
 
       return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-    }
-
-    [RelayCommand]
-    private void Logout()
-    {
-      Messenger.Send(new UserLoggedOutMessage());
-      _topLevelNavigationService.NavigateTo(typeof(LoginViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
     }
   }
 }

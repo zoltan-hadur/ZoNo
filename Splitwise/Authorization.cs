@@ -5,6 +5,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Splitwise
 {
@@ -22,9 +23,14 @@ namespace Splitwise
     private readonly string _state;
 
     /// <summary>
-    /// URL that will be used to logon the user and authorize.
+    /// URL that will be used to login.
     /// </summary>
-    public string LoginURL => $"{_baseURL}/{_authorizeResource}?response_type=code&client_id={_consumerKey}&state={_state}";
+    public string LoginURL => $"{_baseURL}/login";
+
+    /// <summary>
+    /// URL that will be used to authorize the user.
+    /// </summary>
+    public string AuthorizationURL => $"{_baseURL}/{_authorizeResource}?response_type=code&client_id={_consumerKey}&state={_state}";
 
     /// <summary>
     /// Creates an object of type <see cref="Authorization"/> which can be used to authorize the user and get a <see cref="Token"/>.
@@ -73,12 +79,17 @@ namespace Splitwise
       return url == $"{_baseURL}/?error=access_denied&state={_state}";
     }
 
+    public bool IsWrongCredentials(string url)
+    {
+      return url == $"{_baseURL}/authentication";
+    }
+
     /// <summary>
     /// Requests token from Splitwise with the given authorization code.
     /// </summary>
     /// <param name="authorizationCode">Authorization code from Splitwise.</param>
     /// <returns>The bearer token.</returns>
-    public Token GetToken(string authorizationCode)
+    public async Task<Token> GetTokenAsync(string authorizationCode)
     {
       using (var client = new RestClient(_baseURL)
         .UseSystemTextJson(new JsonSerializerOptions()
@@ -93,7 +104,7 @@ namespace Splitwise
           .AddParameter("grant_type", "authorization_code")
           .AddParameter("code", authorizationCode)
           .AddParameter("redirect_uri", string.Empty);
-        return client.Post<Token>(request);
+        return await client.PostAsync<Token>(request);
       }
     }
   }

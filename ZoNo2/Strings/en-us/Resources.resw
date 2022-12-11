@@ -159,7 +159,25 @@
   <data name="Login_Login.Content" xml:space="preserve">
     <value>Login</value>
   </data>
-  <data name="Settings_Logout.Content" xml:space="preserve">
+  <data name="Account_Logout.Content" xml:space="preserve">
     <value>Logout</value>
+  </data>
+  <data name="Login_InfoBar.Message" xml:space="preserve">
+    <value>Incorrect e-mail or password!</value>
+  </data>
+  <data name="Login_InfoBar.Title" xml:space="preserve">
+    <value>Wrong Credentials</value>
+  </data>
+  <data name="Login_Password.Header" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Login_Email.Header" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="Shell_Account.Content" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Login_RememberMe.Content" xml:space="preserve">
+    <value>Remember me!</value>
   </data>
 </root>

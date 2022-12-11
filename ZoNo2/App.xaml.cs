@@ -65,6 +65,7 @@ namespace ZoNo2
         return new PageService.Builder()
           .Configure<ImportViewModel, ImportPage>()
           .Configure<QueryViewModel, QueryPage>()
+          .Configure<AccountViewModel, AccountPage>()
           .Configure<SettingsViewModel, SettingsPage>()
           .Build();
       });
@@ -84,6 +85,7 @@ namespace ZoNo2
       services.AddScoped<LoginViewModel>();
       services.AddScoped<ImportViewModel>();
       services.AddScoped<QueryViewModel>();
+      services.AddScoped<AccountViewModel>();
       services.AddScoped<SettingsViewModel>();
       services.AddScoped<ShellViewModel>();
 

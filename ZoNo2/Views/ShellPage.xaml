@@ -40,23 +40,22 @@
       <NavigationView.MenuItems>
         <NavigationViewItem
           x:Uid="Shell_Import"
+          Icon="Import"
           helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.ImportViewModel">
-          <NavigationViewItem.Icon>
-            <FontIcon
-              FontFamily="{StaticResource SymbolThemeFontFamily}"
-              Glyph="&#xEA52;"/>
-          </NavigationViewItem.Icon>
         </NavigationViewItem>
         <NavigationViewItem
           x:Uid="Shell_Query"
+          Icon="Filter"
           helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.QueryViewModel">
-          <NavigationViewItem.Icon>
-            <FontIcon
-              FontFamily="{StaticResource SymbolThemeFontFamily}"
-              Glyph="&#xE896;"/>
-          </NavigationViewItem.Icon>
         </NavigationViewItem>
       </NavigationView.MenuItems>
+      <NavigationView.FooterMenuItems>
+        <NavigationViewItem
+          x:Uid="Shell_Account"
+          Icon="Contact"
+          helpers:NavigationHelper.NavigateTo="ZoNo2.ViewModels.AccountViewModel">
+        </NavigationViewItem>
+      </NavigationView.FooterMenuItems>
       <!--<NavigationView.HeaderTemplate>
         <DataTemplate>
           <Grid>
