@@ -70,7 +70,7 @@ namespace ZoNo.ViewModels
               var token = await _authorization.GetTokenAsync(wAuthorizationCode);
               using (var client = new Client(token))
               {
-                var user = client.GetCurrentUser();
+                var user = await client.GetCurrentUserAsync();
                 User = new User(token, user.FirstName, user.Picture.Large);
                 _settings.Set(nameof(User), User);
               }

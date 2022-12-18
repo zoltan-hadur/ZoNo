@@ -12,6 +12,7 @@ namespace ZoNo2.Views
     {
       ViewModel = App.GetService<LoginViewModel>();
       InitializeComponent();
+      ViewModel.WebView = WebView;
     }
 
     private async void Page_Loading(FrameworkElement sender, object args)

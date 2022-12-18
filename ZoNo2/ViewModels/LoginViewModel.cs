@@ -2,9 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using Newtonsoft.Json.Linq;
 using Splitwise;
 using Splitwise.Models;
 using System.ComponentModel;
+using System.Drawing;
 using ZoNo2.Contracts.Services;
 
 namespace ZoNo2.ViewModels
@@ -29,6 +31,12 @@ namespace ZoNo2.ViewModels
     [ObservableProperty]
     private bool _isWrongCredentials = false;
 
+    [ObservableProperty]
+    private WebView2? _webView;
+
+    [ObservableProperty]
+    private double _captchaOpacity = 0.0;
+
     private bool _isLoading = false;
 
     private Token? _token;
@@ -46,7 +54,7 @@ namespace ZoNo2.ViewModels
       _isLoading = true;
 
       IsRememberMe = await _localSettingsService.ReadSettingAsync<bool>("Login_RememberMe");
-      _token = await _localSettingsService.ReadSettingAsync<Token>("Token");
+      _token = await _localSettingsService.ReadProtectedSettingAsync<Token>("Protected_Token");
       if (IsRememberMe && _token != null)
       {
         Email = await _localSettingsService.ReadSettingAsync<string>("Login_Email") ?? string.Empty;
@@ -77,7 +85,7 @@ namespace ZoNo2.ViewModels
         case nameof(Password):
         case nameof(IsRememberMe):
           _token = null;
-          await _localSettingsService.RemoveSettingAsync("Token");
+          await _localSettingsService.RemoveSettingAsync("Protected_Token");
           break;
       }
     }
@@ -98,40 +106,58 @@ namespace ZoNo2.ViewModels
 
       var uris = new Dictionary<ulong, string>();
 
-      var webView = new WebView2();
-      await webView.EnsureCoreWebView2Async();
-      webView.CoreWebView2.CookieManager.DeleteAllCookies();
-      webView.Source = new Uri(authorization.AuthorizationURL);
+      await WebView!.EnsureCoreWebView2Async();
+      WebView.CoreWebView2.CookieManager.DeleteAllCookies();
+      WebView.Source = new Uri(authorization.AuthorizationURL);
 
-      //var window = new WindowEx()
-      //{
-      //  Title = "Splitwise Login",
-      //  Width = 600,
-      //  Height = 670,
-      //  Content = webView
-      //};
-
-      webView.NavigationStarting += (s, e) =>
+      WebView.NavigationStarting += (s, e) =>
       {
         uris[e.NavigationId] = e.Uri;
       };
 
-      webView.NavigationCompleted += async (s, e) =>
+      WebView.NavigationCompleted += async (s, e) =>
       {
         var uri = uris[e.NavigationId];
 
         // Fill login details then click on log in button
         if (uri == authorization.LoginURL)
         {
-          await webView.ExecuteScriptAsync($"document.querySelector('#credentials_identity').value = '{Email}'");
-          await webView.ExecuteScriptAsync($"document.querySelector('#credentials_password').value = '{Password}'");
-          await webView.ExecuteScriptAsync($"document.querySelector('input[type=\\'submit\\']').click()");
+          await WebView.ExecuteScriptAsync($"document.querySelector('#credentials_identity').value = '{Email}'");
+          await WebView.ExecuteScriptAsync($"document.querySelector('#credentials_password').value = '{Password}'");
+
+          var isCaptchaExists = Convert.ToBoolean(await WebView.ExecuteScriptAsync("document.querySelector('iframe[title=\\'reCAPTCHA\\']') != null"));
+          if (isCaptchaExists)
+          {
+            // Hide scrollbars
+            await WebView.ExecuteScriptAsync("document.querySelector('body').style.overflow='hidden'");
+            // Display only the captcha
+            await WebView.ExecuteScriptAsync("document.querySelector('iframe[title=\\'reCAPTCHA\\']').scrollIntoView()");
+
+            CaptchaOpacity = 1.0;
+            var solved = false;
+            while (!solved)
+            {
+              await Task.Delay(300);
+              var json = await WebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Page.captureScreenshot", "{}");
+              var dataStr = JObject.Parse(json)["data"].Value<string>();
+              byte[] data = Convert.FromBase64String(dataStr);
+              using var ms = new MemoryStream(data);
+              using var bm = new Bitmap(ms);
+              var color = bm.GetPixel(27, 43);
+              // Green checkmark
+              solved = color == Color.FromArgb(255, 0, 158, 85);
+            }
+            CaptchaOpacity = 0.0;
+          }
+
+          // Click on login button
+          await WebView.ExecuteScriptAsync("document.querySelector('input[type=\\'submit\\']').click()");
         }
 
         // Click on authorize button
         if (uri == authorization.AuthorizationURL)
         {
-          await webView.ExecuteScriptAsync($"document.querySelector('input[type=\\'submit\\']').click()");
+          await WebView.ExecuteScriptAsync($"document.querySelector('input[type=\\'submit\\']').click()");
         }
 
         if (authorization.IsAccessDenied(uri) || authorization.IsWrongCredentials(uri))
@@ -143,8 +169,10 @@ namespace ZoNo2.ViewModels
         if (authorization.IsAccessGranted(uri, out var wAuthorizationCode))
         {
           _token = await authorization.GetTokenAsync(wAuthorizationCode);
-          await _localSettingsService.SaveSettingAsync("Token", _token);
+          await _localSettingsService.SaveProtectedSettingAsync("Protected_Token", _token);
           _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+
+
           //using (var client = new Client(token))
           //{
           //  //var user = client.GetCurrentUser();
@@ -155,8 +183,6 @@ namespace ZoNo2.ViewModels
           //window.Close();
         }
       };
-
-      //window.Show();
     }
   }
 }

@@ -52,5 +52,12 @@
       Width="100"
       Height="100"
       IsActive="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}"/>
+    <WebView2
+      x:Name="WebView"
+      Grid.Row="2"
+      VerticalAlignment="Top"
+      Width="304"
+      Height="78"
+      Opacity="{x:Bind ViewModel.CaptchaOpacity, Mode=OneWay}"/>
   </Grid>
 </Page>

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
+using System.Text;
 using Windows.Storage;
 using ZoNo2.Contracts.Services;
 using ZoNo2.Helpers;
@@ -8,6 +10,7 @@ namespace ZoNo2.Services
 {
   public class LocalSettingsService : ILocalSettingsService
   {
+    private const string _entropy = "Nora is the love of my life";
     private const string _defaultApplicationDataFolder = "ZoNo2/ApplicationData";
     private const string _defaultLocalSettingsFile = "LocalSettings.json";
 
@@ -43,13 +46,13 @@ namespace ZoNo2.Services
       }
     }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
+    private async Task<string?> ReadStringifiedSettingAsync(string key)
     {
       if (RuntimeHelper.IsMSIX)
       {
         if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
         {
-          return await Json.ToObjectAsync<T>((string)obj);
+          return (string)obj;
         }
       }
       else
@@ -58,8 +61,76 @@ namespace ZoNo2.Services
 
         if (_settings != null && _settings.TryGetValue(key, out var obj))
         {
-          return await Json.ToObjectAsync<T>((string)obj);
+          return (string)obj;
         }
+      }
+
+      return null;
+    }
+
+    public async Task SaveStringifiedSettingAsync(string key, string value)
+    {
+      ArgumentNullException.ThrowIfNull(value);
+
+      if (RuntimeHelper.IsMSIX)
+      {
+        ApplicationData.Current.LocalSettings.Values[key] = value;
+      }
+      else
+      {
+        await InitializeAsync();
+
+        _settings[key] = value;
+
+        await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
+      }
+    }
+
+    /// <summary>
+    /// Encrypts a string by using the <see cref="ProtectedData"/> class.
+    /// </summary>
+    /// <param name="stringToEncrypt">String to encrypt.</param>
+    /// <returns>Encrypted string.</returns>
+    private static string Protect(string stringToEncrypt)
+    {
+      return Convert.ToBase64String(
+        ProtectedData.Protect(
+          Encoding.UTF8.GetBytes(stringToEncrypt),
+          Encoding.UTF8.GetBytes(_entropy),
+          DataProtectionScope.CurrentUser));
+    }
+
+    /// <summary>
+    /// Decrypts a string by using the <see cref="ProtectedData"/> class.
+    /// </summary>
+    /// <param name="encryptedString">String to decrypt.</param>
+    /// <returns>Decrypted string.</returns>
+    private static string Unprotect(string encryptedString)
+    {
+      return Encoding.UTF8.GetString(
+        ProtectedData.Unprotect(
+          Convert.FromBase64String(encryptedString),
+          Encoding.UTF8.GetBytes(_entropy),
+          DataProtectionScope.CurrentUser));
+    }
+
+    public async Task<T?> ReadSettingAsync<T>(string key)
+    {
+      var setting = await ReadStringifiedSettingAsync(key);
+      if (setting != null)
+      {
+        return await Json.ToObjectAsync<T>(setting);
+      }
+
+      return default;
+    }
+
+    public async Task<T?> ReadProtectedSettingAsync<T>(string key)
+    {
+      var setting = await ReadStringifiedSettingAsync(key);
+      if (setting != null)
+      {
+        return await Json.ToObjectAsync<T>(Unprotect(setting));
       }
 
       return default;
@@ -69,18 +140,16 @@ namespace ZoNo2.Services
     {
       ArgumentNullException.ThrowIfNull(value);
 
-      if (RuntimeHelper.IsMSIX)
-      {
-        ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value);
-      }
-      else
-      {
-        await InitializeAsync();
+      var setting = await Json.StringifyAsync(value);
+      await SaveStringifiedSettingAsync(key, setting);
+    }
 
-        _settings[key] = await Json.StringifyAsync(value);
+    public async Task SaveProtectedSettingAsync<T>(string key, T value)
+    {
+      ArgumentNullException.ThrowIfNull(value);
 
-        await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
-      }
+      var setting = await Json.StringifyAsync(value);
+      await SaveStringifiedSettingAsync(key, Protect(setting));
     }
 
     public async Task<bool> RemoveSettingAsync(string key)

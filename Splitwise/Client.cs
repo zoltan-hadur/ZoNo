@@ -1,11 +1,12 @@
 ﻿using RestSharp;
+using RestSharp.Authenticators.OAuth2;
 using RestSharp.Serializers.Json;
 using Splitwise.Models;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using RestSharp.Authenticators.OAuth2;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Splitwise
 {
@@ -45,10 +46,11 @@ namespace Splitwise
     /// Gets the currently logged in user.
     /// </summary>
     /// <returns></returns>
-    public User GetCurrentUser()
+    public async Task<User> GetCurrentUserAsync()
     {
       var request = new RestRequest(_getCurrentUserResource);
-      return _client.Get<UserWrapper>(request).User;
+      var result = await _client.GetAsync<UserWrapper>(request);
+      return result.User;
     }
   }
 }
