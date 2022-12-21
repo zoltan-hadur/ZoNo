@@ -31,17 +31,21 @@
       VerticalAlignment="Center">
       <StackPanel Width="200">
         <TextBox
+          Name="Email"
           x:Uid="Login_Email"
           Margin="0,0,0,15"
+          KeyDown="TextBox_KeyDown"
           Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
         <PasswordBox
           x:Uid="Login_Password"
           Margin="0,0,0,15"
+          KeyDown="TextBox_KeyDown"
           Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
         <CheckBox
           x:Uid="Login_RememberMe"
           IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
         <Button
+          Name="Login"
           x:Uid="Login_Login"
           HorizontalAlignment="Stretch"
           Command="{x:Bind ViewModel.LoginCommand}"/>
