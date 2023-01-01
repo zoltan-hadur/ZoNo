@@ -28,7 +28,7 @@ namespace Splitwise
     public string LoginURL => $"{_baseURL}/login";
 
     /// <summary>
-    /// URL that will be used to authorize the user.
+    /// URL that will be used to authorize the logged in user.
     /// </summary>
     public string AuthorizationURL => $"{_baseURL}/{_authorizeResource}?response_type=code&client_id={_consumerKey}&state={_state}";
 
@@ -54,10 +54,10 @@ namespace Splitwise
     {
       if (url.StartsWith(_baseURL))
       {
-        var match = Regex.Match(url, "state=(?<state>[^&]*)");
+        var match = Regex.Match(url, "state=(?<state>[^&#]*)");
         if (match.Success && match.Groups["state"].Success && match.Groups["state"].Value == _state)
         {
-          match = Regex.Match(url, "code=(?<code>[^&]*)");
+          match = Regex.Match(url, "code=(?<code>[^&#]*)");
           if (match.Success && match.Groups["code"].Success)
           {
             authorizationCode = match.Groups["code"].Value;
