@@ -69,16 +69,6 @@ namespace Splitwise
       return false;
     }
 
-    /// <summary>
-    /// Checks if access was denied according to the redirected URL.
-    /// </summary>
-    /// <param name="url">The URL where the user gots redirected after successful authentication but did not give consent.</param>
-    /// <returns>True if the user clicked on the cancel button.</returns>
-    public bool IsAccessDenied(string url)
-    {
-      return url == $"{_baseURL}/?error=access_denied&state={_state}";
-    }
-
     public bool IsWrongCredentials(string url)
     {
       return url == $"{_baseURL}/authentication";

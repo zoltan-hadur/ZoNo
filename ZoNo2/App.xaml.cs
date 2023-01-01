@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Splitwise;
 using ZoNo2.Activation;
 using ZoNo2.Contracts.Services;
 using ZoNo2.Messages;
@@ -47,6 +48,7 @@ namespace ZoNo2
       // Other Activation Handlers
 
       // Services
+      services.AddSingleton(new Authorization(consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"), consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
