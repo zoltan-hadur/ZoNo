@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise", "Splitwise\Splitwise.csproj", "{663AE431-8731-4216-8452-D270667D9E45}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo2", "ZoNo2\ZoNo2.csproj", "{DB7F68B2-E044-48E5-8FE5-2622109707C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo", "ZoNo\ZoNo.csproj", "{DB7F68B2-E044-48E5-8FE5-2622109707C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
