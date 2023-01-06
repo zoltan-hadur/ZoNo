@@ -51,6 +51,7 @@ namespace ZoNo
       services.AddSingleton(new Authorization(consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"), consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+      services.AddSingleton<ITokenService, TokenService>();
       services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
       services.AddScoped<INavigationViewService, NavigationViewService>();
 
@@ -107,9 +108,10 @@ namespace ZoNo
       // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
     }
 
-    private void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
+    private async void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
     {
       ReplaceServiceScope();
+      await App.GetService<ITokenService>().SetTokenAsync(null);
     }
 
     private void ReplaceServiceScope()

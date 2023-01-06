@@ -24,7 +24,6 @@ namespace ZoNo.ViewModels
       Authorized
     }
 
-    private const string SettingToken = "Protected_Token";
     private const string SettingEmail = "Login_Email";
     private const string SettingRememberMe = "Login_RememberMe";
 
@@ -32,6 +31,7 @@ namespace ZoNo.ViewModels
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly Authorization _authorization;
+    private readonly ITokenService _tokenService;
 
     /// <summary>
     /// To determine the theme of the captcha.
@@ -44,7 +44,6 @@ namespace ZoNo.ViewModels
     private string CurrentURL => WebView!.Source.ToString();
 
     private bool _isLoading = false;
-    private Token? _token;
     private State _state = State.LoggingIn;
 
     [ObservableProperty]
@@ -71,12 +70,14 @@ namespace ZoNo.ViewModels
       ITopLevelNavigationService topLevelNavigationService,
       ILocalSettingsService localSettingsService,
       IThemeSelectorService themeSelectorService,
-      Authorization authorization)
+      Authorization authorization,
+      ITokenService tokenService)
     {
       _topLevelNavigationService = topLevelNavigationService;
       _localSettingsService = localSettingsService;
       _themeSelectorService = themeSelectorService;
       _authorization = authorization;
+      _tokenService = tokenService;
 
       PropertyChanged += LoginViewModel_PropertyChanged;
     }
@@ -86,8 +87,7 @@ namespace ZoNo.ViewModels
       _isLoading = true;
 
       IsRememberMe = await _localSettingsService.ReadSettingAsync<bool>(SettingRememberMe);
-      _token = await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken);
-      if (IsRememberMe && _token != null)
+      if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
       {
         Email = await _localSettingsService.ReadSettingAsync<string>(SettingEmail) ?? string.Empty;
         Password = "0123456789";
@@ -120,20 +120,19 @@ namespace ZoNo.ViewModels
         case nameof(Email):
         case nameof(Password):
         case nameof(IsRememberMe):
-          _token = null;
-          await _localSettingsService.RemoveSettingAsync(SettingToken);
+          await _tokenService.DeleteSavedTokenAsync();
           break;
       }
     }
 
     [RelayCommand]
-    private void Login()
+    private async void Login()
     {
       IsWrongCredentials = false;
 
-      if (IsRememberMe && _token != null)
+      if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
       {
-        _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, parameter: _token, infoOverride: new DrillInNavigationTransitionInfo());
+        _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
       }
       else
       {
@@ -301,9 +300,13 @@ namespace ZoNo.ViewModels
           {
             if (_authorization.IsAccessGranted(CurrentURL, out var wAuthorizationCode))
             {
-              _token = await _authorization.GetTokenAsync(wAuthorizationCode);
-              await _localSettingsService.SaveProtectedSettingAsync(SettingToken, _token);
-              _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, parameter: _token, infoOverride: new DrillInNavigationTransitionInfo());
+              var token = await _authorization.GetTokenAsync(wAuthorizationCode);
+              await _tokenService.SetTokenAsync(token);
+              if (IsRememberMe)
+              {
+                await _tokenService.SaveTokenAsync();
+              }
+              _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
             }
             else
             {

@@ -14,7 +14,7 @@ namespace ZoNo.ViewModels
   public partial class AccountViewModel : ObservableRecipient
   {
     private readonly ITopLevelNavigationService _topLevelNavigationService;
-    private readonly ILocalSettingsService _localSettingsService;
+    private readonly ITokenService _tokenService;
     private bool _isLoaded = false;
 
     [ObservableProperty]
@@ -38,10 +38,10 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private bool _isLoading = false;
 
-    public AccountViewModel(ITopLevelNavigationService topLevelNavigationService, ILocalSettingsService localSettingsService, IMessenger messenger) : base(messenger)
+    public AccountViewModel(ITopLevelNavigationService topLevelNavigationService, ITokenService tokenService, IMessenger messenger) : base(messenger)
     {
       _topLevelNavigationService = topLevelNavigationService;
-      _localSettingsService = localSettingsService;
+      _tokenService = tokenService;
     }
 
     public async Task Load()
@@ -49,7 +49,7 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
       IsLoading = true;
 
-      var token = await _localSettingsService.ReadProtectedSettingAsync<Token>("Protected_Token");
+      var token = await _tokenService.GetTokenAsync();
       using var client = new Client(token);
       var user = await client.GetCurrentUserAsync();
       ProfilePicture = user.Picture.Medium;
