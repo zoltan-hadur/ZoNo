@@ -74,54 +74,54 @@
           Sorting="DataGrid_Sorting">
           <ctWinUI:DataGrid.Columns>
             <ctWinUI:DataGridTextColumn
-              Header="TransactionTime"
+              x:Uid="Import_TransactionTime"
               Binding="{Binding TransactionTime}"
               Tag="{StaticResource TransactionTime}"/>
             <ctWinUI:DataGridTextColumn
-              Header="AccountingDate"
+              x:Uid="Import_AccountingDate"
               Visibility="Collapsed"
               Binding="{Binding AccountingDate}"
               Tag="{StaticResource AccountingDate}"/>
             <ctWinUI:DataGridTextColumn
-              Header="Type"
+              x:Uid="Import_Type"
               Visibility="Collapsed"
               Binding="{Binding Type}"
               Tag="{StaticResource Type}"/>
             <ctWinUI:DataGridTextColumn
-              Header="IncomeOutcome"
+              x:Uid="Import_IncomeOutcome"
               Visibility="Collapsed"
               Binding="{Binding IncomeOutcome}"
               Tag="{StaticResource IncomeOutcome}"/>
             <ctWinUI:DataGridTextColumn
-              Header="PartnerName"
+              x:Uid="Import_PartnerName"
               Binding="{Binding PartnerName}"
               Tag="{StaticResource PartnerName}"/>
             <ctWinUI:DataGridTextColumn
-              Header="PartnerAccountId"
+              x:Uid="Import_PartnerAccountId"
               Visibility="Collapsed"
               Binding="{Binding PartnerAccountId}"
               Tag="{StaticResource PartnerAccountId}"/>
             <ctWinUI:DataGridTextColumn
-              Header="SpendingCategory"
+              x:Uid="Import_SpendingCategory"
               Visibility="Collapsed"
               Binding="{Binding SpendingCategory}"
               Tag="{StaticResource SpendingCategory}"/>
             <ctWinUI:DataGridTextColumn
-              Header="Description"
+              x:Uid="Import_Description"
               Binding="{Binding Description}"
               Tag="{StaticResource Description}"/>
             <ctWinUI:DataGridTextColumn
-              Header="AccountName"
+              x:Uid="Import_AccountName"
               Visibility="Collapsed"
               Binding="{Binding AccountName}"
               Tag="{StaticResource AccountName}"/>
             <ctWinUI:DataGridTextColumn
-              Header="AccountId"
+              x:Uid="Import_AccountId"
               Visibility="Collapsed"
               Binding="{Binding AccountId}"
               Tag="{StaticResource AccountId}"/>
             <ctWinUI:DataGridTextColumn
-              Header="Amount"
+              x:Uid="Import_Amount"
               Binding="{Binding Amount}"
               Tag="{StaticResource Amount}">
               <ctWinUI:DataGridTextColumn.CellStyle>
@@ -132,7 +132,7 @@
               </ctWinUI:DataGridTextColumn.CellStyle>
             </ctWinUI:DataGridTextColumn>
             <ctWinUI:DataGridTextColumn
-              Header="Currency"
+              x:Uid="Import_Currency"
               Visibility="Collapsed"
               Binding="{Binding Currency}"
               Tag="{StaticResource Currency}"/>

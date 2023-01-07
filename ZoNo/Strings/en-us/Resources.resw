@@ -201,4 +201,40 @@
   <data name="Import_DropHereText.Text" xml:space="preserve">
     <value>Drop Excel document here</value>
   </data>
+  <data name="Import_AccountId.Header" xml:space="preserve">
+    <value>Account ID</value>
+  </data>
+  <data name="Import_AccountingDate.Header" xml:space="preserve">
+    <value>Accounting Date</value>
+  </data>
+  <data name="Import_AccountName.Header" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="Import_Amount.Header" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Import_Currency.Header" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Import_Description.Header" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Import_IncomeOutcome.Header" xml:space="preserve">
+    <value>Income / Outcome</value>
+  </data>
+  <data name="Import_PartnerAccountId.Header" xml:space="preserve">
+    <value>Partner Account / ID</value>
+  </data>
+  <data name="Import_PartnerName.Header" xml:space="preserve">
+    <value>Partner Name</value>
+  </data>
+  <data name="Import_SpendingCategory.Header" xml:space="preserve">
+    <value>Spending Category</value>
+  </data>
+  <data name="Import_TransactionTime.Header" xml:space="preserve">
+    <value>Transaction Time</value>
+  </data>
+  <data name="Import_Type.Header" xml:space="preserve">
+    <value>Type</value>
+  </data>
 </root>
