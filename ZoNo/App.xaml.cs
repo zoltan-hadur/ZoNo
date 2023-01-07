@@ -33,6 +33,10 @@ namespace ZoNo
 
     public App()
     {
+      // By default, ExcelDataReader throws a NotSupportedException "No data is available for encoding 1252." on .NET Core.
+      // This fixes that.
+      System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
       InitializeComponent();
 
       var configuration = new ConfigurationBuilder()

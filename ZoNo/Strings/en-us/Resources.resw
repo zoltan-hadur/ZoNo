@@ -195,4 +195,10 @@
   <data name="Account_LastName.Header" xml:space="preserve">
     <value>Last Name</value>
   </data>
+  <data name="Import_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Import_DropHereText.Text" xml:space="preserve">
+    <value>Drop Excel document here</value>
+  </data>
 </root>

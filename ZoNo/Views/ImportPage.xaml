@@ -4,8 +4,120 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+  xmlns:core="using:Microsoft.Xaml.Interactions.Core" 
   mc:Ignorable="d">
   <Grid x:Name="ContentArea">
-    <TextBlock Text="{x:Bind ViewModel.Id}"/>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="50"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Border
+      x:Name="DataGridBorder"
+      Grid.Column="0"
+      Background="Transparent"
+      BorderBrush="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8,8,0,0"
+      DragOver="Border_DragOver"
+      AllowDrop="True"
+      Drop="Border_Drop">
+      <Grid>
+        <TextBlock
+          x:Name="DropHereText"
+          x:Uid="Import_DropHereText"
+          Foreground="Gray"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+          <interactivity:Interaction.Behaviors>
+            <core:DataTriggerBehavior
+              Binding="{x:Bind ViewModel.Transactions.Count, Mode=OneWay}"
+              ComparisonCondition="Equal"
+              Value="0">
+                <core:ChangePropertyAction
+                  TargetObject="{Binding ElementName=DropHereText}"
+                  PropertyName="Visibility"
+                  Value="Visible" />
+            </core:DataTriggerBehavior>
+            <core:DataTriggerBehavior
+              Binding="{x:Bind ViewModel.Transactions.Count, Mode=OneWay}"
+              ComparisonCondition="GreaterThan"
+              Value="0">
+                <core:ChangePropertyAction
+                  TargetObject="{Binding ElementName=DropHereText}"
+                  PropertyName="Visibility"
+                  Value="Collapsed" />
+            </core:DataTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
+        </TextBlock>
+        <ctWinUI:DataGrid
+          ItemsSource="{x:Bind ViewModel.Transactions}"
+          GridLinesVisibility="All"
+          AutoGenerateColumns="False">
+          <ctWinUI:DataGrid.Columns>
+            <ctWinUI:DataGridTextColumn
+              Header="TransactionTime"
+              Binding="{Binding TransactionTime}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="AccountingDate"
+              Visibility="Collapsed"
+              Binding="{Binding AccountingDate}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="Type"
+              Visibility="Collapsed"
+              Binding="{Binding Type}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="IncomeOutcome"
+              Visibility="Collapsed"
+              Binding="{Binding IncomeOutcome}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="PartnerName"
+              Binding="{Binding PartnerName}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="PartnerAccountId"
+              Visibility="Collapsed"
+              Binding="{Binding PartnerAccountId}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="SpendingCategory"
+              Visibility="Collapsed"
+              Binding="{Binding SpendingCategory}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="Description"
+              Binding="{Binding Description}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="AccountName"
+              Visibility="Collapsed"
+              Binding="{Binding AccountName}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="AccountId"
+              Visibility="Collapsed"
+              Binding="{Binding AccountId}"/>
+            <ctWinUI:DataGridTextColumn
+              Header="Amount"
+              Binding="{Binding Amount}">
+              <ctWinUI:DataGridTextColumn.CellStyle>
+                <Style TargetType="ctWinUI:DataGridCell">
+                  <Setter Property="HorizontalContentAlignment"
+                          Value="Right"/>
+                </Style>
+              </ctWinUI:DataGridTextColumn.CellStyle>
+            </ctWinUI:DataGridTextColumn>
+            <ctWinUI:DataGridTextColumn
+              Header="Currency"
+              Visibility="Collapsed"
+              Binding="{Binding Currency}"/>
+          </ctWinUI:DataGrid.Columns>
+        </ctWinUI:DataGrid>
+      </Grid>
+    </Border>
+    <Border
+      Grid.Column="2"
+      BorderBrush="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8,8,0,0">
+
+    </Border>
   </Grid>
 </Page>
