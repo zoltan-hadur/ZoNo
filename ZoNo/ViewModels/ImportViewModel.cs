@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.WinUI.UI;
 using ExcelDataReader;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
@@ -7,6 +8,22 @@ using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
+  public enum ColumnHeader
+  {
+    TransactionTime,
+    AccountingDate,
+    Type,
+    IncomeOutcome,
+    PartnerName,
+    PartnerAccountId,
+    SpendingCategory,
+    Description,
+    AccountName,
+    AccountId,
+    Amount,
+    Currency
+  }
+
   public partial class ImportViewModel : ObservableRecipient
   {
     private readonly ImmutableList<string> _headers = ImmutableList.Create<string>(
@@ -24,12 +41,13 @@ namespace ZoNo.ViewModels
       "Pénznem"
     );
 
-    [ObservableProperty]
-    private ObservableCollection<Transaction> _transactions = new();
+    private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
+
+    public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
 
     public ImportViewModel()
     {
-
+      TransactionsView.Source = _transactions;
     }
 
     public async Task LoadExcelDocument(string path)
@@ -67,7 +85,7 @@ namespace ZoNo.ViewModels
       foreach (DataRow row in dataSet.Tables[0].Rows)
       {
         await Task.Delay(1);
-        Transactions.Add(new Transaction(
+        _transactions.Add(new Transaction(
           TransactionTime: DateTime.Parse(row.Field<string>(0)!),
           AccountingDate: DateOnly.Parse(row.Field<string>(1)!),
           Type: row.Field<string>(2)!,

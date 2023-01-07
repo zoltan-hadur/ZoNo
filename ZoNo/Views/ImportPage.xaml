@@ -7,7 +7,22 @@
   xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   xmlns:core="using:Microsoft.Xaml.Interactions.Core" 
+  xmlns:vm="using:ZoNo.ViewModels"
   mc:Ignorable="d">
+  <Page.Resources>
+    <vm:ColumnHeader x:Key="TransactionTime">TransactionTime</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="AccountingDate">AccountingDate</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="Type">Type</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="IncomeOutcome">IncomeOutcome</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="PartnerName">PartnerName</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="PartnerAccountId">PartnerAccountId</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="SpendingCategory">SpendingCategory</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="Description">Description</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="AccountName">AccountName</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="AccountId">AccountId</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="Amount">Amount</vm:ColumnHeader>
+    <vm:ColumnHeader x:Key="Currency">Currency</vm:ColumnHeader>
+  </Page.Resources>
   <Grid x:Name="ContentArea">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
@@ -33,7 +48,7 @@
           VerticalAlignment="Center">
           <interactivity:Interaction.Behaviors>
             <core:DataTriggerBehavior
-              Binding="{x:Bind ViewModel.Transactions.Count, Mode=OneWay}"
+              Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}"
               ComparisonCondition="Equal"
               Value="0">
                 <core:ChangePropertyAction
@@ -42,7 +57,7 @@
                   Value="Visible" />
             </core:DataTriggerBehavior>
             <core:DataTriggerBehavior
-              Binding="{x:Bind ViewModel.Transactions.Count, Mode=OneWay}"
+              Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}"
               ComparisonCondition="GreaterThan"
               Value="0">
                 <core:ChangePropertyAction
@@ -53,50 +68,62 @@
         </interactivity:Interaction.Behaviors>
         </TextBlock>
         <ctWinUI:DataGrid
-          ItemsSource="{x:Bind ViewModel.Transactions}"
+          ItemsSource="{x:Bind ViewModel.TransactionsView}"
           GridLinesVisibility="All"
-          AutoGenerateColumns="False">
+          AutoGenerateColumns="False"
+          Sorting="DataGrid_Sorting">
           <ctWinUI:DataGrid.Columns>
             <ctWinUI:DataGridTextColumn
               Header="TransactionTime"
-              Binding="{Binding TransactionTime}"/>
+              Binding="{Binding TransactionTime}"
+              Tag="{StaticResource TransactionTime}"/>
             <ctWinUI:DataGridTextColumn
               Header="AccountingDate"
               Visibility="Collapsed"
-              Binding="{Binding AccountingDate}"/>
+              Binding="{Binding AccountingDate}"
+              Tag="{StaticResource AccountingDate}"/>
             <ctWinUI:DataGridTextColumn
               Header="Type"
               Visibility="Collapsed"
-              Binding="{Binding Type}"/>
+              Binding="{Binding Type}"
+              Tag="{StaticResource Type}"/>
             <ctWinUI:DataGridTextColumn
               Header="IncomeOutcome"
               Visibility="Collapsed"
-              Binding="{Binding IncomeOutcome}"/>
+              Binding="{Binding IncomeOutcome}"
+              Tag="{StaticResource IncomeOutcome}"/>
             <ctWinUI:DataGridTextColumn
               Header="PartnerName"
-              Binding="{Binding PartnerName}"/>
+              Binding="{Binding PartnerName}"
+              Tag="{StaticResource PartnerName}"/>
             <ctWinUI:DataGridTextColumn
               Header="PartnerAccountId"
               Visibility="Collapsed"
-              Binding="{Binding PartnerAccountId}"/>
+              Binding="{Binding PartnerAccountId}"
+              Tag="{StaticResource PartnerAccountId}"/>
             <ctWinUI:DataGridTextColumn
               Header="SpendingCategory"
               Visibility="Collapsed"
-              Binding="{Binding SpendingCategory}"/>
+              Binding="{Binding SpendingCategory}"
+              Tag="{StaticResource SpendingCategory}"/>
             <ctWinUI:DataGridTextColumn
               Header="Description"
-              Binding="{Binding Description}"/>
+              Binding="{Binding Description}"
+              Tag="{StaticResource Description}"/>
             <ctWinUI:DataGridTextColumn
               Header="AccountName"
               Visibility="Collapsed"
-              Binding="{Binding AccountName}"/>
+              Binding="{Binding AccountName}"
+              Tag="{StaticResource AccountName}"/>
             <ctWinUI:DataGridTextColumn
               Header="AccountId"
               Visibility="Collapsed"
-              Binding="{Binding AccountId}"/>
+              Binding="{Binding AccountId}"
+              Tag="{StaticResource AccountId}"/>
             <ctWinUI:DataGridTextColumn
               Header="Amount"
-              Binding="{Binding Amount}">
+              Binding="{Binding Amount}"
+              Tag="{StaticResource Amount}">
               <ctWinUI:DataGridTextColumn.CellStyle>
                 <Style TargetType="ctWinUI:DataGridCell">
                   <Setter Property="HorizontalContentAlignment"
@@ -107,7 +134,8 @@
             <ctWinUI:DataGridTextColumn
               Header="Currency"
               Visibility="Collapsed"
-              Binding="{Binding Currency}"/>
+              Binding="{Binding Currency}"
+              Tag="{StaticResource Currency}"/>
           </ctWinUI:DataGrid.Columns>
         </ctWinUI:DataGrid>
       </Grid>
