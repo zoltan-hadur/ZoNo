@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace ZoNo.Helpers
+namespace ZoNo.Converters
 {
   public class EnumToBooleanConverter : IValueConverter
   {

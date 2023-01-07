@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Data;
 
-namespace ZoNo.Helpers
+namespace ZoNo.Converters
 {
   public class InverseBooleanConverter : IValueConverter
   {
