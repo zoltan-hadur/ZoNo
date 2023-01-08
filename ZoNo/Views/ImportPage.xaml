@@ -4,7 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   xmlns:core="using:Microsoft.Xaml.Interactions.Core" 
@@ -74,13 +74,13 @@
             </core:DataTriggerBehavior>
         </interactivity:Interaction.Behaviors>
         </TextBlock>
-        <ctWinUI:DataGrid
+        <controls:DataGrid
           ItemsSource="{x:Bind ViewModel.TransactionsView}"
           GridLinesVisibility="All"
           AutoGenerateColumns="False"
           Sorting="DataGrid_Sorting">
-          <ctWinUI:DataGrid.RowStyle>
-            <Style TargetType="ctWinUI:DataGridRow">
+          <controls:DataGrid.RowStyle>
+            <Style TargetType="controls:DataGridRow">
               <Setter Property="Transitions">
                 <Setter.Value>
                   <TransitionCollection>
@@ -89,73 +89,73 @@
                 </Setter.Value>
               </Setter>
             </Style>
-          </ctWinUI:DataGrid.RowStyle>
-          <ctWinUI:DataGrid.Columns>
-            <ctWinUI:DataGridTextColumn
+          </controls:DataGrid.RowStyle>
+          <controls:DataGrid.Columns>
+            <controls:DataGridTextColumn
               x:Uid="Import_TransactionTime"
               Binding="{Binding TransactionTime}"
               Tag="{StaticResource TransactionTime}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_AccountingDate"
               Visibility="Collapsed"
               Binding="{Binding AccountingDate}"
               Tag="{StaticResource AccountingDate}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_Type"
               Visibility="Collapsed"
               Binding="{Binding Type}"
               Tag="{StaticResource Type}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_IncomeOutcome"
               Visibility="Collapsed"
               Binding="{Binding IncomeOutcome}"
               Tag="{StaticResource IncomeOutcome}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_PartnerName"
               Binding="{Binding PartnerName}"
               Tag="{StaticResource PartnerName}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_PartnerAccountId"
               Visibility="Collapsed"
               Binding="{Binding PartnerAccountId}"
               Tag="{StaticResource PartnerAccountId}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_SpendingCategory"
               Visibility="Collapsed"
               Binding="{Binding SpendingCategory}"
               Tag="{StaticResource SpendingCategory}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_Description"
               Binding="{Binding Description}"
               Tag="{StaticResource Description}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_AccountName"
               Visibility="Collapsed"
               Binding="{Binding AccountName}"
               Tag="{StaticResource AccountName}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_AccountId"
               Visibility="Collapsed"
               Binding="{Binding AccountId}"
               Tag="{StaticResource AccountId}"/>
-            <ctWinUI:DataGridTextColumn
+            <controls:DataGridTextColumn
               x:Uid="Import_Amount"
               Binding="{Binding Amount}"
               Tag="{StaticResource Amount}">
-              <ctWinUI:DataGridTextColumn.CellStyle>
-                <Style TargetType="ctWinUI:DataGridCell">
+              <controls:DataGridTextColumn.CellStyle>
+                <Style TargetType="controls:DataGridCell">
                   <Setter Property="HorizontalContentAlignment"
                           Value="Right"/>
                 </Style>
-              </ctWinUI:DataGridTextColumn.CellStyle>
-            </ctWinUI:DataGridTextColumn>
-            <ctWinUI:DataGridTextColumn
+              </controls:DataGridTextColumn.CellStyle>
+            </controls:DataGridTextColumn>
+            <controls:DataGridTextColumn
               x:Uid="Import_Currency"
               Visibility="Collapsed"
               Binding="{Binding Currency}"
               Tag="{StaticResource Currency}"/>
-          </ctWinUI:DataGrid.Columns>
-        </ctWinUI:DataGrid>
+          </controls:DataGrid.Columns>
+        </controls:DataGrid>
       </Grid>
     </Border>
     <Border
