@@ -2,6 +2,7 @@
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Windows.ApplicationModel.DataTransfer;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -17,6 +18,54 @@ namespace ZoNo.Views
     {
       ViewModel = App.GetService<ImportViewModel>();
       InitializeComponent();
+    }
+
+    private async void Page_Loading(FrameworkElement sender, object args)
+    {
+      await ViewModel.Load();
+
+      foreach (var column in ViewModel.Columns!)
+      {
+        // Add items to column header context menu, so the user can show/hide columns
+        var menuItem = new ToggleMenuFlyoutItem()
+        {
+          Text = $"Import_{column.ColumnHeader}".GetLocalized()
+        };
+        menuItem.SetBinding(ToggleMenuFlyoutItem.IsCheckedProperty, new Binding()
+        {
+          Source = column,
+          Path = new PropertyPath(nameof(column.IsVisible)),
+          Mode = BindingMode.TwoWay,
+          UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+        });
+        DataGridHeaderContextMenu.Items.Add(menuItem);
+
+        // Add columns to data grid
+        var textColumn = new DataGridTextColumn()
+        {
+          Header = $"Import_{column.ColumnHeader}".GetLocalized(),
+          Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed,
+          Tag = column.ColumnHeader,
+          Binding = new Binding()
+          {
+            Path = new PropertyPath(_mapToProperty[column.ColumnHeader])
+          }
+        };
+        column.PropertyChanged += (s, e) =>
+        {
+          if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
+          {
+            textColumn.Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+          }
+        };
+        DataGrid.Columns.Add(textColumn);
+      }
+
+      // Set horizontal alignment to the right for column Amount
+      var amountColumn = DataGrid.Columns.Single(column => (ColumnHeader)(int)column.Tag == ColumnHeader.Amount);
+      var style = new Style(typeof(DataGridCell));
+      style.Setters.Add(new Setter(DataGridCell.HorizontalContentAlignmentProperty, HorizontalAlignment.Right));
+      amountColumn.CellStyle = style;
     }
 
     private void Border_DragOver(object sender, DragEventArgs e)

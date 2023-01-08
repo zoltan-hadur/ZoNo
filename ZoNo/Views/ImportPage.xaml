@@ -5,25 +5,12 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
   xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   xmlns:core="using:Microsoft.Xaml.Interactions.Core" 
-  xmlns:vm="using:ZoNo.ViewModels"
-  mc:Ignorable="d">
-  <Page.Resources>
-    <vm:ColumnHeader x:Key="TransactionTime">TransactionTime</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="AccountingDate">AccountingDate</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="Type">Type</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="IncomeOutcome">IncomeOutcome</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="PartnerName">PartnerName</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="PartnerAccountId">PartnerAccountId</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="SpendingCategory">SpendingCategory</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="Description">Description</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="AccountName">AccountName</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="AccountId">AccountId</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="Amount">Amount</vm:ColumnHeader>
-    <vm:ColumnHeader x:Key="Currency">Currency</vm:ColumnHeader>
-  </Page.Resources>
+  mc:Ignorable="d"
+  Loading="Page_Loading">
   <Grid x:Name="ContentArea">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
@@ -75,10 +62,21 @@
         </interactivity:Interaction.Behaviors>
         </TextBlock>
         <controls:DataGrid
+          x:Name="DataGrid"
           ItemsSource="{x:Bind ViewModel.TransactionsView}"
           GridLinesVisibility="All"
           AutoGenerateColumns="False"
           Sorting="DataGrid_Sorting">
+          <controls:DataGrid.ColumnHeaderStyle>
+            <Style TargetType="controlsprimitives:DataGridColumnHeader">
+              <Setter Property="ContextFlyout">
+                <Setter.Value>
+                  <!-- Menu items are added in code behind -->
+                  <MenuFlyout x:Name="DataGridHeaderContextMenu"/>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </controls:DataGrid.ColumnHeaderStyle>
           <controls:DataGrid.RowStyle>
             <Style TargetType="controls:DataGridRow">
               <Setter Property="Transitions">
@@ -90,71 +88,7 @@
               </Setter>
             </Style>
           </controls:DataGrid.RowStyle>
-          <controls:DataGrid.Columns>
-            <controls:DataGridTextColumn
-              x:Uid="Import_TransactionTime"
-              Binding="{Binding TransactionTime}"
-              Tag="{StaticResource TransactionTime}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_AccountingDate"
-              Visibility="Collapsed"
-              Binding="{Binding AccountingDate}"
-              Tag="{StaticResource AccountingDate}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_Type"
-              Visibility="Collapsed"
-              Binding="{Binding Type}"
-              Tag="{StaticResource Type}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_IncomeOutcome"
-              Visibility="Collapsed"
-              Binding="{Binding IncomeOutcome}"
-              Tag="{StaticResource IncomeOutcome}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_PartnerName"
-              Binding="{Binding PartnerName}"
-              Tag="{StaticResource PartnerName}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_PartnerAccountId"
-              Visibility="Collapsed"
-              Binding="{Binding PartnerAccountId}"
-              Tag="{StaticResource PartnerAccountId}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_SpendingCategory"
-              Visibility="Collapsed"
-              Binding="{Binding SpendingCategory}"
-              Tag="{StaticResource SpendingCategory}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_Description"
-              Binding="{Binding Description}"
-              Tag="{StaticResource Description}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_AccountName"
-              Visibility="Collapsed"
-              Binding="{Binding AccountName}"
-              Tag="{StaticResource AccountName}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_AccountId"
-              Visibility="Collapsed"
-              Binding="{Binding AccountId}"
-              Tag="{StaticResource AccountId}"/>
-            <controls:DataGridTextColumn
-              x:Uid="Import_Amount"
-              Binding="{Binding Amount}"
-              Tag="{StaticResource Amount}">
-              <controls:DataGridTextColumn.CellStyle>
-                <Style TargetType="controls:DataGridCell">
-                  <Setter Property="HorizontalContentAlignment"
-                          Value="Right"/>
-                </Style>
-              </controls:DataGridTextColumn.CellStyle>
-            </controls:DataGridTextColumn>
-            <controls:DataGridTextColumn
-              x:Uid="Import_Currency"
-              Visibility="Collapsed"
-              Binding="{Binding Currency}"
-              Tag="{StaticResource Currency}"/>
-          </controls:DataGrid.Columns>
+          <!-- Columns are added in code behind -->
         </controls:DataGrid>
       </Grid>
     </Border>

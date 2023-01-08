@@ -1,13 +1,25 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using ExcelDataReader;
+using Microsoft.UI.Xaml;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Data;
+using ZoNo.Contracts.Services;
 using ZoNo.Models;
+using ZoNo.Views;
+using static System.TimeZoneInfo;
 
 namespace ZoNo.ViewModels
 {
+  public partial class ColumnViewModel : ObservableObject
+  {
+    public ColumnHeader ColumnHeader { get; set; }
+
+    [ObservableProperty]
+    private bool _isVisible;
+  }
+
   public enum ColumnHeader
   {
     TransactionTime,
@@ -26,7 +38,11 @@ namespace ZoNo.ViewModels
 
   public partial class ImportViewModel : ObservableRecipient
   {
-    private readonly ImmutableList<string> _headers = ImmutableList.Create<string>(
+    private const string SettingColumns = "Import_Columns";
+
+    private readonly ILocalSettingsService _localSettingsService;
+
+    private readonly ImmutableList<string> _excelHeaders = ImmutableList.Create<string>(
       "Tranzakció dátuma",
       "Könyvelés dátuma",
       "Típus",
@@ -45,9 +61,44 @@ namespace ZoNo.ViewModels
 
     public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
 
-    public ImportViewModel()
+    [ObservableProperty]
+    private List<ColumnViewModel>? _columns;
+
+    public ImportViewModel(ILocalSettingsService localSettingsService)
     {
+      _localSettingsService = localSettingsService;
       TransactionsView.Source = _transactions;
+    }
+
+    public async Task Load()
+    {
+      Columns = await _localSettingsService.ReadSettingAsync<List<ColumnViewModel>>(SettingColumns) ??
+        new List<ColumnViewModel>()
+        {
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.TransactionTime , IsVisible = true  },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountingDate  , IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.Type            , IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.IncomeOutcome   , IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.PartnerName     , IsVisible = true  },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.PartnerAccountId, IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.SpendingCategory, IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.Description     , IsVisible = true  },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountName     , IsVisible = false },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountId       , IsVisible = true  },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.Amount          , IsVisible = true  },
+          new ColumnViewModel() { ColumnHeader = ColumnHeader.Currency        , IsVisible = false }
+        };
+
+      foreach (var column in Columns)
+      {
+        column.PropertyChanged += async (s, e) =>
+        {
+          if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
+          {
+            await _localSettingsService.SaveSettingAsync(SettingColumns, Columns);
+          }
+        };
+      }
     }
 
     public async Task LoadExcelDocument(string path)
@@ -71,13 +122,13 @@ namespace ZoNo.ViewModels
         throw new Exception($"There are more than one worksheet!");
       if (dataSet.Tables[0].TableName != "Tranzakciók")
         throw new Exception($"Worksheet name is not 'Tranzakciók'");
-      if (dataSet.Tables[0].Columns.Count != _headers.Count)
-        throw new Exception($"Column count is not {_headers.Count}, it is {dataSet.Tables[0].Columns.Count}!");
+      if (dataSet.Tables[0].Columns.Count != _excelHeaders.Count)
+        throw new Exception($"Column count is not {_excelHeaders.Count}, it is {dataSet.Tables[0].Columns.Count}!");
       for (int i = 0; i < dataSet.Tables[0].Columns.Count; ++i)
       {
-        if (dataSet.Tables[0].Columns[i].ColumnName != _headers[i])
+        if (dataSet.Tables[0].Columns[i].ColumnName != _excelHeaders[i])
         {
-          throw new Exception($"Header[{i}] is not '{_headers[i]}', it is '{dataSet.Tables[0].Columns[i].ColumnName}'!");
+          throw new Exception($"Header[{i}] is not '{_excelHeaders[i]}', it is '{dataSet.Tables[0].Columns[i].ColumnName}'!");
         }
       }
 
