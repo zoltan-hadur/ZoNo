@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using System.Diagnostics.CodeAnalysis;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
@@ -51,7 +52,7 @@ namespace ZoNo.Services
     {
       if (args.IsSettingsInvoked)
       {
-        _navigationService.NavigateTo(typeof(SettingsViewModel).FullName!);
+        _navigationService.NavigateTo(typeof(SettingsViewModel).FullName!, infoOverride: new EntranceNavigationTransitionInfo());
       }
       else
       {
@@ -59,7 +60,7 @@ namespace ZoNo.Services
 
         if (selectedItem?.GetValue(NavigationHelper.NavigateToProperty) is string pageKey)
         {
-          _navigationService.NavigateTo(pageKey);
+          _navigationService.NavigateTo(pageKey, infoOverride: new EntranceNavigationTransitionInfo());
         }
       }
     }
