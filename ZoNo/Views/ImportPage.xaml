@@ -72,6 +72,17 @@
           GridLinesVisibility="All"
           AutoGenerateColumns="False"
           Sorting="DataGrid_Sorting">
+          <ctWinUI:DataGrid.RowStyle>
+            <Style TargetType="ctWinUI:DataGridRow">
+              <Setter Property="Transitions">
+                <Setter.Value>
+                  <TransitionCollection>
+                    <EntranceThemeTransition/>
+                  </TransitionCollection>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </ctWinUI:DataGrid.RowStyle>
           <ctWinUI:DataGrid.Columns>
             <ctWinUI:DataGridTextColumn
               x:Uid="Import_TransactionTime"
