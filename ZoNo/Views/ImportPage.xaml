@@ -67,12 +67,37 @@
           GridLinesVisibility="All"
           AutoGenerateColumns="False"
           Sorting="DataGrid_Sorting">
+          <controls:DataGrid.Resources>
+            <!-- So that it kinda looks like the default DataGridTextColumn -->
+            <Style TargetType="TextBlock">
+              <Setter Property="TextTrimming"
+                      Value="CharacterEllipsis"/>
+              <Setter Property="Margin"
+                      Value="12,0,12,0"/>
+              <Setter Property="VerticalAlignment"
+                      Value="Center"/>
+            </Style>
+          </controls:DataGrid.Resources>
           <controls:DataGrid.ColumnHeaderStyle>
             <Style TargetType="controlsprimitives:DataGridColumnHeader">
               <Setter Property="ContextFlyout">
                 <Setter.Value>
                   <!-- Menu items are added in code behind -->
                   <MenuFlyout x:Name="DataGridHeaderContextMenu"/>
+                </Setter.Value>
+              </Setter>
+              <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
+              <Setter Property="Padding"
+                      Value="12,0,-20,0"/>
+              <!-- To have tooltip when column width is so small, the text is trimming -->
+              <Setter Property="ContentTemplate">
+                <Setter.Value>
+                  <DataTemplate>
+                    <TextBlock
+                      Text="{Binding}"
+                      ToolTipService.ToolTip="{Binding}"
+                      TextTrimming="CharacterEllipsis"/>
+                  </DataTemplate>
                 </Setter.Value>
               </Setter>
             </Style>

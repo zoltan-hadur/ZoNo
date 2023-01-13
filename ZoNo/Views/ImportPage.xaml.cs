@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Markup;
+using System.Reflection;
 using Windows.ApplicationModel.DataTransfer;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -41,24 +44,30 @@ namespace ZoNo.Views
         DataGridHeaderContextMenu.Items.Add(menuItem);
 
         // Add columns to data grid
-        var textColumn = new DataGridTextColumn()
+        var cellDataTemplateXaml = $$"""
+                    <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                      <TextBlock
+                        Text="{Binding {{_mapToProperty[column.ColumnHeader]}}}"
+                        ToolTipService.ToolTip="{Binding {{_mapToProperty[column.ColumnHeader]}}}"/>
+                    </DataTemplate>
+                    """;
+        var cellDataTemplate = XamlReader.Load(cellDataTemplateXaml) as DataTemplate;
+        var dataGridColumn = new DataGridTemplateColumn()
         {
           Header = $"Import_{column.ColumnHeader}".GetLocalized(),
           Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed,
           Tag = column.ColumnHeader,
-          Binding = new Binding()
-          {
-            Path = new PropertyPath(_mapToProperty[column.ColumnHeader])
-          }
+          IsReadOnly = true,
+          CellTemplate = cellDataTemplate,
         };
         column.PropertyChanged += (s, e) =>
         {
           if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
           {
-            textColumn.Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+            dataGridColumn.Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed;
           }
         };
-        DataGrid.Columns.Add(textColumn);
+        DataGrid.Columns.Add(dataGridColumn);
       }
 
       // Set horizontal alignment to the right for column Amount
@@ -102,9 +111,31 @@ namespace ZoNo.Views
       { ColumnHeader.Currency        , nameof(Transaction.Currency        ) }
     };
 
+    private DataGridColumnHeader GetHeader(DataGridColumn column)
+    {
+      var propertyInfo = typeof(DataGridColumn).GetProperty("HeaderCell", BindingFlags.NonPublic | BindingFlags.Instance);
+      if (propertyInfo == null)
+      {
+        throw new Exception($"HeaderCell is not a property of {typeof(DataGridColumn)}!");
+      }
+      var value = propertyInfo.GetValue(column);
+      if (value == null)
+      {
+        throw new Exception($"Property 'HeaderCell' is null!");
+      }
+      var header = value as DataGridColumnHeader;
+      if (header == null)
+      {
+        throw new Exception($"Property values type is '{value.GetType()} instead of {typeof(DataGridColumnHeader)}!");
+      }
+      return header;
+    }
+
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
       ViewModel.TransactionsView.SortDescriptions.Clear();
+
+      GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);
 
       switch (e.Column.SortDirection)
       {
@@ -117,6 +148,7 @@ namespace ZoNo.Views
         // Default after Descending
         case DataGridSortDirection.Descending:
           e.Column.SortDirection = null;
+          GetHeader(e.Column).Padding = new Thickness(12, 0, -20, 0);
           ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
           break;
 
@@ -131,6 +163,7 @@ namespace ZoNo.Views
       foreach (var column in (sender as DataGrid)!.Columns.Where(column => column.Tag != e.Column.Tag))
       {
         column.SortDirection = null;
+        GetHeader(column).Padding = new Thickness(12, 0, -20, 0);
       }
     }
   }
