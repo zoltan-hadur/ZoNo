@@ -10,7 +10,7 @@
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   xmlns:core="using:Microsoft.Xaml.Interactions.Core" 
   mc:Ignorable="d"
-  Loading="Page_Loading">
+  Loaded="Page_Loaded">
   <Grid x:Name="ContentArea">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
@@ -81,12 +81,6 @@
           </controls:DataGrid.Resources>
           <controls:DataGrid.ColumnHeaderStyle>
             <Style TargetType="controlsprimitives:DataGridColumnHeader">
-              <Setter Property="ContextFlyout">
-                <Setter.Value>
-                  <!-- Menu items are added in code behind -->
-                  <MenuFlyout x:Name="DataGridHeaderContextMenu"/>
-                </Setter.Value>
-              </Setter>
               <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
               <Setter Property="Padding"
                       Value="12,0,-20,0"/>

@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
-using System.Linq;
+using Microsoft.UI.Xaml.Media;
 using System.Reflection;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
@@ -26,13 +27,26 @@ namespace ZoNo.Views
       InitializeComponent();
     }
 
-    private async void Page_Loading(FrameworkElement sender, object args)
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
       await ViewModel.Load();
 
+      // Set context menu to the row that contains the headers
+      var headerPresenter = (DataGrid.FindDescendant("Root") as Grid)
+        ?.Children.FirstOrDefault()
+        ?.FindDescendant("ColumnHeadersPresenter") as DataGridColumnHeadersPresenter;
+      if (headerPresenter == null)
+      {
+        throw new Exception("DataGrid -> Root -> ColumnHeadersPresenter is not found!");
+      }
+      var headerContextMenu = new MenuFlyout();
+      headerPresenter.ContextFlyout = headerContextMenu;
+      headerPresenter.Background = new SolidColorBrush(Colors.Transparent);   // Otherwise right click is not registering on the empty space
+
+
       foreach (var column in ViewModel.Columns!)
       {
-        // Add items to column header context menu, so the user can show/hide columns
+        // Add items to the context menu, so the user can show/hide columns
         var menuItem = new ToggleMenuFlyoutItem()
         {
           Text = $"Import_{column.ColumnHeader}".GetLocalized()
@@ -44,7 +58,7 @@ namespace ZoNo.Views
           Mode = BindingMode.TwoWay,
           UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
         });
-        DataGridHeaderContextMenu.Items.Add(menuItem);
+        headerContextMenu.Items.Add(menuItem);
 
         // Add columns to data grid
         // Column 'Amount' is right aligned and thousands separated
