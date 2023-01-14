@@ -4,9 +4,12 @@ using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
+using System.Linq;
 using System.Reflection;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels;
@@ -160,10 +163,31 @@ namespace ZoNo.Views
       }
 
       // Null out every other column sort direction
-      foreach (var column in (sender as DataGrid)!.Columns.Where(column => column.Tag != e.Column.Tag))
+      foreach (var column in DataGrid.Columns.Where(column => column.Tag != e.Column.Tag))
       {
         column.SortDirection = null;
         GetHeader(column).Padding = new Thickness(12, 0, -20, 0);
+      }
+    }
+
+    private async void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+      if (e.Key == VirtualKey.Delete)
+      {
+        var selectedItems = DataGrid.SelectedItems.Cast<object>().ToList();
+        foreach (var selectedItem in selectedItems)
+        {
+          try
+          {
+            ViewModel.TransactionsView.Source.Remove(selectedItem);
+          }
+          catch (ArgumentOutOfRangeException ex)
+          {
+            // When deleting last item, there is an exception
+            ViewModel.TransactionsView.Refresh();
+          }
+          await Task.Delay(1);
+        }
       }
     }
   }
