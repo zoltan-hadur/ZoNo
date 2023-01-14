@@ -47,13 +47,15 @@ namespace ZoNo.Views
         DataGridHeaderContextMenu.Items.Add(menuItem);
 
         // Add columns to data grid
-        var cellDataTemplateXaml = $$"""
+        // Column 'Amount' is right aligned and thousands separated
+        var cellDataTemplateXaml = $$$""""
                     <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                       <TextBlock
-                        Text="{Binding {{_mapToProperty[column.ColumnHeader]}}}"
-                        ToolTipService.ToolTip="{Binding {{_mapToProperty[column.ColumnHeader]}}}"/>
+                        Text="{Binding Path={{{_mapToProperty[column.ColumnHeader]}}} {{{(column.ColumnHeader == ColumnHeader.Amount ? ", Converter={StaticResource ThousandsSeparatorConverter}" : string.Empty)}}}}"
+                        {{{(column.ColumnHeader == ColumnHeader.Amount ? "HorizontalAlignment = \"Right\"" : string.Empty)}}}
+                        ToolTipService.ToolTip="{Binding {{{_mapToProperty[column.ColumnHeader]}}}}"/>
                     </DataTemplate>
-                    """;
+                    """";
         var cellDataTemplate = XamlReader.Load(cellDataTemplateXaml) as DataTemplate;
         var dataGridColumn = new DataGridTemplateColumn()
         {
@@ -72,12 +74,6 @@ namespace ZoNo.Views
         };
         DataGrid.Columns.Add(dataGridColumn);
       }
-
-      // Set horizontal alignment to the right for column Amount
-      var amountColumn = DataGrid.Columns.Single(column => (ColumnHeader)(int)column.Tag == ColumnHeader.Amount);
-      var style = new Style(typeof(DataGridCell));
-      style.Setters.Add(new Setter(DataGridCell.HorizontalContentAlignmentProperty, HorizontalAlignment.Right));
-      amountColumn.CellStyle = style;
     }
 
     private void Border_DragOver(object sender, DragEventArgs e)
