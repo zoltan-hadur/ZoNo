@@ -74,6 +74,10 @@ namespace ZoNo.Views
         };
         DataGrid.Columns.Add(dataGridColumn);
       }
+
+      // Default sort by transaction time
+      ViewModel.TransactionsView.SortDescriptions.Clear();
+      ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
     }
 
     private void Border_DragOver(object sender, DragEventArgs e)
