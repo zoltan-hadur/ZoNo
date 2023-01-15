@@ -58,6 +58,11 @@ namespace ZoNo.Views
           Mode = BindingMode.TwoWay,
           UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
         });
+        menuItem.SetBinding(ToggleMenuFlyoutItem.IsEnabledProperty, new Binding()
+        {
+          Source = column,
+          Path = new PropertyPath(nameof(column.IsEnabled))
+        });
         headerContextMenu.Items.Add(menuItem);
 
         // Add columns to data grid

@@ -18,6 +18,9 @@ namespace ZoNo.ViewModels
 
     [ObservableProperty]
     private bool _isVisible;
+
+    [ObservableProperty]
+    private bool _isEnabled = true;
   }
 
   public enum ColumnHeader
@@ -62,12 +65,27 @@ namespace ZoNo.ViewModels
     public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VisibleColumnCount))]
     private List<ColumnViewModel>? _columns;
+
+    public int VisibleColumnCount => Columns?.Count(column => column.IsVisible) ?? 0;
 
     public ImportViewModel(ILocalSettingsService localSettingsService)
     {
       _localSettingsService = localSettingsService;
       TransactionsView.Source = _transactions;
+
+      PropertyChanged += (s, e) =>
+      {
+        if (e.PropertyName == nameof(VisibleColumnCount))
+        {
+          var count = VisibleColumnCount;
+          foreach (var column in Columns!)
+          {
+            column.IsEnabled = !(column.IsVisible && VisibleColumnCount == 1);
+          }
+        }
+      };
     }
 
     public async Task Load()
@@ -95,6 +113,7 @@ namespace ZoNo.ViewModels
         {
           if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
           {
+            OnPropertyChanged(nameof(VisibleColumnCount));
             await _localSettingsService.SaveSettingAsync(SettingColumns, Columns);
           }
         };
