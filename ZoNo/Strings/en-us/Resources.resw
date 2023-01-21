@@ -237,4 +237,7 @@
   <data name="Import_Type" xml:space="preserve">
     <value>Type</value>
   </data>
+  <data name="Import_UploadButton.Content" xml:space="preserve">
+    <value>Upload to Splitwise</value>
+  </data>
 </root>
