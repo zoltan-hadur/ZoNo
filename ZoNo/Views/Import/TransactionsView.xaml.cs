@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI;
@@ -8,26 +8,43 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
+using System.Collections.Immutable;
 using System.Reflection;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
-using ZoNo.ViewModels;
+using ZoNo.ViewModels.Import;
 
-namespace ZoNo.Views
+namespace ZoNo.Views.Import
 {
-  public sealed partial class ImportPage : Page
+  public sealed partial class TransactionsView : UserControl
   {
-    public ImportViewModel ViewModel { get; }
-
-    public ImportPage()
+    private ImmutableDictionary<ColumnHeader, string> MapColumnToProperty { get; } = new Dictionary<ColumnHeader, string>()
     {
-      ViewModel = App.GetService<ImportViewModel>();
+      { ColumnHeader.TransactionTime , nameof(Transaction.TransactionTime ) },
+      { ColumnHeader.AccountingDate  , nameof(Transaction.AccountingDate  ) },
+      { ColumnHeader.Type            , nameof(Transaction.Type            ) },
+      { ColumnHeader.IncomeOutcome   , nameof(Transaction.IncomeOutcome   ) },
+      { ColumnHeader.PartnerName     , nameof(Transaction.PartnerName     ) },
+      { ColumnHeader.PartnerAccountId, nameof(Transaction.PartnerAccountId) },
+      { ColumnHeader.SpendingCategory, nameof(Transaction.SpendingCategory) },
+      { ColumnHeader.Description     , nameof(Transaction.Description     ) },
+      { ColumnHeader.AccountName     , nameof(Transaction.AccountName     ) },
+      { ColumnHeader.AccountId       , nameof(Transaction.AccountId       ) },
+      { ColumnHeader.Amount          , nameof(Transaction.Amount          ) },
+      { ColumnHeader.Currency        , nameof(Transaction.Currency        ) }
+    }.ToImmutableDictionary();
+
+    public TransactionsViewModel ViewModel { get; }
+
+    public TransactionsView()
+    {
+      ViewModel = App.GetService<TransactionsViewModel>();
       InitializeComponent();
     }
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
       await ViewModel.Load();
 
@@ -68,13 +85,13 @@ namespace ZoNo.Views
         // Add columns to data grid
         // Column 'Amount' is right aligned and thousands separated
         var cellDataTemplateXaml = $$$""""
-                    <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                      <TextBlock
-                        Text="{Binding Path={{{_mapToProperty[column.ColumnHeader]}}} {{{(column.ColumnHeader == ColumnHeader.Amount ? ", Converter={StaticResource ThousandsSeparatorConverter}" : string.Empty)}}}}"
-                        {{{(column.ColumnHeader == ColumnHeader.Amount ? "HorizontalAlignment = \"Right\"" : string.Empty)}}}
-                        ToolTipService.ToolTip="{Binding {{{_mapToProperty[column.ColumnHeader]}}}}"/>
-                    </DataTemplate>
-                    """";
+          <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+            <TextBlock
+              Text="{Binding Path={{{MapColumnToProperty[column.ColumnHeader]}}} {{{(column.ColumnHeader == ColumnHeader.Amount ? ", Converter={StaticResource ThousandsSeparatorConverter}" : string.Empty)}}}}"
+              {{{(column.ColumnHeader == ColumnHeader.Amount ? "HorizontalAlignment = \"Right\"" : string.Empty)}}}
+              ToolTipService.ToolTip="{Binding {{{MapColumnToProperty[column.ColumnHeader]}}}}"/>
+          </DataTemplate>
+          """";
         var cellDataTemplate = XamlReader.Load(cellDataTemplateXaml) as DataTemplate;
         var dataGridColumn = new DataGridTemplateColumn()
         {
@@ -96,16 +113,16 @@ namespace ZoNo.Views
 
       // Default sort by transaction time
       ViewModel.TransactionsView.SortDescriptions.Clear();
-      ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
+      ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
     }
 
-    private void Border_DragOver(object sender, DragEventArgs e)
+    private void Grid_DragOver(object sender, DragEventArgs e)
     {
       e.AcceptedOperation = DataPackageOperation.Copy;
       e.DragUIOverride.Caption = "Import_Add".GetLocalized();
     }
 
-    private async void Border_Drop(object sender, DragEventArgs e)
+    private async void Grid_Drop(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.StorageItems))
       {
@@ -116,22 +133,6 @@ namespace ZoNo.Views
         }
       }
     }
-
-    private Dictionary<ColumnHeader, string> _mapToProperty = new Dictionary<ColumnHeader, string>()
-    {
-      { ColumnHeader.TransactionTime , nameof(Transaction.TransactionTime ) },
-      { ColumnHeader.AccountingDate  , nameof(Transaction.AccountingDate  ) },
-      { ColumnHeader.Type            , nameof(Transaction.Type            ) },
-      { ColumnHeader.IncomeOutcome   , nameof(Transaction.IncomeOutcome   ) },
-      { ColumnHeader.PartnerName     , nameof(Transaction.PartnerName     ) },
-      { ColumnHeader.PartnerAccountId, nameof(Transaction.PartnerAccountId) },
-      { ColumnHeader.SpendingCategory, nameof(Transaction.SpendingCategory) },
-      { ColumnHeader.Description     , nameof(Transaction.Description     ) },
-      { ColumnHeader.AccountName     , nameof(Transaction.AccountName     ) },
-      { ColumnHeader.AccountId       , nameof(Transaction.AccountId       ) },
-      { ColumnHeader.Amount          , nameof(Transaction.Amount          ) },
-      { ColumnHeader.Currency        , nameof(Transaction.Currency        ) }
-    };
 
     private DataGridColumnHeader GetHeader(DataGridColumn column)
     {
@@ -164,20 +165,20 @@ namespace ZoNo.Views
         // Descending after Ascending
         case DataGridSortDirection.Ascending:
           e.Column.SortDirection = DataGridSortDirection.Descending;
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Descending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Descending));
           break;
 
         // Default after Descending
         case DataGridSortDirection.Descending:
           e.Column.SortDirection = null;
           GetHeader(e.Column).Padding = new Thickness(12, 0, -20, 0);
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
           break;
 
         // Ascending after default
         default:
           e.Column.SortDirection = DataGridSortDirection.Ascending;
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(_mapToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Ascending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Ascending));
           break;
       }
 

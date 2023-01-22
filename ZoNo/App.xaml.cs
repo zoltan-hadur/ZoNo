@@ -10,7 +10,9 @@ using ZoNo.Messages;
 using ZoNo.Models;
 using ZoNo.Services;
 using ZoNo.ViewModels;
+using ZoNo.ViewModels.Import;
 using ZoNo.Views;
+using ZoNo.Views.Import;
 
 namespace ZoNo
 {
@@ -91,6 +93,7 @@ namespace ZoNo
       // Views and ViewModels
       services.AddScoped<LoginViewModel>();
       services.AddScoped<ImportViewModel>();
+      services.AddScoped<TransactionsViewModel>();
       services.AddScoped<QueryViewModel>();
       services.AddScoped<AccountViewModel>();
       services.AddScoped<SettingsViewModel>();

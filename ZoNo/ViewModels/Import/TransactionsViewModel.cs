@@ -1,50 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using ExcelDataReader;
-using Microsoft.UI.Xaml;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
-using ZoNo.Views;
-using static System.TimeZoneInfo;
 
-namespace ZoNo.ViewModels
+namespace ZoNo.ViewModels.Import
 {
-  public partial class ColumnViewModel : ObservableObject
-  {
-    public ColumnHeader ColumnHeader { get; set; }
-
-    [ObservableProperty]
-    private bool _isVisible;
-
-    [ObservableProperty]
-    private bool _isEnabled = true;
-  }
-
-  public enum ColumnHeader
-  {
-    TransactionTime,
-    AccountingDate,
-    Type,
-    IncomeOutcome,
-    PartnerName,
-    PartnerAccountId,
-    SpendingCategory,
-    Description,
-    AccountName,
-    AccountId,
-    Amount,
-    Currency
-  }
-
-  public partial class ImportViewModel : ObservableRecipient
+  public partial class TransactionsViewModel : ObservableObject
   {
     private const string SettingColumns = "Import_Columns";
-
-    private readonly ILocalSettingsService _localSettingsService;
-
     private readonly ImmutableList<string> _excelHeaders = ImmutableList.Create<string>(
       "Tranzakció dátuma",
       "Könyvelés dátuma",
@@ -60,6 +32,8 @@ namespace ZoNo.ViewModels
       "Pénznem"
     );
 
+    private readonly ILocalSettingsService _localSettingsService;
+
     private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
 
     public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
@@ -70,7 +44,7 @@ namespace ZoNo.ViewModels
 
     public int VisibleColumnCount => Columns?.Count(column => column.IsVisible) ?? 0;
 
-    public ImportViewModel(ILocalSettingsService localSettingsService)
+    public TransactionsViewModel(ILocalSettingsService localSettingsService)
     {
       _localSettingsService = localSettingsService;
       TransactionsView.Source = _transactions;
@@ -82,7 +56,7 @@ namespace ZoNo.ViewModels
           var count = VisibleColumnCount;
           foreach (var column in Columns!)
           {
-            column.IsEnabled = !(column.IsVisible && VisibleColumnCount == 1);
+            column.IsEnabled = !(column.IsVisible && count == 1);
           }
         }
       };
