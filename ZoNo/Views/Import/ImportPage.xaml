@@ -6,35 +6,40 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:local="using:ZoNo.Views.Import"
   mc:Ignorable="d">
-  <!-- TODO: set columnspacing -->
-  <Grid x:Name="ContentArea">
+  <Grid
+    x:Name="ContentArea"
+    ColumnSpacing="12">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="12"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <Border
-      Grid.Column="0"
-      BorderBrush="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"
-      BorderThickness="1"
-      CornerRadius="8">
+    <Grid.Resources>
+      <Style TargetType="Border">
+        <Setter
+          Property="BorderThickness"
+          Value="1"/>
+        <Setter
+          Property="CornerRadius"
+          Value="8"/>
+        <Setter
+          Property="BorderBrush"
+          Value="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"/>
+      </Style>
+    </Grid.Resources>
+    <Border Grid.Column="0">
       <local:TransactionsView/>
     </Border>
-    <Border
-      Grid.Column="2"
-      BorderBrush="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"
-      BorderThickness="1"
-      CornerRadius="8">
+    <Border Grid.Column="1">
       
     </Border>
     <Button
       x:Uid="Import_UploadButton"
       Grid.Row="1"
-      Grid.Column="2"
+      Grid.Column="1"
       HorizontalAlignment="Right"
       Margin="{StaticResource SmallTopBottomMargin}"/>
   </Grid>
