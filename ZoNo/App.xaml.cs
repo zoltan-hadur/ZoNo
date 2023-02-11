@@ -87,8 +87,8 @@ namespace ZoNo
       });
       services.AddScoped<INavigationService, NavigationService>();
 
-      // Core Services
       services.AddSingleton<IFileService, FileService>();
+      services.AddSingleton<IExcelLoader, ExcelLoader>();
 
       // Views and ViewModels
       services.AddScoped<LoginViewModel>();
