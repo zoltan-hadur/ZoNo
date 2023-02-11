@@ -1,14 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using ExcelDataReader;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
@@ -128,21 +123,23 @@ namespace ZoNo.ViewModels.Import
       // Read transactions row by row
       foreach (DataRow row in dataSet.Tables[0].Rows)
       {
-        await Task.Delay(1);
-        _transactions.Add(new Transaction(
-          TransactionTime: DateTime.Parse(row.Field<string>(0)!),
-          AccountingDate: DateOnly.Parse(row.Field<string>(1)!),
-          Type: row.Field<string>(2)!,
-          IncomeOutcome: row.Field<string>(3)! == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,
-          PartnerName: row.Field<string>(4)!,
-          PartnerAccountId: row.Field<string>(5)!,
-          SpendingCategory: row.Field<string>(6)!,
-          Description: row.Field<string>(7)!,
-          AccountName: row.Field<string>(8)!,
-          AccountId: row.Field<string>(9)!,
-          Amount: row.Field<double>(10)!,
-          Currency: Enum.Parse<Currency>(row.Field<string>(11)!)
-        ));
+        //await Task.Delay(1);
+        var transaction = new Transaction
+        {
+          TransactionTime = DateTime.Parse(row.Field<string>(0)!),
+          AccountingDate = DateOnly.Parse(row.Field<string>(1)!),
+          Type = row.Field<string>(2)!,
+          IncomeOutcome = row.Field<string>(3)! == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,
+          PartnerName = row.Field<string>(4)!,
+          PartnerAccountId = row.Field<string>(5)!,
+          SpendingCategory = row.Field<string>(6)!,
+          Description = row.Field<string>(7)!,
+          AccountName = row.Field<string>(8)!,
+          AccountId = row.Field<string>(9)!,
+          Amount = row.Field<double>(10)!,
+          Currency = Enum.Parse<Currency>(row.Field<string>(11)!)
+        };
+        _transactions.Add(transaction);
       }
     }
   }
