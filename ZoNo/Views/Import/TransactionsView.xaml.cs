@@ -20,22 +20,6 @@ namespace ZoNo.Views.Import
 {
   public sealed partial class TransactionsView : UserControl
   {
-    private ImmutableDictionary<ColumnHeader, string> MapColumnToProperty { get; } = new Dictionary<ColumnHeader, string>()
-    {
-      { ColumnHeader.TransactionTime , nameof(Transaction.TransactionTime ) },
-      { ColumnHeader.AccountingDate  , nameof(Transaction.AccountingDate  ) },
-      { ColumnHeader.Type            , nameof(Transaction.Type            ) },
-      { ColumnHeader.IncomeOutcome   , nameof(Transaction.IncomeOutcome   ) },
-      { ColumnHeader.PartnerName     , nameof(Transaction.PartnerName     ) },
-      { ColumnHeader.PartnerAccountId, nameof(Transaction.PartnerAccountId) },
-      { ColumnHeader.SpendingCategory, nameof(Transaction.SpendingCategory) },
-      { ColumnHeader.Description     , nameof(Transaction.Description     ) },
-      { ColumnHeader.AccountName     , nameof(Transaction.AccountName     ) },
-      { ColumnHeader.AccountId       , nameof(Transaction.AccountId       ) },
-      { ColumnHeader.Amount          , nameof(Transaction.Amount          ) },
-      { ColumnHeader.Currency        , nameof(Transaction.Currency        ) }
-    }.ToImmutableDictionary();
-
     public TransactionsViewModel ViewModel { get; }
 
     public TransactionsView()
@@ -48,72 +32,9 @@ namespace ZoNo.Views.Import
     {
       await ViewModel.Load();
 
-      // Set context menu to the row that contains the headers
-      var headerPresenter = (DataGrid.FindDescendant("Root") as Grid)
-        ?.Children.FirstOrDefault()
-        ?.FindDescendant("ColumnHeadersPresenter") as DataGridColumnHeadersPresenter;
-      if (headerPresenter == null)
-      {
-        throw new Exception("DataGrid -> Root -> ColumnHeadersPresenter is not found!");
-      }
-      var headerContextMenu = new MenuFlyout();
-      headerPresenter.ContextFlyout = headerContextMenu;
-      headerPresenter.Background = new SolidColorBrush(Colors.Transparent);   // Otherwise right click is not registering on the empty space
-
-
-      foreach (var column in ViewModel.Columns!)
-      {
-        // Add items to the context menu, so the user can show/hide columns
-        var menuItem = new ToggleMenuFlyoutItem()
-        {
-          Text = $"Import_{column.ColumnHeader}".GetLocalized()
-        };
-        menuItem.SetBinding(ToggleMenuFlyoutItem.IsCheckedProperty, new Binding()
-        {
-          Source = column,
-          Path = new PropertyPath(nameof(column.IsVisible)),
-          Mode = BindingMode.TwoWay,
-          UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-        });
-        menuItem.SetBinding(ToggleMenuFlyoutItem.IsEnabledProperty, new Binding()
-        {
-          Source = column,
-          Path = new PropertyPath(nameof(column.IsEnabled))
-        });
-        headerContextMenu.Items.Add(menuItem);
-
-        // Add columns to data grid
-        // Column 'Amount' is right aligned and thousands separated
-        var cellDataTemplateXaml = $$$""""
-          <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-            <TextBlock
-              Text="{Binding Path={{{MapColumnToProperty[column.ColumnHeader]}}} {{{(column.ColumnHeader == ColumnHeader.Amount ? ", Converter={StaticResource ThousandsSeparatorConverter}" : string.Empty)}}}}"
-              {{{(column.ColumnHeader == ColumnHeader.Amount ? "HorizontalAlignment = \"Right\"" : string.Empty)}}}
-              ToolTipService.ToolTip="{Binding {{{MapColumnToProperty[column.ColumnHeader]}}}}"/>
-          </DataTemplate>
-          """";
-        var cellDataTemplate = XamlReader.Load(cellDataTemplateXaml) as DataTemplate;
-        var dataGridColumn = new DataGridTemplateColumn()
-        {
-          Header = $"Import_{column.ColumnHeader}".GetLocalized(),
-          Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed,
-          Tag = column.ColumnHeader,
-          IsReadOnly = true,
-          CellTemplate = cellDataTemplate,
-        };
-        column.PropertyChanged += (s, e) =>
-        {
-          if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
-          {
-            dataGridColumn.Visibility = column.IsVisible ? Visibility.Visible : Visibility.Collapsed;
-          }
-        };
-        DataGrid.Columns.Add(dataGridColumn);
-      }
-
       // Default sort by transaction time
       ViewModel.TransactionsView.SortDescriptions.Clear();
-      ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
+      ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
@@ -165,20 +86,20 @@ namespace ZoNo.Views.Import
         // Descending after Ascending
         case DataGridSortDirection.Ascending:
           e.Column.SortDirection = DataGridSortDirection.Descending;
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Descending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Descending));
           break;
 
         // Default after Descending
         case DataGridSortDirection.Descending:
           e.Column.SortDirection = null;
           GetHeader(e.Column).Padding = new Thickness(12, 0, -20, 0);
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[ColumnHeader.TransactionTime], SortDirection.Ascending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
           break;
 
         // Ascending after default
         default:
           e.Column.SortDirection = DataGridSortDirection.Ascending;
-          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(MapColumnToProperty[(ColumnHeader)(int)e.Column.Tag], SortDirection.Ascending));
+          ViewModel.TransactionsView.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Ascending));
           break;
       }
 

@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data.Common;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
@@ -8,8 +10,6 @@ namespace ZoNo.ViewModels.Import
 {
   public partial class TransactionsViewModel : ObservableObject
   {
-    private const string SettingColumns = "Import_Columns";
-
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IExcelLoader _excelLoader;
 
@@ -17,61 +17,48 @@ namespace ZoNo.ViewModels.Import
 
     public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(VisibleColumnCount))]
-    private List<ColumnViewModel>? _columns;
-
-    public int VisibleColumnCount => Columns?.Count(column => column.IsVisible) ?? 0;
+    public Dictionary<string, ColumnViewModel>? Columns { get; private set; } = null;
 
     public TransactionsViewModel(ILocalSettingsService localSettingsService, IExcelLoader excelLoader)
     {
       _localSettingsService = localSettingsService;
       _excelLoader = excelLoader;
       TransactionsView.Source = _transactions;
-
-      PropertyChanged += (s, e) =>
-      {
-        if (e.PropertyName == nameof(VisibleColumnCount))
-        {
-          var count = VisibleColumnCount;
-          foreach (var column in Columns!)
-          {
-            column.IsEnabled = !(column.IsVisible && count == 1);
-          }
-        }
-      };
     }
 
     public async Task Load()
     {
-      Columns = await _localSettingsService.ReadSettingAsync<List<ColumnViewModel>>(SettingColumns) ??
-        new List<ColumnViewModel>()
-        {
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.TransactionTime , IsVisible = true  },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountingDate  , IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.Type            , IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.IncomeOutcome   , IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.PartnerName     , IsVisible = true  },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.PartnerAccountId, IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.SpendingCategory, IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.Description     , IsVisible = true  },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountName     , IsVisible = false },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.AccountId       , IsVisible = true  },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.Amount          , IsVisible = true  },
-          new ColumnViewModel() { ColumnHeader = ColumnHeader.Currency        , IsVisible = false }
-        };
-
-      foreach (var column in Columns)
+      Columns = new Dictionary<string, ColumnViewModel>()
       {
-        column.PropertyChanged += async (s, e) =>
+        { nameof(ColumnHeader.TransactionTime ), new() { ColumnHeader = ColumnHeader.TransactionTime , IsVisible = true  } },
+        { nameof(ColumnHeader.AccountingDate  ), new() { ColumnHeader = ColumnHeader.AccountingDate  , IsVisible = false } },
+        { nameof(ColumnHeader.Type            ), new() { ColumnHeader = ColumnHeader.Type            , IsVisible = false } },
+        { nameof(ColumnHeader.IncomeOutcome   ), new() { ColumnHeader = ColumnHeader.IncomeOutcome   , IsVisible = false } },
+        { nameof(ColumnHeader.PartnerName     ), new() { ColumnHeader = ColumnHeader.PartnerName     , IsVisible = true  } },
+        { nameof(ColumnHeader.PartnerAccountId), new() { ColumnHeader = ColumnHeader.PartnerAccountId, IsVisible = false } },
+        { nameof(ColumnHeader.SpendingCategory), new() { ColumnHeader = ColumnHeader.SpendingCategory, IsVisible = false } },
+        { nameof(ColumnHeader.Description     ), new() { ColumnHeader = ColumnHeader.Description     , IsVisible = true  } },
+        { nameof(ColumnHeader.AccountName     ), new() { ColumnHeader = ColumnHeader.AccountName     , IsVisible = false } },
+        { nameof(ColumnHeader.AccountId       ), new() { ColumnHeader = ColumnHeader.AccountId       , IsVisible = true  } },
+        { nameof(ColumnHeader.Amount          ), new() { ColumnHeader = ColumnHeader.Amount          , IsVisible = true  } },
+        { nameof(ColumnHeader.Currency        ), new() { ColumnHeader = ColumnHeader.Currency        , IsVisible = false } }
+      };
+
+      foreach (var (_, column) in Columns)
+      {
+        var isColumnVisible = await _localSettingsService.ReadSettingAsync<bool?>(SettingColumnIsVisible(column.ColumnHeader));
+        if (isColumnVisible.HasValue)
         {
-          if (e.PropertyName == nameof(ColumnViewModel.IsVisible))
-          {
-            OnPropertyChanged(nameof(VisibleColumnCount));
-            await _localSettingsService.SaveSettingAsync(SettingColumns, Columns);
-          }
-        };
+          column.IsVisible = isColumnVisible.Value;
+        }
       }
+
+      foreach (var (_, column) in Columns)
+      {
+        column.PropertyChanged += Column_PropertyChanged;
+      }
+
+      OnPropertyChanged(nameof(Columns));
     }
 
     public async Task LoadExcelDocument(string path)
@@ -79,6 +66,21 @@ namespace ZoNo.ViewModels.Import
       foreach (var transaction in await _excelLoader.LoadAsync(path))
       {
         _transactions.Add(transaction);
+      }
+    }
+
+    private string SettingColumnIsVisible(ColumnHeader columnHeader) => $"Import_Columns_{columnHeader}_IsVisible";
+
+    private async void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+      if (sender is ColumnViewModel senderColumn && e.PropertyName == nameof(ColumnViewModel.IsVisible))
+      {
+        var visibleColumnCount = Columns!.Count(column => column.Value.IsVisible);
+        foreach (var (_, column) in Columns!)
+        {
+          column.IsEnabled = !(column.IsVisible && visibleColumnCount == 1);
+        }
+        await _localSettingsService.SaveSettingAsync(SettingColumnIsVisible(senderColumn.ColumnHeader), senderColumn.IsVisible);
       }
     }
   }
