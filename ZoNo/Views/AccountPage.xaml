@@ -5,12 +5,8 @@
   xmlns:local="using:ZoNo.Views"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:converters="using:ZoNo.Converters"
   mc:Ignorable="d"
   Loading="Page_Loading">
-  <Page.Resources>
-    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-  </Page.Resources>
   <Grid>
     <ContentControl
       IsEnabled="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
