@@ -147,7 +147,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -160,7 +160,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -173,7 +173,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -186,7 +186,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -199,7 +199,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -212,7 +212,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -225,7 +225,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -238,7 +238,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -251,7 +251,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -264,7 +264,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -277,7 +277,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
@@ -290,7 +290,7 @@
         <controls:DataGridTemplateColumn
           Tag="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay}"
           Header="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=OneWay}"
+          Visibility="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
