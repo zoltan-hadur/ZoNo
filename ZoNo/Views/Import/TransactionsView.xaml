@@ -282,6 +282,7 @@
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <TextBlock
+                HorizontalAlignment="Right"
                 Text="{Binding Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
                 ToolTipService.ToolTip="{Binding Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
             </DataTemplate>
