@@ -44,6 +44,14 @@
           helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Import.ImportViewModel">
         </NavigationViewItem>
         <NavigationViewItem
+          x:Uid="Shell_Rules"
+          helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.RulesViewModel">
+          <NavigationViewItem.Icon>
+            <!-- Handwriting -->
+            <FontIcon Glyph="&#xe929;"/>
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+        <NavigationViewItem
           x:Uid="Shell_Query"
           Icon="Filter"
           helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.QueryViewModel">

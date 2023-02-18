@@ -240,4 +240,7 @@
   <data name="Import_UploadButton.Content" xml:space="preserve">
     <value>Upload to Splitwise</value>
   </data>
+  <data name="Shell_Rules.Content" xml:space="preserve">
+    <value>Rules</value>
+  </data>
 </root>

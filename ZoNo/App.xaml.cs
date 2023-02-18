@@ -73,6 +73,7 @@ namespace ZoNo
       {
         return new PageService.Builder()
           .Configure<ImportViewModel, ImportPage>()
+          .Configure<RulesViewModel, RulesPage>()
           .Configure<QueryViewModel, QueryPage>()
           .Configure<AccountViewModel, AccountPage>()
           .Configure<SettingsViewModel, SettingsPage>()
@@ -89,11 +90,13 @@ namespace ZoNo
 
       services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelLoader, ExcelLoader>();
+      services.AddSingleton<IRulesService, RulesService>();
 
       // Views and ViewModels
       services.AddScoped<LoginViewModel>();
       services.AddScoped<ImportViewModel>();
       services.AddScoped<TransactionsViewModel>();
+      services.AddScoped<RulesViewModel>();
       services.AddScoped<QueryViewModel>();
       services.AddScoped<AccountViewModel>();
       services.AddScoped<SettingsViewModel>();
