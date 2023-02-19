@@ -9,6 +9,7 @@
   xmlns:core="using:Microsoft.Xaml.Interactions.Core"
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
+  xmlns:models="using:ZoNo.Models"
   mc:Ignorable="d"
   Loaded="UserControl_Loaded">
   <Grid
@@ -150,10 +151,10 @@
           Visibility="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding TransactionTime}"
-                ToolTipService.ToolTip="{Binding TransactionTime}"/>
+                Text="{x:Bind TransactionTime}"
+                ToolTipService.ToolTip="{x:Bind TransactionTime}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -163,10 +164,10 @@
           Visibility="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding AccountingDate}"
-                ToolTipService.ToolTip="{Binding AccountingDate}"/>
+                Text="{x:Bind AccountingDate}"
+                ToolTipService.ToolTip="{x:Bind AccountingDate}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -176,10 +177,10 @@
           Visibility="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding Type}"
-                ToolTipService.ToolTip="{Binding Type}"/>
+                Text="{x:Bind Type}"
+                ToolTipService.ToolTip="{x:Bind Type}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -189,10 +190,10 @@
           Visibility="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding IncomeOutcome}"
-                ToolTipService.ToolTip="{Binding IncomeOutcome}"/>
+                Text="{x:Bind IncomeOutcome}"
+                ToolTipService.ToolTip="{x:Bind IncomeOutcome}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -202,10 +203,10 @@
           Visibility="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding PartnerName}"
-                ToolTipService.ToolTip="{Binding PartnerName}"/>
+                Text="{x:Bind PartnerName}"
+                ToolTipService.ToolTip="{x:Bind PartnerName}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -215,10 +216,10 @@
           Visibility="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding PartnerAccountId}"
-                ToolTipService.ToolTip="{Binding PartnerAccountId}"/>
+                Text="{x:Bind PartnerAccountId}"
+                ToolTipService.ToolTip="{x:Bind PartnerAccountId}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -228,10 +229,10 @@
           Visibility="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding SpendingCategory}"
-                ToolTipService.ToolTip="{Binding SpendingCategory}"/>
+                Text="{x:Bind SpendingCategory}"
+                ToolTipService.ToolTip="{x:Bind SpendingCategory}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -241,10 +242,10 @@
           Visibility="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding Description}"
-                ToolTipService.ToolTip="{Binding Description}"/>
+                Text="{x:Bind Description}"
+                ToolTipService.ToolTip="{x:Bind Description}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -254,10 +255,10 @@
           Visibility="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding AccountName}"
-                ToolTipService.ToolTip="{Binding AccountName}"/>
+                Text="{x:Bind AccountName}"
+                ToolTipService.ToolTip="{x:Bind AccountName}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -267,10 +268,10 @@
           Visibility="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding AccountId}"
-                ToolTipService.ToolTip="{Binding AccountId}"/>
+                Text="{x:Bind AccountId}"
+                ToolTipService.ToolTip="{x:Bind AccountId}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -280,11 +281,11 @@
           Visibility="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
                 HorizontalAlignment="Right"
-                Text="{Binding Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
-                ToolTipService.ToolTip="{Binding Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+                Text="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
+                ToolTipService.ToolTip="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
@@ -294,10 +295,10 @@
           Visibility="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
           IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Transaction">
               <TextBlock
-                Text="{Binding Currency}"
-                ToolTipService.ToolTip="{Binding Currency}"/>
+                Text="{x:Bind Currency}"
+                ToolTipService.ToolTip="{x:Bind Currency}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
