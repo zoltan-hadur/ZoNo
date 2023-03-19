@@ -9,12 +9,18 @@ namespace ZoNo.Services
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
+    private readonly IRulesService _rulesService;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService)
+    public ActivationService(
+      ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+      IEnumerable<IActivationHandler> activationHandlers,
+      IThemeSelectorService themeSelectorService,
+      IRulesService rulesService)
     {
       _defaultHandler = defaultHandler;
       _activationHandlers = activationHandlers;
       _themeSelectorService = themeSelectorService;
+      _rulesService = rulesService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -50,6 +56,7 @@ namespace ZoNo.Services
     private async Task InitializeAsync()
     {
       await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+      await _rulesService.LoadRulesAsync();
       await Task.CompletedTask;
     }
 

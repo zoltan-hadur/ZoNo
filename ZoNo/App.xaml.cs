@@ -11,8 +11,10 @@ using ZoNo.Models;
 using ZoNo.Services;
 using ZoNo.ViewModels;
 using ZoNo.ViewModels.Import;
+using ZoNo.ViewModels.Rules;
 using ZoNo.Views;
 using ZoNo.Views.Import;
+using ZoNo.Views.Rules;
 
 namespace ZoNo
 {
@@ -91,6 +93,7 @@ namespace ZoNo
       services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelLoader, ExcelLoader>();
       services.AddSingleton<IRulesService, RulesService>();
+      services.AddSingleton<IRuleEvaluatorService, RuleEvaluatorService>();
 
       // Views and ViewModels
       services.AddScoped<LoginViewModel>();

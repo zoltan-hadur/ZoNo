@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
+using ZoNo.Services;
 
 namespace ZoNo.ViewModels.Import
 {
@@ -12,6 +13,8 @@ namespace ZoNo.ViewModels.Import
   {
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IExcelLoader _excelLoader;
+    private readonly IRulesService _rulesService;
+    private readonly IRuleEvaluatorService _ruleEvaluatorService;
 
     private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
 
@@ -19,10 +22,12 @@ namespace ZoNo.ViewModels.Import
 
     public Dictionary<string, ColumnViewModel>? Columns { get; private set; } = null;
 
-    public TransactionsViewModel(ILocalSettingsService localSettingsService, IExcelLoader excelLoader)
+    public TransactionsViewModel(ILocalSettingsService localSettingsService, IExcelLoader excelLoader, IRulesService rulesService, IRuleEvaluatorService ruleEvaluatorService)
     {
       _localSettingsService = localSettingsService;
       _excelLoader = excelLoader;
+      _rulesService = rulesService;
+      _ruleEvaluatorService = ruleEvaluatorService;
       TransactionsView.Source = _transactions;
     }
 
@@ -65,6 +70,7 @@ namespace ZoNo.ViewModels.Import
     {
       foreach (var transaction in await _excelLoader.LoadAsync(path))
       {
+        await _ruleEvaluatorService.EvaluateRulesAsync(_rulesService.GetRules(RuleType.Import), transaction, transaction);
         _transactions.Add(transaction);
       }
     }

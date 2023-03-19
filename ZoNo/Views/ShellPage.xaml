@@ -45,7 +45,7 @@
         </NavigationViewItem>
         <NavigationViewItem
           x:Uid="Shell_Rules"
-          helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.RulesViewModel">
+          helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Rules.RulesViewModel">
           <NavigationViewItem.Icon>
             <!-- Handwriting -->
             <FontIcon Glyph="&#xe929;"/>

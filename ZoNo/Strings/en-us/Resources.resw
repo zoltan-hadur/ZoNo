@@ -243,4 +243,28 @@
   <data name="Shell_Rules.Content" xml:space="preserve">
     <value>Rules</value>
   </data>
+  <data name="RuleManager_And.Value" xml:space="preserve">
+    <value> and </value>
+  </data>
+  <data name="RuleManager_DeleteRule.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="RuleManager_EditRule.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="RuleManager_If.Text" xml:space="preserve">
+    <value>, If </value>
+  </data>
+  <data name="RuleManager_ThenLet.Text" xml:space="preserve">
+    <value>, then let </value>
+  </data>
+  <data name="Rules_Import.Header" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Rules_Splitwise.Header" xml:space="preserve">
+    <value>Splitwise</value>
+  </data>
+  <data name="RuleManager_NewRule.Content" xml:space="preserve">
+    <value>New Rule</value>
+  </data>
 </root>

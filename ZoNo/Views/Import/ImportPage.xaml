@@ -27,7 +27,7 @@
           Value="8"/>
         <Setter
           Property="BorderBrush"
-          Value="{StaticResource SystemControlBackgroundListMediumRevealBorderBrush}"/>
+          Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
       </Style>
     </Grid.Resources>
     <Border Grid.Column="0">
