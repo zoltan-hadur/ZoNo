@@ -5,84 +5,28 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:model="using:ZoNo.Models"
-      mc:Ignorable="d"
-      SizeChanged="Page_SizeChanged">
-  <Grid x:Name="grid" ColumnSpacing="12">
-    <VisualStateManager.VisualStateGroups>
-      <VisualStateGroup>
-        <VisualState x:Name="DefaultState">
-          <Storyboard/>
-        </VisualState>
-        <VisualState x:Name="WideState">
-          <Storyboard>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="importRulesPlaceholder" Storyboard.TargetProperty="(Grid.Row)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="importRulesPlaceholder" Storyboard.TargetProperty="(Grid.Column)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="importRulesPlaceholder" Storyboard.TargetProperty="(Grid.RowSpan)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="2"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="importRulesPlaceholder" Storyboard.TargetProperty="(Grid.ColumnSpan)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="splitwiseRulesPlaceholder" Storyboard.TargetProperty="(Grid.Row)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="splitwiseRulesPlaceholder" Storyboard.TargetProperty="(Grid.Column)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="splitwiseRulesPlaceholder" Storyboard.TargetProperty="(Grid.RowSpan)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="2"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="splitwiseRulesPlaceholder" Storyboard.TargetProperty="(Grid.ColumnSpan)">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
-            </ObjectAnimationUsingKeyFrames>
-          </Storyboard>
-        </VisualState>
-      </VisualStateGroup>
-    </VisualStateManager.VisualStateGroups>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="*"/>
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
-    <Grid.Resources>
+      mc:Ignorable="d">
+  <local:AutomaticStackPanel StartingOrientation="Vertical" Threshold="1280" Spacing="12" Margin="0,0,0,12">
+    <local:AutomaticStackPanel.Resources>
       <Style TargetType="local:RuleManager">
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
       </Style>
-    </Grid.Resources>
-    <Rectangle x:Name="importRulesPlaceholder" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,12"/>
-    <Rectangle x:Name="splitwiseRulesPlaceholder" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,12"/>
-    <Canvas Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
-      <Canvas.Resources>
-        <model:RuleType x:Key="Import">Import</model:RuleType>
-        <model:RuleType x:Key="Splitwise">Splitwise</model:RuleType>
-      </Canvas.Resources>
-      <local:RuleManager Width="200"
-                         Height="200"
-                         x:Name="importRules"
-                         x:Uid="Rules_Import"
-                         Rules="{x:Bind ViewModel.ImportRules}"
-                         NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
-                         NewRuleCommandParameter="{StaticResource Import}"
-                         EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
-                         DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
-      <local:RuleManager Width="200"
-                         Height="200"
-                         x:Name="splitwiseRules"
-                         x:Uid="Rules_Splitwise"
-                         Rules="{x:Bind ViewModel.SplitwiseRules}"
-                         NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
-                         NewRuleCommandParameter="{StaticResource Splitwise}"
-                         EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
-                         DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
-    </Canvas>
-  </Grid>
+      <model:RuleType x:Key="Import">Import</model:RuleType>
+      <model:RuleType x:Key="Splitwise">Splitwise</model:RuleType>
+    </local:AutomaticStackPanel.Resources>
+    <local:RuleManager x:Uid="Rules_Import"
+                       Rules="{x:Bind ViewModel.ImportRules}"
+                       NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
+                       NewRuleCommandParameter="{StaticResource Import}"
+                       EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
+                       DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+    <local:RuleManager x:Uid="Rules_Splitwise"
+                       Rules="{x:Bind ViewModel.SplitwiseRules}"
+                       NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
+                       NewRuleCommandParameter="{StaticResource Splitwise}"
+                       EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
+                       DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+  </local:AutomaticStackPanel>
 </Page>
