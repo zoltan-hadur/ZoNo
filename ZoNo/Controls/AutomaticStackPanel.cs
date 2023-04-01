@@ -8,7 +8,7 @@ using Microsoft.UI.Xaml.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace ZoNo.Views.Rules
+namespace ZoNo.Controls
 {
   [ContentProperty(Name = nameof(Children))]
   public class AutomaticStackPanel : ContentControl

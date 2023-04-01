@@ -5,9 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:model="using:ZoNo.Models"
+      xmlns:controls="using:ZoNo.Controls"
       mc:Ignorable="d">
-  <local:AutomaticStackPanel StartingOrientation="Vertical" Threshold="1280" Spacing="12" Margin="0,0,0,12">
-    <local:AutomaticStackPanel.Resources>
+  <controls:AutomaticStackPanel StartingOrientation="Vertical" Threshold="1280" Spacing="12" Margin="0,0,0,12">
+    <controls:AutomaticStackPanel.Resources>
       <Style TargetType="local:RuleManager">
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="8"/>
@@ -15,7 +16,7 @@
       </Style>
       <model:RuleType x:Key="Import">Import</model:RuleType>
       <model:RuleType x:Key="Splitwise">Splitwise</model:RuleType>
-    </local:AutomaticStackPanel.Resources>
+    </controls:AutomaticStackPanel.Resources>
     <local:RuleManager x:Uid="Rules_Import"
                        Rules="{x:Bind ViewModel.ImportRules}"
                        NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
@@ -28,5 +29,5 @@
                        NewRuleCommandParameter="{StaticResource Splitwise}"
                        EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
                        DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
-  </local:AutomaticStackPanel>
+  </controls:AutomaticStackPanel>
 </Page>
