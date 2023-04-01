@@ -1,8 +1,7 @@
-﻿<Application
-  x:Class="ZoNo.App"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:converters="using:ZoNo.Converters">
+﻿<Application x:Class="ZoNo.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:ZoNo.Converters">
   <Application.Resources>
     <ResourceDictionary>
       <converters:ThousandsSeparatorConverter x:Key="ThousandsSeparatorConverter"/>

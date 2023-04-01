@@ -61,13 +61,13 @@
                 <ItemsRepeater.ItemTemplate>
                   <DataTemplate x:DataType="rules:OutputExpressionViewModel">
                     <TextBlock>
-                      <Run x:Name="separator">
+                      <Run x:Name="Separator">
                         <interactivity:Interaction.Behaviors>
                           <core:DataTriggerBehavior Binding="{x:Bind Index, Mode=OneWay}" ComparisonCondition="Equal" Value="1">
-                            <core:ChangePropertyAction TargetObject="{Binding ElementName=separator}" PropertyName="Text" Value=" "/>
+                            <core:ChangePropertyAction TargetObject="{Binding ElementName=Separator}" PropertyName="Text" Value=" "/>
                           </core:DataTriggerBehavior>
                           <core:DataTriggerBehavior Binding="{x:Bind Index, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="1">
-                            <core:ChangePropertyAction x:Uid="RuleManager_And" TargetObject="{Binding ElementName=separator}" PropertyName="Text"/>
+                            <core:ChangePropertyAction x:Uid="RuleManager_And" TargetObject="{Binding ElementName=Separator}" PropertyName="Text"/>
                           </core:DataTriggerBehavior>
                         </interactivity:Interaction.Behaviors>
                       </Run><!--

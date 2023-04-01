@@ -1,14 +1,11 @@
-﻿<Page
-  x:Class="ZoNo.Views.Import.ImportPage"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:local="using:ZoNo.Views.Import"
-  mc:Ignorable="d">
-  <Grid
-    x:Name="ContentArea"
-    ColumnSpacing="12">
+﻿<Page x:Class="ZoNo.Views.Import.ImportPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="using:ZoNo.Views.Import"
+      mc:Ignorable="d">
+  <Grid ColumnSpacing="12">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
@@ -19,15 +16,9 @@
     </Grid.RowDefinitions>
     <Grid.Resources>
       <Style TargetType="Border">
-        <Setter
-          Property="BorderThickness"
-          Value="1"/>
-        <Setter
-          Property="CornerRadius"
-          Value="8"/>
-        <Setter
-          Property="BorderBrush"
-          Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
       </Style>
     </Grid.Resources>
     <Border Grid.Column="0">
@@ -36,11 +27,6 @@
     <Border Grid.Column="1">
       
     </Border>
-    <Button
-      x:Uid="Import_UploadButton"
-      Grid.Row="1"
-      Grid.Column="1"
-      HorizontalAlignment="Right"
-      Margin="{StaticResource SmallTopBottomMargin}"/>
+    <Button x:Uid="Import_UploadButton" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Margin="{StaticResource SmallTopBottomMargin}"/>
   </Grid>
 </Page>

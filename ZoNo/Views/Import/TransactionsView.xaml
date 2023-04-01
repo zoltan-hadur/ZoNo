@@ -1,28 +1,18 @@
-<UserControl
-  x:Class="ZoNo.Views.Import.TransactionsView"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
-  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-  xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
-  xmlns:models="using:ZoNo.Models"
-  mc:Ignorable="d"
-  Loaded="UserControl_Loaded">
-  <Grid
-    Background="Transparent"
-    AllowDrop="True"
-    DragOver="Grid_DragOver"
-    Drop="Grid_Drop">
-    <TextBlock
-      x:Name="DropHereText"
-      x:Uid="Import_DropHereText"
-      Foreground="Gray"
-      HorizontalAlignment="Center"
-      VerticalAlignment="Center">
+<UserControl x:Class="ZoNo.Views.Import.TransactionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+             xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
+             xmlns:models="using:ZoNo.Models"
+             mc:Ignorable="d"
+             Loaded="UserControl_Loaded">
+  <Grid Background="Transparent" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
+    <TextBlock x:Name="DropHereText" x:Uid="Import_DropHereText" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
       <animations:Implicit.ShowAnimations>
         <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1"/>
       </animations:Implicit.ShowAnimations>
@@ -30,275 +20,204 @@
         <animations:OpacityAnimation Duration="0:0:0.3" From="1" To="0"/>
       </animations:Implicit.HideAnimations>
       <interactivity:Interaction.Behaviors>
-        <core:DataTriggerBehavior
-          Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}"
-          ComparisonCondition="Equal"
-          Value="0">
-          <core:ChangePropertyAction
-            TargetObject="{Binding ElementName=DropHereText}"
-            PropertyName="Visibility"
-            Value="Visible"/>
+        <core:DataTriggerBehavior Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}" ComparisonCondition="Equal" Value="0">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Visibility" Value="Visible"/>
         </core:DataTriggerBehavior>
-        <core:DataTriggerBehavior
-          Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}"
-          ComparisonCondition="GreaterThan"
-          Value="0">
-          <core:ChangePropertyAction
-            TargetObject="{Binding ElementName=DropHereText}"
-            PropertyName="Visibility"
-            Value="Collapsed" />
+        <core:DataTriggerBehavior Binding="{x:Bind ViewModel.TransactionsView.Count, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="0">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Visibility" Value="Collapsed" />
         </core:DataTriggerBehavior>
       </interactivity:Interaction.Behaviors>
     </TextBlock>
-    <controls:DataGrid
-      x:Name="DataGrid"
-      ItemsSource="{x:Bind ViewModel.TransactionsView}"
-      GridLinesVisibility="All"
-      AutoGenerateColumns="False"
-      Sorting="DataGrid_Sorting"
-      KeyDown="DataGrid_KeyDown">
+    <controls:DataGrid x:Name="DataGrid"
+                       ItemsSource="{x:Bind ViewModel.TransactionsView}"
+                       GridLinesVisibility="All"
+                       AutoGenerateColumns="False"
+                       Sorting="DataGrid_Sorting"
+                       KeyDown="DataGrid_KeyDown">
       <controls:DataGrid.Resources>
         <!-- So that it kinda looks like the default DataGridTextColumn -->
         <Style TargetType="TextBlock">
-          <Setter
-            Property="TextTrimming"
-            Value="CharacterEllipsis"/>
-          <Setter
-            Property="Padding"
-            Value="12,0,12,0"/>
-          <Setter
-            Property="VerticalAlignment"
-            Value="Center"/>
+          <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+          <Setter Property="Padding" Value="12,0,12,0"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
       </controls:DataGrid.Resources>
       <controls:DataGrid.ColumnHeaderStyle>
         <Style TargetType="controlsprimitives:DataGridColumnHeader">
           <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
-          <Setter
-            Property="Padding"
-            Value="12,0,-20,0"/>
+          <Setter Property="Padding" Value="12,0,-20,0"/>
           <!-- To have tooltip when column width is so small, the text is trimming -->
           <Setter Property="ContentTemplate">
             <Setter.Value>
               <DataTemplate>
-                <TextBlock
-                  Text="{Binding}"
-                  ToolTipService.ToolTip="{Binding}"
-                  TextTrimming="CharacterEllipsis"/>
+                <TextBlock Text="{Binding}" ToolTipService.ToolTip="{Binding}" TextTrimming="CharacterEllipsis"/>
               </DataTemplate>
             </Setter.Value>
           </Setter>
           <Setter Property="ContextFlyout">
             <Setter.Value>
               <MenuFlyout>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['TransactionTime'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['AccountingDate'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['Type'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['IncomeOutcome'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['PartnerName'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['PartnerAccountId'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['SpendingCategory'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['Description'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['AccountName'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['AccountId'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['Amount'].IsEnabled, Mode=OneWay}"/>
-                <ToggleMenuFlyoutItem
-                  Text="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-                  IsChecked="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{x:Bind ViewModel.Columns['Currency'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['TransactionTime'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['AccountingDate'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['Type'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['IncomeOutcome'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['PartnerName'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['PartnerAccountId'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['SpendingCategory'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['Description'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['AccountName'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['AccountId'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['Amount'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                      IsChecked="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind ViewModel.Columns['Currency'].IsEnabled, Mode=OneWay}"/>
               </MenuFlyout>
             </Setter.Value>
           </Setter>
         </Style>
       </controls:DataGrid.ColumnHeaderStyle>
       <controls:DataGrid.Columns>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['TransactionTime'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['TransactionTime'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind TransactionTime}"
-                ToolTipService.ToolTip="{x:Bind TransactionTime}"/>
+              <TextBlock Text="{x:Bind TransactionTime}" ToolTipService.ToolTip="{x:Bind TransactionTime}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['AccountingDate'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['AccountingDate'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind AccountingDate}"
-                ToolTipService.ToolTip="{x:Bind AccountingDate}"/>
+              <TextBlock Text="{x:Bind AccountingDate}" ToolTipService.ToolTip="{x:Bind AccountingDate}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['Type'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['Type'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind Type}"
-                ToolTipService.ToolTip="{x:Bind Type}"/>
+              <TextBlock Text="{x:Bind Type}" ToolTipService.ToolTip="{x:Bind Type}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['IncomeOutcome'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind IncomeOutcome}"
-                ToolTipService.ToolTip="{x:Bind IncomeOutcome}"/>
+              <TextBlock Text="{x:Bind IncomeOutcome}" ToolTipService.ToolTip="{x:Bind IncomeOutcome}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['PartnerName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['PartnerName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind PartnerName}"
-                ToolTipService.ToolTip="{x:Bind PartnerName}"/>
+              <TextBlock Text="{x:Bind PartnerName}" ToolTipService.ToolTip="{x:Bind PartnerName}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['PartnerAccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind PartnerAccountId}"
-                ToolTipService.ToolTip="{x:Bind PartnerAccountId}"/>
+              <TextBlock Text="{x:Bind PartnerAccountId}" ToolTipService.ToolTip="{x:Bind PartnerAccountId}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['SpendingCategory'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['SpendingCategory'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind SpendingCategory}"
-                ToolTipService.ToolTip="{x:Bind SpendingCategory}"/>
+              <TextBlock Text="{x:Bind SpendingCategory}" ToolTipService.ToolTip="{x:Bind SpendingCategory}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['Description'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['Description'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind Description}"
-                ToolTipService.ToolTip="{x:Bind Description}"/>
+              <TextBlock Text="{x:Bind Description}" ToolTipService.ToolTip="{x:Bind Description}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['AccountName'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['AccountName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind AccountName}"
-                ToolTipService.ToolTip="{x:Bind AccountName}"/>
+              <TextBlock Text="{x:Bind AccountName}" ToolTipService.ToolTip="{x:Bind AccountName}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['AccountId'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['AccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind AccountId}"
-                ToolTipService.ToolTip="{x:Bind AccountId}"/>
+              <TextBlock Text="{x:Bind AccountId}" ToolTipService.ToolTip="{x:Bind AccountId}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['Amount'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['Amount'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                HorizontalAlignment="Right"
-                Text="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
-                ToolTipService.ToolTip="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+              <TextBlock HorizontalAlignment="Right"
+                         Text="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
+                         ToolTipService.ToolTip="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
-        <controls:DataGridTemplateColumn
-          Tag="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay}"
-          Header="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
-          Visibility="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
-          IsReadOnly="True">
+        <controls:DataGridTemplateColumn Tag="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind ViewModel.Columns['Currency'].ColumnHeader, Mode=OneWay, Converter={StaticResource LocalizationConverter}, ConverterParameter='Import_{0}'}"
+                                         Visibility="{x:Bind ViewModel.Columns['Currency'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock
-                Text="{x:Bind Currency}"
-                ToolTipService.ToolTip="{x:Bind Currency}"/>
+              <TextBlock Text="{x:Bind Currency}" ToolTipService.ToolTip="{x:Bind Currency}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>

@@ -1,63 +1,29 @@
-﻿<Page
-  x:Class="ZoNo.Views.LoginPage"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  mc:Ignorable="d"
-  Loading="Page_Loading">
-  <Grid x:Name="ContentArea">
+﻿<Page x:Class="ZoNo.Views.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Loading="Page_Loading">
+  <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
       <RowDefinition Height="*"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <InfoBar
-      x:Uid="Login_InfoBar"
-      Grid.Row="0"
-      HorizontalAlignment="Center"
-      VerticalAlignment="Bottom"
-      Width="350"
-      Severity="Error"
-      IsOpen="{x:Bind ViewModel.IsWrongCredentials, Mode=OneWay}"/>
-    <ContentControl
-      Grid.Row="1"
-      IsEnabled="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-      HorizontalAlignment="Center"
-      VerticalAlignment="Center">
+    <InfoBar x:Uid="Login_InfoBar" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="350" Severity="Error" IsOpen="{x:Bind ViewModel.IsWrongCredentials, Mode=OneWay}"/>
+    <ContentControl Grid.Row="1"
+                    IsEnabled="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
       <StackPanel Width="200">
-        <TextBox
-          Name="Email"
-          x:Uid="Login_Email"
-          Margin="0,0,0,15"
-          KeyDown="TextBox_KeyDown"
-          Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
-        <PasswordBox
-          x:Uid="Login_Password"
-          Margin="0,0,0,15"
-          KeyDown="TextBox_KeyDown"
-          Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
-        <CheckBox
-          x:Uid="Login_RememberMe"
-          IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
-        <Button
-          Name="Login"
-          x:Uid="Login_Login"
-          HorizontalAlignment="Stretch"
-          Command="{x:Bind ViewModel.LoginCommand}"/>
+        <TextBox Name="Email" x:Uid="Login_Email" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
+        <PasswordBox x:Uid="Login_Password" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
+        <CheckBox x:Uid="Login_RememberMe" IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
+        <Button Name="Login" x:Uid="Login_Login" HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.LoginCommand}"/>
       </StackPanel>
     </ContentControl>
-    <ProgressRing
-      Grid.Row="1"
-      Width="100"
-      Height="100"
-      IsActive="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}"/>
-    <WebView2
-      x:Name="WebView"
-      Grid.Row="2"
-      VerticalAlignment="Top"
-      Width="302"
-      Height="76"
-      Opacity="{x:Bind ViewModel.CaptchaOpacity, Mode=OneWay}"/>
+    <ProgressRing Grid.Row="1" Width="100" Height="100" IsActive="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}"/>
+    <WebView2 x:Name="WebView" Grid.Row="2" VerticalAlignment="Top" Width="302" Height="76" Opacity="{x:Bind ViewModel.CaptchaOpacity, Mode=OneWay}"/>
   </Grid>
 </Page>

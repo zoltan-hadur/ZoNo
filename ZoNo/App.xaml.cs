@@ -18,7 +18,6 @@ using ZoNo.Views.Rules;
 
 namespace ZoNo
 {
-  // To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
   public partial class App : Application
   {
     private new static App Current => (App)Application.Current;
