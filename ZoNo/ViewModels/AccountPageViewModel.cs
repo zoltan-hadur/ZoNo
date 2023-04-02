@@ -11,7 +11,7 @@ using ZoNo.Services;
 
 namespace ZoNo.ViewModels
 {
-  public partial class AccountViewModel : ObservableRecipient
+  public partial class AccountPageViewModel : ObservableRecipient
   {
     private readonly ITopLevelNavigationService _topLevelNavigationService;
     private readonly ITokenService _tokenService;
@@ -38,7 +38,7 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private bool _isLoading = false;
 
-    public AccountViewModel(ITopLevelNavigationService topLevelNavigationService, ITokenService tokenService, IMessenger messenger) : base(messenger)
+    public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ITokenService tokenService, IMessenger messenger) : base(messenger)
     {
       _topLevelNavigationService = topLevelNavigationService;
       _tokenService = tokenService;
@@ -67,7 +67,7 @@ namespace ZoNo.ViewModels
     private void Logout()
     {
       Messenger.Send(new UserLoggedOutMessage());
-      _topLevelNavigationService.NavigateTo(typeof(LoginViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
     }
   }
 }

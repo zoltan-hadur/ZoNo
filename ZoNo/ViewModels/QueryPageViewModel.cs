@@ -2,12 +2,12 @@
 
 namespace ZoNo.ViewModels
 {
-  public class QueryViewModel : ObservableRecipient
+  public class QueryPageViewModel : ObservableRecipient
   {
     private static int _id = 0;
     public int Id { get; } = _id++;
 
-    public QueryViewModel()
+    public QueryPageViewModel()
     {
 
     }

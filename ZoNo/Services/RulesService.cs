@@ -3,93 +3,62 @@ using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class RulesService : IRulesService
+  public class RulesService : IRulesService, IImportRulesService, ISplitwiseRulesService
   {
-    private const string SettingRules = "Rules";
-
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly string SettingName;
 
-    protected List<Rule> _rules = new List<Rule>();
-    private bool _isLoaded = false;
+    private Rule[]? _rules;
+    private SemaphoreSlim _isLoaded = new SemaphoreSlim(initialCount: 0, maxCount: 1);
 
-    public RulesService(ILocalSettingsService localSettingsService)
+    public RulesService(ILocalSettingsService localSettingsService, string settingName)
     {
       _localSettingsService = localSettingsService;
-    }
-
-    private async Task OnSaveChangesAsync()
-    {
-      await _localSettingsService.SaveSettingAsync(SettingRules, _rules);
-    }
-
-    private async Task OnLoadRulesAsync()
-    {
-      _rules = await _localSettingsService.ReadSettingAsync<List<Rule>>(SettingRules) ?? new List<Rule>()
-      {
-        new Rule { Type = RuleType.Import, InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
-        new Rule { Type = RuleType.Import, InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"" } },
-        new Rule { Type = RuleType.Import, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"", "AccountId = AccountId + \" 100\"" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { Type = RuleType.Splitwise, InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
-      };
+      SettingName = settingName;
     }
 
     public async Task LoadRulesAsync()
     {
-      await OnLoadRulesAsync();
-      _isLoaded = true;
+      _rules = await _localSettingsService.ReadSettingAsync<Rule[]>(SettingName) ?? new Rule[]
+      {
+        new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
+        new Rule { InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
+        new Rule { InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"", "AccountId = AccountId + \" 100\"" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
+      };
+      _isLoaded.Release();
     }
 
-    public async Task AddRuleAsync(Rule rule)
+    public async Task<IEnumerable<Rule>> GetRulesAsync()
     {
-      if (!_isLoaded)
-      {
-        throw new InvalidOperationException("The rules has not been loaded yet!");
-      }
-      _rules.Add(rule.Clone());
-      await OnSaveChangesAsync();
+      await Loading();
+      return _rules!.Select(rule => rule.Clone());
     }
 
-    public List<Rule> GetRules(RuleType type)
+    public async Task SaveRulesAsync(IEnumerable<Rule> rules)
     {
-      if (!_isLoaded)
-      {
-        throw new InvalidOperationException("The rules has not been loaded yet!");
-      }
-      return _rules.Where(rule => rule.Type == type).Select(rule => rule.Clone()).ToList();
+      await Loading();
+      _rules = rules.Select(rule => rule.Clone()).ToArray();
+      await _localSettingsService.SaveSettingAsync(SettingName, _rules);
     }
 
-    public async Task UpdateRuleAsync(Rule rule)
+    private async Task Loading()
     {
-      if (!_isLoaded)
+      if (await _isLoaded.WaitAsync(TimeSpan.FromSeconds(5)) == false)
       {
-        throw new InvalidOperationException("The rules has not been loaded yet!");
+        throw new InvalidOperationException("Loading of rules has timed out!");
       }
-      var storedRule = _rules.Single(storedRule => storedRule.Id == rule.Id);
-      storedRule.Type = rule.Type;
-      storedRule.InputExpression = rule.InputExpression;
-      storedRule.OutputExpressions = rule.OutputExpressions.ToList();
-      await OnSaveChangesAsync();
-    }
-
-    public async Task DeleteRuleAsync(Rule rule)
-    {
-      if (!_isLoaded)
-      {
-        throw new InvalidOperationException("The rules has not been loaded yet!");
-      }
-      var storedRule = _rules.Single(storedRule => storedRule == rule);
-      _rules.Remove(storedRule);
-      await OnSaveChangesAsync();
+      _isLoaded.Release();
     }
   }
 }

@@ -5,11 +5,11 @@ namespace ZoNo.Views
 {
   public sealed partial class QueryPage : Page
   {
-    public QueryViewModel ViewModel { get; }
+    public QueryPageViewModel ViewModel { get; }
 
     public QueryPage()
     {
-      ViewModel = App.GetService<QueryViewModel>();
+      ViewModel = App.GetService<QueryPageViewModel>();
       InitializeComponent();
     }
   }

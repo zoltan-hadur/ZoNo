@@ -25,7 +25,7 @@ namespace ZoNo.Activation
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {
       // TODO: navigate to ShellPage when logged in, otherwise navigate to LoginPage
-      _topLevelNavigationService.NavigateTo(typeof(LoginViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
 
       await Task.CompletedTask;
     }

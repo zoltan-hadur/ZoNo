@@ -13,6 +13,20 @@ namespace ZoNo.ViewModels.Rules
     private int _index;
 
     [ObservableProperty]
-    private string _value;
+    private string _outputExpression = string.Empty;
+
+    public static OutputExpressionViewModel FromModel(string outputExpression, int index)
+    {
+      return new OutputExpressionViewModel
+      {
+        Index = index + 1,
+        OutputExpression = outputExpression
+      };
+    }
+
+    public static string ToModel(OutputExpressionViewModel vm)
+    {
+      return vm.OutputExpression;
+    }
   }
 }

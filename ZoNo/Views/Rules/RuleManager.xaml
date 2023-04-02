@@ -20,10 +20,7 @@
       <ListViewHeaderItem Grid.Row="0" HorizontalContentAlignment="Stretch">
         <Grid>
           <TextBlock Text="{x:Bind Header, Mode=OneWay}"/>
-          <Button x:Uid="RuleManager_NewRule"
-                  HorizontalAlignment="Right"
-                  Command="{x:Bind NewRuleCommand, Mode=OneWay}"
-                  CommandParameter="{x:Bind NewRuleCommandParameter}"/>
+          <Button x:Uid="RuleManager_NewRule" HorizontalAlignment="Right" Command="{x:Bind NewRuleCommand, Mode=OneWay}"/>
         </Grid>
       </ListViewHeaderItem>
       <ListView Grid.Row="1" CanReorderItems="True" AllowDrop="True" ItemsSource="{x:Bind Rules, Mode=OneWay}">
@@ -32,14 +29,8 @@
             <Setter Property="ContextFlyout">
               <Setter.Value>
                 <MenuFlyout Opening="MenuFlyout_Opening">
-                  <MenuFlyoutItem x:Uid="RuleManager_EditRule"
-                                  Icon="Edit"
-                                  Command="{x:Bind EditRuleCommand, Mode=OneWay}"
-                                  CommandParameter="{Binding}"/>
-                  <MenuFlyoutItem x:Uid="RuleManager_DeleteRule"
-                                  Icon="Delete"
-                                  Command="{x:Bind DeleteRuleCommand, Mode=OneWay}"
-                                  CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem x:Uid="RuleManager_EditRule" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem x:Uid="RuleManager_DeleteRule" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                 </MenuFlyout>
               </Setter.Value>
             </Setter>
@@ -71,7 +62,7 @@
                           </core:DataTriggerBehavior>
                         </interactivity:Interaction.Behaviors>
                       </Run><!--
-                   --><Run Text="{x:Bind Value,Mode=OneWay}" Foreground="Green"/>
+                   --><Run Text="{x:Bind OutputExpression, Mode=OneWay}" Foreground="Green"/>
                     </TextBlock>
                   </DataTemplate>
                 </ItemsRepeater.ItemTemplate>

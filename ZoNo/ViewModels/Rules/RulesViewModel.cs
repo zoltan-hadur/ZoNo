@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Globalization.DateTimeFormatting;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
@@ -16,57 +17,45 @@ namespace ZoNo.ViewModels.Rules
   {
     private readonly IRulesService _rulesService;
 
-    public ObservableCollection<RuleViewModel> ImportRules { get; }
-    public ObservableCollection<RuleViewModel> SplitwiseRules { get; }
+    public ObservableCollection<RuleViewModel>? Rules { get; private set; }
 
     public RulesViewModel(IRulesService rulesService)
     {
       _rulesService = rulesService;
-      ImportRules = new ObservableCollection<RuleViewModel>(_rulesService.GetRules(RuleType.Import).Select((rule, index) => new RuleViewModel(rule)
-      {
-        Index = index + 1
-      }));
-      SplitwiseRules = new ObservableCollection<RuleViewModel>(_rulesService.GetRules(RuleType.Splitwise).Select((rule, index) => new RuleViewModel(rule)
-      {
-        Index = index + 1
-      }));
-
-      ImportRules.CollectionChanged += ImportRules_CollectionChanged;
-      SplitwiseRules.CollectionChanged += SplitwiseRules_CollectionChanged;
     }
 
-    private void ImportRules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    public async Task Load()
     {
-      for (int i = 0; i < ImportRules.Count; ++i)
+      var rules = await _rulesService.GetRulesAsync();
+      Rules = new ObservableCollection<RuleViewModel>(rules.Select(RuleViewModel.FromModel));
+      Rules.CollectionChanged += Rules_CollectionChanged;
+    }
+
+    private async void Rules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+      for (int i = 0; i < Rules!.Count; ++i)
       {
-        ImportRules[i].Index = i + 1;
+        Rules[i].Index = i + 1;
       }
-    }
-
-    private void SplitwiseRules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-      for (int i = 0; i < SplitwiseRules.Count; ++i)
-      {
-        SplitwiseRules[i].Index = i + 1;
-      }
+      await _rulesService.SaveRulesAsync(Rules!.Select(RuleViewModel.ToModel));
     }
 
     [RelayCommand]
-    private async void NewRule(RuleType type)
+    private void NewRule()
     {
 
     }
 
     [RelayCommand]
-    private async void EditRule(RuleViewModel rule)
+    private void EditRule(RuleViewModel rule)
     {
 
     }
 
     [RelayCommand]
-    private async void DeleteRule(RuleViewModel rule)
+    private void DeleteRule(RuleViewModel rule)
     {
-
+      Rules!.Remove(rule);
     }
   }
 }

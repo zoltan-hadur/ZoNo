@@ -6,11 +6,11 @@ namespace ZoNo.Views
 {
   public sealed partial class LoginPage : Page
   {
-    public LoginViewModel ViewModel { get; }
+    public LoginPageViewModel ViewModel { get; }
 
     public LoginPage()
     {
-      ViewModel = App.GetService<LoginViewModel>();
+      ViewModel = App.GetService<LoginPageViewModel>();
       InitializeComponent();
       ViewModel.WebView = WebView;
     }

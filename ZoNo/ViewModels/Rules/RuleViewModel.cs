@@ -11,30 +11,36 @@ namespace ZoNo.ViewModels.Rules
 {
   public partial class RuleViewModel : ObservableObject
   {
-    public Guid Id { get; }
-
-    [ObservableProperty]
-    private RuleType _type;
+    public Guid Id { get; private set; }
 
     [ObservableProperty]
     private int _index;
 
     [ObservableProperty]
-    private string _inputExpression;
+    private string _inputExpression = string.Empty;
 
     [ObservableProperty]
-    private ObservableCollection<OutputExpressionViewModel> _outputExpressions;
+    private ObservableCollection<OutputExpressionViewModel> _outputExpressions = new ObservableCollection<OutputExpressionViewModel>();
 
-    public RuleViewModel(Rule rule)
+    public static RuleViewModel FromModel(Rule model, int index)
     {
-      Id = rule.Id;
-      _type = rule.Type;
-      _inputExpression = rule.InputExpression;
-      _outputExpressions = new ObservableCollection<OutputExpressionViewModel>(rule.OutputExpressions.Select((expression, index) => new OutputExpressionViewModel()
+      return new RuleViewModel()
       {
+        Id = model.Id,
         Index = index + 1,
-        Value = expression
-      }));
+        InputExpression = model.InputExpression,
+        OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(model.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
+      };
+    }
+
+    public static Rule ToModel(RuleViewModel vm)
+    {
+      return new Rule()
+      {
+        Id = vm.Id,
+        InputExpression = vm.InputExpression,
+        OutputExpressions = vm.OutputExpressions.Select(OutputExpressionViewModel.ToModel).ToList()
+      };
     }
   }
 }

@@ -10,7 +10,7 @@ using ZoNo.Helpers;
 
 namespace ZoNo.ViewModels
 {
-  public partial class SettingsViewModel : ObservableRecipient
+  public partial class SettingsPageViewModel : ObservableRecipient
   {
     private readonly IThemeSelectorService _themeSelectorService;
     private ElementTheme _elementTheme;
@@ -30,7 +30,7 @@ namespace ZoNo.ViewModels
 
     public ICommand SwitchThemeCommand { get; }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService, IMessenger messenger) : base(messenger)
+    public SettingsPageViewModel(IThemeSelectorService themeSelectorService, IMessenger messenger) : base(messenger)
     {
       _themeSelectorService = themeSelectorService;
       _elementTheme = _themeSelectorService.Theme;

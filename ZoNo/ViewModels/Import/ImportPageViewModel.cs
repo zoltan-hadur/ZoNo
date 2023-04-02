@@ -2,7 +2,7 @@
 
 namespace ZoNo.ViewModels.Import
 {
-  public partial class ImportViewModel : ObservableObject
+  public partial class ImportPageViewModel : ObservableObject
   {
 
   }

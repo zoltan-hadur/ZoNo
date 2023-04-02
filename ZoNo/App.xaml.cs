@@ -66,18 +66,18 @@ namespace ZoNo
       services.AddSingleton<ITopLevelPageService, PageService>(provider =>
       {
         return new PageService.Builder()
-          .Configure<LoginViewModel, LoginPage>()
-          .Configure<ShellViewModel, ShellPage>()
+          .Configure<LoginPageViewModel, LoginPage>()
+          .Configure<ShellPageViewModel, ShellPage>()
           .Build();
       });
       services.AddSingleton<IPageService, PageService>(provider =>
       {
         return new PageService.Builder()
-          .Configure<ImportViewModel, ImportPage>()
-          .Configure<RulesViewModel, RulesPage>()
-          .Configure<QueryViewModel, QueryPage>()
-          .Configure<AccountViewModel, AccountPage>()
-          .Configure<SettingsViewModel, SettingsPage>()
+          .Configure<ImportPageViewModel, ImportPage>()
+          .Configure<RulesPageViewModel, RulesPage>()
+          .Configure<QueryPageViewModel, QueryPage>()
+          .Configure<AccountPageViewModel, AccountPage>()
+          .Configure<SettingsPageViewModel, SettingsPage>()
           .Build();
       });
       services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
@@ -91,18 +91,22 @@ namespace ZoNo
 
       services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelLoader, ExcelLoader>();
-      services.AddSingleton<IRulesService, RulesService>();
+      services.AddSingleton<IImportRulesService>(provider => new RulesService(provider.GetService<ILocalSettingsService>()!, "Rules_Import"));
+      services.AddSingleton<ISplitwiseRulesService>(provider => new RulesService(provider.GetService<ILocalSettingsService>()!, "Rules_Splitwise"));
       services.AddSingleton<IRuleEvaluatorService, RuleEvaluatorService>();
 
       // Views and ViewModels
-      services.AddScoped<LoginViewModel>();
-      services.AddScoped<ImportViewModel>();
+      services.AddScoped<LoginPageViewModel>();
+      services.AddScoped<ImportPageViewModel>();
       services.AddScoped<TransactionsViewModel>();
-      services.AddScoped<RulesViewModel>();
-      services.AddScoped<QueryViewModel>();
-      services.AddScoped<AccountViewModel>();
-      services.AddScoped<SettingsViewModel>();
-      services.AddScoped<ShellViewModel>();
+      services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
+        new RulesViewModel(provider.GetService<IImportRulesService>()!),
+        new RulesViewModel(provider.GetService<ISplitwiseRulesService>()!))
+      );
+      services.AddScoped<QueryPageViewModel>();
+      services.AddScoped<AccountPageViewModel>();
+      services.AddScoped<SettingsPageViewModel>();
+      services.AddScoped<ShellPageViewModel>();
 
       // Configuration
       services.Configure<LocalSettingsOptions>(configuration.GetSection(nameof(LocalSettingsOptions)));

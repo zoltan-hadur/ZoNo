@@ -5,11 +5,11 @@ namespace ZoNo.Views.Import
 {
   public sealed partial class ImportPage : Page
   {
-    public ImportViewModel ViewModel { get; }
+    public ImportPageViewModel ViewModel { get; }
 
     public ImportPage()
     {
-      ViewModel = App.GetService<ImportViewModel>();
+      ViewModel = App.GetService<ImportPageViewModel>();
       InitializeComponent();
     }
   }

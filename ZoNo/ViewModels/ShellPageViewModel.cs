@@ -5,7 +5,7 @@ using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
-  public class ShellViewModel : ObservableRecipient
+  public class ShellPageViewModel : ObservableRecipient
   {
     private object? _selected;
 
@@ -19,7 +19,7 @@ namespace ZoNo.ViewModels
       set => SetProperty(ref _selected, value);
     }
 
-    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
+    public ShellPageViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
     {
       NavigationService = navigationService;
       NavigationService.Navigated += OnNavigated;

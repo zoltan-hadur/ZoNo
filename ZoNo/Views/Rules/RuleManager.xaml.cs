@@ -12,7 +12,6 @@ namespace ZoNo.Views.Rules
     public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(nameof(Header), typeof(string), typeof(RuleManager), null);
     public static readonly DependencyProperty RulesProperty = DependencyProperty.Register(nameof(Rules), typeof(ObservableCollection<RuleViewModel>), typeof(RuleManager), null);
     public static readonly DependencyProperty NewRuleCommandProperty = DependencyProperty.Register(nameof(NewRuleCommand), typeof(ICommand), typeof(RuleManager), null);
-    public static readonly DependencyProperty NewRuleCommandParameterProperty = DependencyProperty.Register(nameof(NewRuleCommandParameter), typeof(RuleType), typeof(RuleManager), null);
     public static readonly DependencyProperty EditRuleCommandProperty = DependencyProperty.Register(nameof(EditRuleCommand), typeof(ICommand), typeof(RuleManager), null);
     public static readonly DependencyProperty DeleteRuleCommandProperty = DependencyProperty.Register(nameof(DeleteRuleCommand), typeof(ICommand), typeof(RuleManager), null);
 
@@ -32,12 +31,6 @@ namespace ZoNo.Views.Rules
     {
       get => (ICommand)GetValue(NewRuleCommandProperty);
       set => SetValue(NewRuleCommandProperty, value);
-    }
-
-    public RuleType NewRuleCommandParameter
-    {
-      get => (RuleType)GetValue(NewRuleCommandParameterProperty);
-      set => SetValue(NewRuleCommandParameterProperty, value);
     }
 
     public ICommand EditRuleCommand

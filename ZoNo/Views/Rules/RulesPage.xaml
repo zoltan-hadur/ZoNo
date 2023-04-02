@@ -6,7 +6,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:model="using:ZoNo.Models"
       xmlns:controls="using:ZoNo.Controls"
-      mc:Ignorable="d">
+      mc:Ignorable="d"
+      Loading="Page_Loading">
   <controls:AutomaticStackPanel StartingOrientation="Vertical" Threshold="1280" Spacing="12" Margin="0,0,0,12">
     <controls:AutomaticStackPanel.Resources>
       <Style TargetType="local:RuleManager">
@@ -14,20 +15,16 @@
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
       </Style>
-      <model:RuleType x:Key="Import">Import</model:RuleType>
-      <model:RuleType x:Key="Splitwise">Splitwise</model:RuleType>
     </controls:AutomaticStackPanel.Resources>
     <local:RuleManager x:Uid="Rules_Import"
-                       Rules="{x:Bind ViewModel.ImportRules}"
-                       NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
-                       NewRuleCommandParameter="{StaticResource Import}"
-                       EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
-                       DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+                       Rules="{x:Bind ViewModel.ImportRulesViewModel.Rules}"
+                       NewRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.NewRuleCommand, Mode=OneWay}"
+                       EditRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.EditRuleCommand, Mode=OneWay}"
+                       DeleteRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.DeleteRuleCommand, Mode=OneWay}"/>
     <local:RuleManager x:Uid="Rules_Splitwise"
-                       Rules="{x:Bind ViewModel.SplitwiseRules}"
-                       NewRuleCommand="{x:Bind ViewModel.NewRuleCommand, Mode=OneWay}"
-                       NewRuleCommandParameter="{StaticResource Splitwise}"
-                       EditRuleCommand="{x:Bind ViewModel.EditRuleCommand, Mode=OneWay}"
-                       DeleteRuleCommand="{x:Bind ViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+                       Rules="{x:Bind ViewModel.SplitwiseRulesViewModel.Rules}"
+                       NewRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.NewRuleCommand, Mode=OneWay}"
+                       EditRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.EditRuleCommand, Mode=OneWay}"
+                       DeleteRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.DeleteRuleCommand, Mode=OneWay}"/>
   </controls:AutomaticStackPanel>
 </Page>

@@ -13,7 +13,7 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.ViewModels
 {
-  public partial class LoginViewModel : ObservableRecipient
+  public partial class LoginPageViewModel : ObservableRecipient
   {
     private enum State
     {
@@ -66,7 +66,7 @@ namespace ZoNo.ViewModels
 
     public WebView2? WebView { get; set; }
 
-    public LoginViewModel(
+    public LoginPageViewModel(
       ITopLevelNavigationService topLevelNavigationService,
       ILocalSettingsService localSettingsService,
       IThemeSelectorService themeSelectorService,
@@ -132,7 +132,7 @@ namespace ZoNo.ViewModels
 
       if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
       {
-        _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+        _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
       }
       else
       {
@@ -306,7 +306,7 @@ namespace ZoNo.ViewModels
               {
                 await _tokenService.SaveTokenAsync();
               }
-              _topLevelNavigationService.NavigateTo(typeof(ShellViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+              _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
             }
             else
             {

@@ -6,11 +6,11 @@ namespace ZoNo.Views
 {
   public sealed partial class AccountPage : Page
   {
-    public AccountViewModel ViewModel { get; }
+    public AccountPageViewModel ViewModel { get; }
 
     public AccountPage()
     {
-      ViewModel = App.GetService<AccountViewModel>();
+      ViewModel = App.GetService<AccountPageViewModel>();
       InitializeComponent();
     }
 
