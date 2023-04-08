@@ -35,8 +35,6 @@ namespace ZoNo.Services
       if (App.MainWindow.Content is FrameworkElement rootElement)
       {
         rootElement.RequestedTheme = Theme;
-
-        //TitleBarHelper.UpdateTitleBar(Theme);
       }
 
       await Task.CompletedTask;
