@@ -9,21 +9,18 @@ namespace ZoNo.Services
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
-    private readonly IImportRulesService _importRulesService;
-    private readonly ISplitwiseRulesService _splitwiseRulesService;
+    private readonly IRulesService _rulesService;
 
     public ActivationService(
       ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
       IEnumerable<IActivationHandler> activationHandlers,
       IThemeSelectorService themeSelectorService,
-      IImportRulesService importRulesService,
-      ISplitwiseRulesService splitwiseRulesService)
+      IRulesService rulesService)
     {
       _defaultHandler = defaultHandler;
       _activationHandlers = activationHandlers;
       _themeSelectorService = themeSelectorService;
-      _importRulesService = importRulesService;
-      _splitwiseRulesService = splitwiseRulesService;
+      _rulesService = rulesService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -59,8 +56,7 @@ namespace ZoNo.Services
     private async Task InitializeAsync()
     {
       await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
-      _ = _importRulesService.LoadRulesAsync();
-      _ = _splitwiseRulesService.LoadRulesAsync();
+      _ = _rulesService.LoadRulesAsync();
       await Task.CompletedTask;
     }
 

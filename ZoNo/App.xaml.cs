@@ -91,8 +91,7 @@ namespace ZoNo
 
       services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelLoader, ExcelLoader>();
-      services.AddSingleton<IImportRulesService>(provider => new RulesService(provider.GetService<ILocalSettingsService>()!, "Rules_Import"));
-      services.AddSingleton<ISplitwiseRulesService>(provider => new RulesService(provider.GetService<ILocalSettingsService>()!, "Rules_Splitwise"));
+      services.AddSingleton<IRulesService, RulesService>();
       services.AddSingleton<IRuleEvaluatorService, RuleEvaluatorService>();
 
       // Views and ViewModels
@@ -100,8 +99,8 @@ namespace ZoNo
       services.AddScoped<ImportPageViewModel>();
       services.AddScoped<TransactionsViewModel>();
       services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
-        new RulesViewModel(provider.GetService<IImportRulesService>()!),
-        new RulesViewModel(provider.GetService<ISplitwiseRulesService>()!))
+        new RulesViewModel(provider.GetService<IRulesService>()!, RuleType.Import),
+        new RulesViewModel(provider.GetService<IRulesService>()!, RuleType.Splitwise))
       );
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();

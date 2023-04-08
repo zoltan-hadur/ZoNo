@@ -8,11 +8,17 @@ using System.Threading.Tasks;
 
 namespace ZoNo.Models
 {
+  public enum RuleType
+  {
+    Import,
+    Splitwise
+  }
+
   public class Rule
   {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public required string InputExpression { get; set; }
-    public required List<string> OutputExpressions { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public required string InputExpression { get; init; }
+    public required IReadOnlyList<string> OutputExpressions { get; init; }
 
     public Rule Clone()
     {
@@ -20,7 +26,7 @@ namespace ZoNo.Models
       {
         Id = Id,
         InputExpression = InputExpression,
-        OutputExpressions = OutputExpressions.ToList()
+        OutputExpressions = OutputExpressions.ToArray()
       };
     }
   }

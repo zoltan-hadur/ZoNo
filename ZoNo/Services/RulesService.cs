@@ -1,64 +1,62 @@
 ﻿using ZoNo.Contracts.Services;
+using ZoNo.Helpers;
 using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class RulesService : IRulesService, IImportRulesService, ISplitwiseRulesService
+  public class RulesService : IRulesService
   {
     private readonly ILocalSettingsService _localSettingsService;
-    private readonly string SettingName;
+    private readonly string SettingName = "Rules";
 
-    private Rule[]? _rules;
-    private SemaphoreSlim _isLoaded = new SemaphoreSlim(initialCount: 0, maxCount: 1);
+    private Dictionary<RuleType, Rule[]> _rules = new Dictionary<RuleType, Rule[]>();
+    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
-    public RulesService(ILocalSettingsService localSettingsService, string settingName)
+    public RulesService(ILocalSettingsService localSettingsService)
     {
       _localSettingsService = localSettingsService;
-      SettingName = settingName;
     }
 
     public async Task LoadRulesAsync()
     {
-      _rules = await _localSettingsService.ReadSettingAsync<Rule[]>(SettingName) ?? new Rule[]
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      foreach (var type in Enum.GetValues<RuleType>())
       {
-        new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
-        new Rule { InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new List<string>{ "AccountId = \"Asd\"" } },
-        new Rule { InputExpression = "Amount > 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" 100\"", "AccountId = AccountId + \" 100\"" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-        new Rule { InputExpression = "Amount < 0", OutputExpressions = new List<string>{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
-      };
-      _isLoaded.Release();
-    }
-
-    public async Task<IEnumerable<Rule>> GetRulesAsync()
-    {
-      await Loading();
-      return _rules!.Select(rule => rule.Clone());
-    }
-
-    public async Task SaveRulesAsync(IEnumerable<Rule> rules)
-    {
-      await Loading();
-      _rules = rules.Select(rule => rule.Clone()).ToArray();
-      await _localSettingsService.SaveSettingAsync(SettingName, _rules);
-    }
-
-    private async Task Loading()
-    {
-      if (await _isLoaded.WaitAsync(TimeSpan.FromSeconds(5)) == false)
-      {
-        throw new InvalidOperationException("Loading of rules has timed out!");
+        _rules[type] = await _localSettingsService.ReadSettingAsync<Rule[]>($"{SettingName}_{type}") ?? (type == RuleType.Import ?
+          new Rule[]
+          {
+            new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new string[]{ "AccountId = \"Asd\"" } },
+            new Rule { InputExpression = "Amount > 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" 100\"" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
+          } :
+          new Rule[]
+          {
+            new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new string[]{ "AccountId = \"Asd\"" } },
+            new Rule { InputExpression = "Amount > 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" 100\"", "AccountId = AccountId + \" 100\"" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
+            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
+          });
       }
-      _isLoaded.Release();
+    }
+
+    public async Task<IList<Rule>> GetRulesAsync(RuleType type)
+    {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+      return _rules[type].Select(rule => rule.Clone()).ToArray();
+    }
+
+    public async Task SaveRulesAsync(RuleType type, IList<Rule> rules)
+    {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+      _rules[type] = rules.Select(rule => rule.Clone()).ToArray();
+      await _localSettingsService.SaveSettingAsync($"{SettingName}_{type}", _rules[type]);
     }
   }
 }

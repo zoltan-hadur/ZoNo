@@ -13,7 +13,7 @@ namespace ZoNo.ViewModels.Import
   {
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IExcelLoader _excelLoader;
-    private readonly IImportRulesService _importRulesService;
+    private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorService _ruleEvaluatorService;
 
     private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
@@ -25,12 +25,12 @@ namespace ZoNo.ViewModels.Import
     public TransactionsViewModel(
       ILocalSettingsService localSettingsService,
       IExcelLoader excelLoader,
-      IImportRulesService importRulesService,
+      IRulesService rulesService,
       IRuleEvaluatorService ruleEvaluatorService)
     {
       _localSettingsService = localSettingsService;
       _excelLoader = excelLoader;
-      _importRulesService = importRulesService;
+      _rulesService = rulesService;
       _ruleEvaluatorService = ruleEvaluatorService;
       TransactionsView.Source = _transactions;
     }
@@ -72,7 +72,7 @@ namespace ZoNo.ViewModels.Import
 
     public async Task LoadExcelDocument(string path)
     {
-      var rules = await _importRulesService.GetRulesAsync();
+      var rules = await _rulesService.GetRulesAsync(RuleType.Import);
       foreach (var transaction in await _excelLoader.LoadAsync(path))
       {
         await _ruleEvaluatorService.EvaluateRulesAsync(rules, input: transaction, output: transaction);
