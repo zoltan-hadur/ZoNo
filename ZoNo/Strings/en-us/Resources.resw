@@ -267,4 +267,10 @@
   <data name="RuleManager_NewRule.Content" xml:space="preserve">
     <value>New Rule</value>
   </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>
