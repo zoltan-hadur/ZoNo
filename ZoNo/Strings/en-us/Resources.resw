@@ -297,4 +297,7 @@
   <data name="RuleEditor_Then.Text" xml:space="preserve">
     <value>Then</value>
   </data>
+  <data name="RuleManager_DuplicateRule.Text" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
 </root>

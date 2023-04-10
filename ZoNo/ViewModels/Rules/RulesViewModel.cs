@@ -89,6 +89,15 @@ namespace ZoNo.ViewModels.Rules
     }
 
     [RelayCommand]
+    private void DuplicateRule(RuleViewModel rule)
+    {
+      var index = Rules.IndexOf(rule);
+      var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);
+      copiedRule.Id = Guid.NewGuid();
+      Rules.Insert(index + 1, copiedRule);
+    }
+
+    [RelayCommand]
     private void DeleteRule(RuleViewModel rule)
     {
       Rules.Remove(rule);

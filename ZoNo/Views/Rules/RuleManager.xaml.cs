@@ -13,6 +13,7 @@ namespace ZoNo.Views.Rules
     public static readonly DependencyProperty RulesProperty = DependencyProperty.Register(nameof(Rules), typeof(ObservableCollection<RuleViewModel>), typeof(RuleManager), null);
     public static readonly DependencyProperty NewRuleCommandProperty = DependencyProperty.Register(nameof(NewRuleCommand), typeof(ICommand), typeof(RuleManager), null);
     public static readonly DependencyProperty EditRuleCommandProperty = DependencyProperty.Register(nameof(EditRuleCommand), typeof(ICommand), typeof(RuleManager), null);
+    public static readonly DependencyProperty DuplicateRuleCommandProperty = DependencyProperty.Register(nameof(DuplicateRuleCommand), typeof(ICommand), typeof(RuleManager), null);
     public static readonly DependencyProperty DeleteRuleCommandProperty = DependencyProperty.Register(nameof(DeleteRuleCommand), typeof(ICommand), typeof(RuleManager), null);
 
     public string Header
@@ -37,6 +38,12 @@ namespace ZoNo.Views.Rules
     {
       get => (ICommand)GetValue(EditRuleCommandProperty);
       set => SetValue(EditRuleCommandProperty, value);
+    }
+
+    public ICommand DuplicateRuleCommand
+    {
+      get => (ICommand)GetValue(DuplicateRuleCommandProperty);
+      set => SetValue(DuplicateRuleCommandProperty, value);
     }
 
     public ICommand DeleteRuleCommand

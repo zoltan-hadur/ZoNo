@@ -30,6 +30,7 @@
               <Setter.Value>
                 <MenuFlyout Opening="MenuFlyout_Opening">
                   <MenuFlyoutItem x:Uid="RuleManager_EditRule" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem x:Uid="RuleManager_DuplicateRule" Icon="Copy" Command="{x:Bind DuplicateRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                   <MenuFlyoutItem x:Uid="RuleManager_DeleteRule" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                 </MenuFlyout>
               </Setter.Value>

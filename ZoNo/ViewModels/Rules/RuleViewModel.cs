@@ -14,7 +14,7 @@ namespace ZoNo.ViewModels.Rules
 {
   public partial class RuleViewModel : ObservableObject
   {
-    private Guid _id = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [ObservableProperty]
     private int _index;
@@ -53,7 +53,7 @@ namespace ZoNo.ViewModels.Rules
     {
       return new RuleViewModel()
       {
-        _id = model.Id,
+        Id = model.Id,
         Index = index + 1,
         InputExpression = model.InputExpression,
         OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(model.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
@@ -64,7 +64,7 @@ namespace ZoNo.ViewModels.Rules
     {
       return new Rule()
       {
-        Id = vm._id,
+        Id = vm.Id,
         InputExpression = vm.InputExpression,
         OutputExpressions = vm.OutputExpressions.Select(OutputExpressionViewModel.ToModel).ToArray()
       };
