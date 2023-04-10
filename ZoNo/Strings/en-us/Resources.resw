@@ -273,4 +273,28 @@
   <data name="Dialog_OK" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="RuleEditor_Import_Edit" xml:space="preserve">
+    <value>Edit Import Rule</value>
+  </data>
+  <data name="RuleEditor_Import_New" xml:space="preserve">
+    <value>New Import Rule</value>
+  </data>
+  <data name="RuleEditor_Splitwise_Edit" xml:space="preserve">
+    <value>Edit Splitwise Rule</value>
+  </data>
+  <data name="RuleEditor_Splitwise_New" xml:space="preserve">
+    <value>New Splitwise Rule</value>
+  </data>
+  <data name="RuleEditor_If.Text" xml:space="preserve">
+    <value>If</value>
+  </data>
+  <data name="RuleEditor_Let.Text" xml:space="preserve">
+    <value>, let</value>
+  </data>
+  <data name="RuleEditor_NewOutputExpression.Content" xml:space="preserve">
+    <value>New Output Expression</value>
+  </data>
+  <data name="RuleEditor_Then.Text" xml:space="preserve">
+    <value>Then</value>
+  </data>
 </root>

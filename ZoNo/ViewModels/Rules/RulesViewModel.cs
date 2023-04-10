@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,12 +13,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Globalization.DateTimeFormatting;
 using ZoNo.Contracts.Services;
+using ZoNo.Helpers;
 using ZoNo.Models;
+using ZoNo.Services;
+using ZoNo.Views.Rules;
 
 namespace ZoNo.ViewModels.Rules
 {
   public partial class RulesViewModel : ObservableObject
   {
+    private readonly IDialogService _dialogService;
     private readonly IRulesService _rulesService;
     private readonly RuleType _ruleType;
 
@@ -24,8 +30,9 @@ namespace ZoNo.ViewModels.Rules
 
     public ObservableCollection<RuleViewModel> Rules { get; } = new ObservableCollection<RuleViewModel>();
 
-    public RulesViewModel(IRulesService rulesService, RuleType ruleType)
+    public RulesViewModel(IDialogService dialogService, IRulesService rulesService, RuleType ruleType)
     {
+      _dialogService = dialogService;
       _rulesService = rulesService;
       _ruleType = ruleType;
     }
@@ -55,15 +62,30 @@ namespace ZoNo.ViewModels.Rules
     }
 
     [RelayCommand]
-    private void NewRule()
+    private async void NewRule()
     {
-
+      var rule = new RuleViewModel()
+      {
+        Index = Rules.Count + 1,
+        OutputExpressions = new ObservableCollection<OutputExpressionViewModel> { new OutputExpressionViewModel() { Index = 1 } }
+      };
+      var ok = await _dialogService.ShowDialogAsync($"RuleEditor_{_ruleType}_New".GetLocalized(), new RuleEditor(rule));
+      if (ok)
+      {
+        Rules.Add(rule);
+      }
     }
 
     [RelayCommand]
-    private void EditRule(RuleViewModel rule)
+    private async void EditRule(RuleViewModel rule)
     {
-
+      var index = Rules.IndexOf(rule);
+      var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);
+      var ok = await _dialogService.ShowDialogAsync($"RuleEditor_{_ruleType}_Edit".GetLocalized(), new RuleEditor(copiedRule));
+      if (ok)
+      {
+        Rules[index] = copiedRule;
+      }
     }
 
     [RelayCommand]

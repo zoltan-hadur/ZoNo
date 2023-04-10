@@ -18,13 +18,13 @@
     </controls:AutomaticStackPanel.Resources>
     <local:RuleManager x:Uid="Rules_Import"
                        Rules="{x:Bind ViewModel.ImportRulesViewModel.Rules}"
-                       NewRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.NewRuleCommand, Mode=OneWay}"
-                       EditRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.EditRuleCommand, Mode=OneWay}"
-                       DeleteRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+                       NewRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.NewRuleCommand}"
+                       EditRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.EditRuleCommand}"
+                       DeleteRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.DeleteRuleCommand}"/>
     <local:RuleManager x:Uid="Rules_Splitwise"
                        Rules="{x:Bind ViewModel.SplitwiseRulesViewModel.Rules}"
-                       NewRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.NewRuleCommand, Mode=OneWay}"
-                       EditRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.EditRuleCommand, Mode=OneWay}"
-                       DeleteRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.DeleteRuleCommand, Mode=OneWay}"/>
+                       NewRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.NewRuleCommand}"
+                       EditRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.EditRuleCommand}"
+                       DeleteRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.DeleteRuleCommand}"/>
   </controls:AutomaticStackPanel>
 </Page>

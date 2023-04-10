@@ -100,8 +100,8 @@ namespace ZoNo
       services.AddScoped<ImportPageViewModel>();
       services.AddScoped<TransactionsViewModel>();
       services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
-        new RulesViewModel(provider.GetService<IRulesService>()!, RuleType.Import),
-        new RulesViewModel(provider.GetService<IRulesService>()!, RuleType.Splitwise))
+        new RulesViewModel(provider.GetService<IDialogService>()!, provider.GetService<IRulesService>()!, RuleType.Import),
+        new RulesViewModel(provider.GetService<IDialogService>()!, provider.GetService<IRulesService>()!, RuleType.Splitwise))
       );
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();
