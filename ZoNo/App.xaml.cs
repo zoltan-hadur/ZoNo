@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Splitwise;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
+using ZoNo.Helpers;
 using ZoNo.Messages;
 using ZoNo.Models;
 using ZoNo.Services;
@@ -118,10 +119,15 @@ namespace ZoNo
       ServiceScope.ServiceProvider.GetService<IMessenger>()!.Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
     }
 
-    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-      // TODO: Log and handle exceptions as appropriate.
-      // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+      e.Handled = true;
+      await GetService<IDialogService>().ShowDialogAsync(DialogType.Ok, "App_UnhandledException".GetLocalized(), new TextBlock()
+      {
+        Text = e.Exception.ToString(),
+        IsTextSelectionEnabled = true
+      });
+      Exit();
     }
 
     private async void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)

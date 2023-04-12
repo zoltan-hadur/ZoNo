@@ -300,4 +300,7 @@
   <data name="RuleManager_DuplicateRule.Text" xml:space="preserve">
     <value>Duplicate</value>
   </data>
+  <data name="App_UnhandledException" xml:space="preserve">
+    <value>Unhandled Exception</value>
+  </data>
 </root>

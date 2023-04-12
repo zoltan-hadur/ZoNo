@@ -69,7 +69,7 @@ namespace ZoNo.ViewModels.Rules
         Index = Rules.Count + 1,
         OutputExpressions = new ObservableCollection<OutputExpressionViewModel> { new OutputExpressionViewModel() { Index = 1 } }
       };
-      var ok = await _dialogService.ShowDialogAsync($"RuleEditor_{_ruleType}_New".GetLocalized(), new RuleEditor(rule));
+      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"RuleEditor_{_ruleType}_New".GetLocalized(), new RuleEditor(rule));
       if (ok)
       {
         Rules.Add(rule);
@@ -81,7 +81,7 @@ namespace ZoNo.ViewModels.Rules
     {
       var index = Rules.IndexOf(rule);
       var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);
-      var ok = await _dialogService.ShowDialogAsync($"RuleEditor_{_ruleType}_Edit".GetLocalized(), new RuleEditor(copiedRule));
+      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"RuleEditor_{_ruleType}_Edit".GetLocalized(), new RuleEditor(copiedRule));
       if (ok)
       {
         Rules[index] = copiedRule;

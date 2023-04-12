@@ -22,7 +22,7 @@ namespace ZoNo.Services
       _themeSelectorService = themeSelectorService;
     }
 
-    public async Task<bool> ShowDialogAsync<T>(string title, T content, Binding? isPrimaryButtonEnabled = null)
+    public async Task<bool> ShowDialogAsync<T>(DialogType type, string title, T content, Binding? isPrimaryButtonEnabled = null)
     {
       var margin = 12;
       var dialog = new ContentDialog()
@@ -31,7 +31,7 @@ namespace ZoNo.Services
         RequestedTheme = _themeSelectorService.Theme,
         Title = title,
         PrimaryButtonText = "Dialog_OK".GetLocalized(),
-        CloseButtonText = "Dialog_Cancel".GetLocalized(),
+        CloseButtonText = type == DialogType.OkCancel ? "Dialog_Cancel".GetLocalized() : string.Empty,
         Content = content
       };
       dialog.Resources["ContentDialogMinWidth"] = 0.0;
