@@ -26,8 +26,6 @@ namespace ZoNo.ViewModels.Rules
     private readonly IRulesService _rulesService;
     private readonly RuleType _ruleType;
 
-    private bool _isLoaded = false;
-
     public ObservableCollection<RuleViewModel> Rules { get; } = new ObservableCollection<RuleViewModel>();
 
     public RulesViewModel(IDialogService dialogService, IRulesService rulesService, RuleType ruleType)
@@ -39,16 +37,14 @@ namespace ZoNo.ViewModels.Rules
 
     public async Task Load()
     {
-      if (_isLoaded) return;
-
+      Rules.CollectionChanged -= Rules_CollectionChanged;
+      Rules.Clear();
       var rules = await _rulesService.GetRulesAsync(_ruleType);
       foreach (var rule in rules.Select(RuleViewModel.FromModel))
       {
         Rules.Add(rule);
       }
       Rules.CollectionChanged += Rules_CollectionChanged;
-
-      _isLoaded = true;
     }
 
     private async void Rules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
