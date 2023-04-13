@@ -22,27 +22,7 @@ namespace ZoNo.Services
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       foreach (var type in Enum.GetValues<RuleType>())
       {
-        _rules[type] = await _localSettingsService.ReadSettingAsync<Rule[]>($"{SettingName}_{type}") ?? (type == RuleType.Import ?
-          new Rule[]
-          {
-            new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new string[]{ "AccountId = \"Asd\"" } },
-            new Rule { InputExpression = "Amount > 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" 100\"" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
-          } :
-          new Rule[]
-          {
-            new Rule { InputExpression = "AccountId == \"0\"", OutputExpressions = new string[]{ "AccountId = \"Asd\"" } },
-            new Rule { InputExpression = "Amount > 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" 100\"", "AccountId = AccountId + \" 100\"" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } },
-            new Rule { InputExpression = "Amount < 0", OutputExpressions = new string[]{ "AccountId = AccountId + \" \" + TransactionTime.Year" } }
-          });
+        _rules[type] = await _localSettingsService.ReadSettingAsync<Rule[]>($"{SettingName}_{type}") ?? new Rule[] { };
       }
     }
 
