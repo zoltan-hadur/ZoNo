@@ -7,6 +7,11 @@
       mc:Ignorable="d">
   <Grid>
     <StackPanel>
+      <TextBlock x:Uid="Settings_Rules" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+      <StackPanel Orientation="Horizontal" Margin="{StaticResource SmallTopBottomMargin}">
+        <Button x:Uid="Settings_Rules_Import" Margin="{StaticResource SmallRightMargin}" Command="{x:Bind ViewModel.ImportRulesCommand}"/>
+        <Button x:Uid="Settings_Rules_Export" Command="{x:Bind ViewModel.ExportRulesCommand}"/>
+      </StackPanel>
       <TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}"/>
       <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
         <TextBlock x:Uid="Settings_Theme"/>

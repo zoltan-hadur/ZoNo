@@ -303,4 +303,28 @@
   <data name="App_UnhandledException" xml:space="preserve">
     <value>Unhandled Exception</value>
   </data>
+  <data name="Settings_Dialog_Export_Failure" xml:space="preserve">
+    <value>Export to {0} was not successful!</value>
+  </data>
+  <data name="Settings_Dialog_Export_Success" xml:space="preserve">
+    <value>Export to {0} was successful!</value>
+  </data>
+  <data name="Settings_Dialog_Import_Failure" xml:space="preserve">
+    <value>Import from {0} was not successful!</value>
+  </data>
+  <data name="Settings_Dialog_Import_Success" xml:space="preserve">
+    <value>Import from {0} was successful!</value>
+  </data>
+  <data name="Settings_Dialog_Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Settings_Rules.Text" xml:space="preserve">
+    <value>Rules</value>
+  </data>
+  <data name="Settings_Rules_Export.Content" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Settings_Rules_Import.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
 </root>
