@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
+using ZoNo.Models;
 
 namespace ZoNo.Services
 {
@@ -10,17 +11,20 @@ namespace ZoNo.Services
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IRulesService _rulesService;
+    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
 
     public ActivationService(
       ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
       IEnumerable<IActivationHandler> activationHandlers,
       IThemeSelectorService themeSelectorService,
-      IRulesService rulesService)
+      IRulesService rulesService,
+      IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder)
     {
       _defaultHandler = defaultHandler;
       _activationHandlers = activationHandlers;
       _themeSelectorService = themeSelectorService;
       _rulesService = rulesService;
+      _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -57,6 +61,7 @@ namespace ZoNo.Services
     {
       await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
       _ = _rulesService.LoadRulesAsync();
+      _ = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(Array.Empty<Rule>());
       await Task.CompletedTask;
     }
 
