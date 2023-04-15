@@ -43,10 +43,7 @@ namespace ZoNo.Views.Import
       if (e.DataView.Contains(StandardDataFormats.StorageItems))
       {
         var items = await e.DataView.GetStorageItemsAsync();
-        foreach (var path in items.Select(item => item.Path))
-        {
-          await ViewModel.LoadExcelDocument(path);
-        }
+        await ViewModel.LoadExcelDocuments(items.Select(item => item.Path).ToArray());
       }
     }
 

@@ -68,15 +68,18 @@ namespace ZoNo.ViewModels.Import
       OnPropertyChanged(nameof(Columns));
     }
 
-    public async Task LoadExcelDocument(string path)
+    public async Task LoadExcelDocuments(IList<string> paths)
     {
       var rules = await _rulesService.GetRulesAsync(RuleType.Import);
       var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
-      foreach (var transaction in await _excelLoader.LoadAsync(path))
+      foreach (var path in paths)
       {
-        await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
-        _transactions.Add(transaction);
-        await Task.Delay(1);
+        foreach (var transaction in await _excelLoader.LoadAsync(path))
+        {
+          await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
+          _transactions.Add(transaction);
+          await Task.Delay(1);
+        }
       }
     }
 
