@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoNo.Models;
-
-namespace ZoNo.Contracts.Services
+﻿namespace ZoNo.Contracts.Services
 {
-  public interface IRuleEvaluatorService
+  public interface IRuleEvaluatorService<Input, Output>
   {
-    Task EvaluateRulesAsync<Input, Output>(IEnumerable<Rule> rules, Input input, Output output);
+    Task EvaluateRulesAsync(Input input, Output output);
   }
 }

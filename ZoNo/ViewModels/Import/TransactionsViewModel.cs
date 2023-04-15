@@ -2,10 +2,8 @@
 using CommunityToolkit.WinUI.UI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Common;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
-using ZoNo.Services;
 
 namespace ZoNo.ViewModels.Import
 {
@@ -14,7 +12,7 @@ namespace ZoNo.ViewModels.Import
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IExcelLoader _excelLoader;
     private readonly IRulesService _rulesService;
-    private readonly IRuleEvaluatorService _ruleEvaluatorService;
+    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
 
     private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
 
@@ -26,12 +24,12 @@ namespace ZoNo.ViewModels.Import
       ILocalSettingsService localSettingsService,
       IExcelLoader excelLoader,
       IRulesService rulesService,
-      IRuleEvaluatorService ruleEvaluatorService)
+      IRuleEvaluatorServiceBuilder ruleEvaluatorService)
     {
       _localSettingsService = localSettingsService;
       _excelLoader = excelLoader;
       _rulesService = rulesService;
-      _ruleEvaluatorService = ruleEvaluatorService;
+      _ruleEvaluatorServiceBuilder = ruleEvaluatorService;
       TransactionsView.Source = _transactions;
     }
 
@@ -73,10 +71,12 @@ namespace ZoNo.ViewModels.Import
     public async Task LoadExcelDocument(string path)
     {
       var rules = await _rulesService.GetRulesAsync(RuleType.Import);
+      var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
       foreach (var transaction in await _excelLoader.LoadAsync(path))
       {
-        await _ruleEvaluatorService.EvaluateRulesAsync(rules, input: transaction, output: transaction);
+        await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
         _transactions.Add(transaction);
+        await Task.Delay(1);
       }
     }
 
