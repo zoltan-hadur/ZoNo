@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ZoNo.Models;
@@ -66,6 +67,14 @@ namespace ZoNo.Views.Rules
         {
           item.DataContext = dataContext;
         }
+      }
+    }
+
+    private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+      if (e.OriginalSource is FrameworkElement element)
+      {
+        EditRuleCommand?.Execute(element.DataContext);
       }
     }
   }

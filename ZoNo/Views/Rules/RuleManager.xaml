@@ -23,7 +23,7 @@
           <Button x:Uid="RuleManager_NewRule" HorizontalAlignment="Right" Command="{x:Bind NewRuleCommand, Mode=OneWay}"/>
         </Grid>
       </ListViewHeaderItem>
-      <ListView Grid.Row="1" CanReorderItems="True" AllowDrop="True" ItemsSource="{x:Bind Rules, Mode=OneWay}">
+      <ListView Grid.Row="1" CanReorderItems="True" AllowDrop="True" ItemsSource="{x:Bind Rules, Mode=OneWay}" DoubleTapped="ListView_DoubleTapped">
         <ListView.ItemContainerStyle>
           <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
             <Setter Property="ContextFlyout">
