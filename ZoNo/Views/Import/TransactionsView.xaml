@@ -40,10 +40,16 @@
           <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
           <Setter Property="Padding" Value="12,0,12,0"/>
           <Setter Property="VerticalAlignment" Value="Center"/>
+          <Setter Property="FontSize" Value="14"/>
         </Style>
+        <StaticResource x:Key="DataGridColumnHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseHighBrush"/>
+        <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+        <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+        <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
       </controls:DataGrid.Resources>
       <controls:DataGrid.ColumnHeaderStyle>
         <Style TargetType="controlsprimitives:DataGridColumnHeader">
+          <Setter Property="FontSize" Value="16"/>
           <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
           <Setter Property="Padding" Value="12,0,-20,0"/>
           <!-- To have tooltip when column width is so small, the text is trimming -->
