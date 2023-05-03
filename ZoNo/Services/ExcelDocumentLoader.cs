@@ -6,7 +6,7 @@ using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class ExcelLoader : IExcelLoader
+  public class ExcelDocumentLoader : IExcelDocumentLoader
   {
     private const int _expectedWorksheetCount = 1;
     private const string _expectedWorksheetName = "Tranzakciók";
@@ -25,7 +25,7 @@ namespace ZoNo.Services
       "Pénznem"
     );
 
-    public DataSet GetDataSet(string path)
+    private DataSet GetDataSet(string path)
     {
       using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
       using var reader = ExcelReaderFactory.CreateReader(stream);
@@ -39,7 +39,7 @@ namespace ZoNo.Services
       return result;
     }
 
-    public void Validate(DataSet dataSet)
+    private void Validate(DataSet dataSet)
     {
       var actualWorksheetCount = dataSet.Tables.Count;
       if (actualWorksheetCount != _expectedWorksheetCount)
@@ -69,7 +69,7 @@ namespace ZoNo.Services
       }
     }
 
-    public Transaction TransformDataRowToTransaction(DataRow row)
+    private Transaction TransformDataRowToTransaction(DataRow row)
     {
       return new Transaction
       {
@@ -88,13 +88,13 @@ namespace ZoNo.Services
       };
     }
 
-    public async Task<IEnumerable<Transaction>> LoadAsync(string path)
+    public async Task<IList<Transaction>> LoadAsync(string path)
     {
       return await Task.Run(() =>
       {
         var dataSet = GetDataSet(path);
         Validate(dataSet);
-        return dataSet.Tables[0].Rows.Cast<DataRow>().Select(TransformDataRowToTransaction);
+        return dataSet.Tables[0].Rows.Cast<DataRow>().Select(TransformDataRowToTransaction).ToArray();
       });
     }
   }

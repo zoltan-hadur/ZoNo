@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using ZoNo.ViewModels.Import;
 
 namespace ZoNo.Views.Import
@@ -11,6 +12,11 @@ namespace ZoNo.Views.Import
     {
       ViewModel = App.GetService<ImportPageViewModel>();
       InitializeComponent();
+    }
+
+    private async void Page_Loading(FrameworkElement sender, object args)
+    {
+      await ViewModel.TransactionsViewModel.Load();
     }
   }
 }

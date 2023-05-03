@@ -6,7 +6,8 @@ namespace ZoNo.ViewModels.Import
   [DebuggerDisplay("ColumnHeader = {ColumnHeader} IsVisible = {IsVisible} IsEnabled = {IsEnabled}")]
   public partial class ColumnViewModel : ObservableObject
   {
-    public required ColumnHeader ColumnHeader { get; init; }
+    [ObservableProperty]
+    private ColumnHeader _columnHeader;
 
     [ObservableProperty]
     private bool _isVisible;

@@ -5,7 +5,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="using:ZoNo.Views.Import"
       xmlns:controls="using:ZoNo.Controls"
-      mc:Ignorable="d">
+      mc:Ignorable="d"
+      Loading="Page_Loading">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
@@ -20,7 +21,9 @@
         </Style>
       </controls:AutomaticStackPanel.Resources>
       <Border>
-        <local:TransactionsView/>
+        <local:TransactionsView Transactions="{x:Bind ViewModel.TransactionsViewModel.TransactionsView}"
+                                Columns="{x:Bind ViewModel.TransactionsViewModel.Columns}"
+                                LoadExcelDocumentsCommand="{x:Bind ViewModel.TransactionsViewModel.LoadExcelDocumentsCommand}"/>
       </Border>
       <Border>
 

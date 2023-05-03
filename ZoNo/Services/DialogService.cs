@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.WinUI.UI;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
@@ -41,7 +42,7 @@ namespace ZoNo.Services
       dialog.Resources["ContentDialogPadding"] = new Thickness(margin);
       dialog.Loaded += (s, e) =>
       {
-        if (dialog.FindChild<Border>(border => border.Name == "BackgroundElement") is Border border)
+        if (dialog.FindDescendant("BackgroundElement") is Border border)
         {
           border.Margin = new Thickness(margin);
         }

@@ -7,8 +7,8 @@ using ZoNo.Models;
 
 namespace ZoNo.Contracts.Services
 {
-  public interface IExcelLoader
+  public interface IExcelDocumentLoader
   {
-    Task<IEnumerable<Transaction>> LoadAsync(string path);
+    Task<IList<Transaction>> LoadAsync(string path);
   }
 }
