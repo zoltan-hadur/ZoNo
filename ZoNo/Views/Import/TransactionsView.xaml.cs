@@ -1,9 +1,16 @@
 using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI.UI.Animations;
 using CommunityToolkit.WinUI.UI.Controls;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
+using System.Collections;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Numerics;
 using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
@@ -11,13 +18,19 @@ using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels.Import;
-using ZoNo.Views.Rules;
 
 namespace ZoNo.Views.Import
 {
   public sealed partial class TransactionsView : UserControl
   {
-    public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), null);
+    private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
+    private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
+    private ScrollBar? _scrollBar;
+    private Stopwatch _lastSort = Stopwatch.StartNew();
+    private Stopwatch _lastAddition = Stopwatch.StartNew();
+    private Stopwatch _lastDeletion = Stopwatch.StartNew();
+
+    public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
     public static readonly DependencyProperty LoadExcelDocumentsCommandProperty = DependencyProperty.Register(nameof(LoadExcelDocumentsCommand), typeof(ICommand), typeof(TransactionsView), null);
 
@@ -44,11 +57,189 @@ namespace ZoNo.Views.Import
       InitializeComponent();
     }
 
-    private void UserControl_Loaded(object sender, RoutedEventArgs e)
+    private static void OnTransactionsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      if (sender is TransactionsView view)
+      {
+        if (e.OldValue is AdvancedCollectionView oldTransactions &&
+            oldTransactions.Source is INotifyCollectionChanged oldSource)
+        {
+          oldSource.CollectionChanged -= view.Transactions_CollectionChanged_BeforeDataContextChanges;
+          oldSource.CollectionChanged -= view.Transactions_CollectionChanged_AfterDataContextChanges;
+        }
+        if (e.NewValue is AdvancedCollectionView newTransactions &&
+            newTransactions.Source is INotifyCollectionChanged newSource)
+        {
+          newSource.CollectionChanged += view.Transactions_CollectionChanged_BeforeDataContextChanges;
+          newTransactions.Source = Array.Empty<Transaction>();
+          newTransactions.Source = newSource as IList;
+          newSource.CollectionChanged += view.Transactions_CollectionChanged_AfterDataContextChanges;
+        }
+        if (view.DataGrid.IsLoaded)
+        {
+          view.DataGrid.ItemsSource = e.NewValue as IEnumerable;
+        }
+      }
+    }
+
+    private void Transactions_CollectionChanged_BeforeDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+      foreach (Transaction transaction in e.OldItems ?? Array.Empty<Transaction>())
+      {
+        _lastDeletion.Restart();
+        _loadTimes.Remove(transaction);
+        var rowToBeDeleted = _rows.FirstOrDefault(row => row.DataContext == transaction);
+        if (rowToBeDeleted != null)
+        {
+          if (_scrollBar!.Value > _scrollBar.Maximum - rowToBeDeleted.ActualHeight && _scrollBar.Maximum != 0)
+          {
+            foreach (var row in _rows.Where(x => x.ActualOffset.Y <= rowToBeDeleted.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
+            {
+              AnimationBuilder.Create().Translation(
+                from: new Vector2(0, -(float)row.ActualHeight),
+                to: new Vector2(0, 0),
+                easingMode: EasingMode.EaseOut,
+                layer: FrameworkLayer.Composition
+              ).Start(row);
+            }
+          }
+          else
+          {
+            foreach (var row in _rows.Where(x => x.ActualOffset.Y >= rowToBeDeleted.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
+            {
+              AnimationBuilder.Create().Translation(
+                from: new Vector2(0, (float)row.ActualHeight),
+                to: new Vector2(0, 0),
+                easingMode: EasingMode.EaseOut,
+                layer: FrameworkLayer.Composition
+              ).Start(row);
+            }
+          }
+        }
+      }
+      foreach (Transaction transaction in e.NewItems ?? Array.Empty<Transaction>())
+      {
+        _lastAddition.Restart();
+        _loadTimes[transaction] = DateTime.Now;
+      }
+    }
+
+    private async void Transactions_CollectionChanged_AfterDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+      foreach (Transaction transaction in e.NewItems ?? Array.Empty<Transaction>())
+      {
+        var addedRow = _rows.FirstOrDefault(row => row.DataContext == transaction);
+        if (addedRow != null)
+        {
+          using var semaphore = new SemaphoreSlim(0, 1);
+          EventHandler<object> handler = (s, e) =>
+          {
+            semaphore.Release();
+          };
+          addedRow.LayoutUpdated += handler;
+          await semaphore.WaitAsync();
+          addedRow.LayoutUpdated -= handler;
+          if (_scrollBar!.Value > _scrollBar.Maximum - addedRow.ActualHeight && _scrollBar.Maximum != 0)
+          {
+            foreach (var row in _rows.Where(x => x.ActualOffset.Y < addedRow.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
+            {
+              AnimationBuilder.Create().Translation(
+                from: new Vector2(0, (float)row.ActualHeight),
+                to: new Vector2(0, 0),
+                easingMode: EasingMode.EaseOut,
+                layer: FrameworkLayer.Composition
+              ).Start(row);
+            }
+          }
+          else
+          {
+            foreach (var row in _rows.Where(x => x.ActualOffset.Y > addedRow.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
+            {
+              AnimationBuilder.Create().Translation(
+                from: new Vector2(0, -(float)row.ActualHeight),
+                to: new Vector2(0, 0),
+                easingMode: EasingMode.EaseOut,
+                layer: FrameworkLayer.Composition
+              ).Start(row);
+            }
+          }
+        }
+      }
+    }
+
+    private void ScrollBar_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+    {
+      var lastSort = _lastSort.ElapsedMilliseconds;
+      var lastAddition = _lastAddition.ElapsedMilliseconds;
+      var lastDeletion = _lastDeletion.ElapsedMilliseconds;
+      if (lastSort < 100 || lastAddition < 100 || lastDeletion < 100)
+      {
+        return;
+      }
+      foreach (var row in _rows)
+      {
+        AnimationBuilder.Create().Translation(
+          from: new Vector2(0, (float)(e.NewValue - e.OldValue)),
+          to: new Vector2(0, 0),
+          easingMode: EasingMode.EaseOut,
+          layer: FrameworkLayer.Composition
+        ).Start(row);
+      }
+    }
+
+    private void DataGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
+    {
+      var now = DateTime.Now;
+      if (e.Row.DataContext is Transaction transaction &&
+          _loadTimes.TryGetValue(transaction, out var loadTime) &&
+          (now - loadTime).TotalMilliseconds < 100)
+      {
+        AnimationBuilder.Create().Opacity(
+          from: 0,
+          to: 1,
+          layer: FrameworkLayer.Composition
+        ).Start(e.Row);
+        _loadTimes.Remove(transaction);
+      }
+
+      if (_rows.Add(e.Row))
+      {
+        e.Row.Loaded += Row_Loaded;
+        e.Row.Unloaded += Row_Unloaded;
+      }
+    }
+
+    private void Row_Loaded(object sender, RoutedEventArgs e)
+    {
+      AnimationBuilder.Create().Opacity(
+        from: 0,
+        to: 1,
+        layer: FrameworkLayer.Composition
+      ).Start((DataGridRow)sender);
+    }
+
+    private void Row_Unloaded(object sender, RoutedEventArgs e)
+    {
+      _rows.Remove((DataGridRow)sender);
+    }
+
+    private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+    {
+      DataGrid.LoadingRow += DataGrid_LoadingRow;
+      _scrollBar = DataGrid.FindDescendant("VerticalScrollBar") as ScrollBar;
+      _scrollBar!.ValueChanged += ScrollBar_ValueChanged;
+
+      await Task.Delay(1);
+      DataGrid.ItemsSource = Transactions;
+
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
+    }
+
+    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+    {
+      Transactions = new AdvancedCollectionView();
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
@@ -87,8 +278,10 @@ namespace ZoNo.Views.Import
       return header;
     }
 
-    private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
+    private async void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
+      _lastSort.Restart();
+
       Transactions.SortDescriptions.Clear();
 
       GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);

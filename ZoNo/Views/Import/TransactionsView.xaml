@@ -10,7 +10,8 @@
              xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
              xmlns:models="using:ZoNo.Models"
              mc:Ignorable="d"
-             Loaded="UserControl_Loaded">
+             Loaded="UserControl_Loaded"
+             Unloaded="UserControl_Unloaded">
   <Grid Background="Transparent" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
     <TextBlock x:Name="DropHereText" x:Uid="Import_DropHereText" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
       <animations:Implicit.ShowAnimations>
@@ -29,7 +30,6 @@
       </interactivity:Interaction.Behaviors>
     </TextBlock>
     <controls:DataGrid x:Name="DataGrid"
-                       ItemsSource="{x:Bind Transactions, Mode=OneWay}"
                        GridLinesVisibility="All"
                        AutoGenerateColumns="False"
                        Sorting="DataGrid_Sorting"
