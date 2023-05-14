@@ -25,19 +25,15 @@ namespace ZoNo.ViewModels.Rules
     [ObservableProperty]
     private ObservableCollection<OutputExpressionViewModel> _outputExpressions = new ObservableCollection<OutputExpressionViewModel>();
 
-    partial void OnOutputExpressionsChanging(ObservableCollection<OutputExpressionViewModel> value)
+    partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel>? oldValue, ObservableCollection<OutputExpressionViewModel> newValue)
     {
-      if (OutputExpressions != null)
+      if (oldValue != null)
       {
-        OutputExpressions.CollectionChanged -= OutputExpressions_CollectionChanged;
+        oldValue.CollectionChanged -= OutputExpressions_CollectionChanged;
       }
-    }
-
-    partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel> value)
-    {
-      if (OutputExpressions != null)
+      if (newValue != null)
       {
-        OutputExpressions.CollectionChanged += OutputExpressions_CollectionChanged;
+        newValue.CollectionChanged += OutputExpressions_CollectionChanged;
       }
     }
 
