@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Animation;
 using Newtonsoft.Json.Linq;
 using Splitwise;
+using Splitwise.Contracts;
 using Splitwise.Models;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
@@ -14,7 +15,7 @@ namespace ZoNo.ViewModels
   public partial class AccountPageViewModel : ObservableRecipient
   {
     private readonly ITopLevelNavigationService _topLevelNavigationService;
-    private readonly ITokenService _tokenService;
+    private readonly ISplitwiseService _splitwiseService;
     private bool _isLoaded = false;
 
     [ObservableProperty]
@@ -38,10 +39,10 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private bool _isLoading = false;
 
-    public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ITokenService tokenService, IMessenger messenger) : base(messenger)
+    public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ISplitwiseService splitwiseService, IMessenger messenger) : base(messenger)
     {
       _topLevelNavigationService = topLevelNavigationService;
-      _tokenService = tokenService;
+      _splitwiseService = splitwiseService;
     }
 
     public async Task Load()
@@ -49,9 +50,7 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
       IsLoading = true;
 
-      var token = await _tokenService.GetTokenAsync();
-      using var client = new Client(token);
-      var user = await client.GetCurrentUserAsync();
+      var user = await _splitwiseService.GetCurrentUserAsync();
       ProfilePicture = user.Picture.Medium;
       FirstName = user.FirstName;
       LastName = user.LastName;

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json.Linq;
 using Splitwise;
+using Splitwise.Contracts;
 using Splitwise.Models;
 using System.ComponentModel;
 using System.Drawing;
@@ -30,7 +31,7 @@ namespace ZoNo.ViewModels
     private readonly ITopLevelNavigationService _topLevelNavigationService;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IThemeSelectorService _themeSelectorService;
-    private readonly Authorization _authorization;
+    private readonly ISplitwiseAuthorizationService _authorizationService;
     private readonly ITokenService _tokenService;
 
     /// <summary>
@@ -70,13 +71,13 @@ namespace ZoNo.ViewModels
       ITopLevelNavigationService topLevelNavigationService,
       ILocalSettingsService localSettingsService,
       IThemeSelectorService themeSelectorService,
-      Authorization authorization,
+      ISplitwiseAuthorizationService authorizationService,
       ITokenService tokenService)
     {
       _topLevelNavigationService = topLevelNavigationService;
       _localSettingsService = localSettingsService;
       _themeSelectorService = themeSelectorService;
-      _authorization = authorization;
+      _authorizationService = authorizationService;
       _tokenService = tokenService;
 
       PropertyChanged += LoginViewModel_PropertyChanged;
@@ -137,7 +138,7 @@ namespace ZoNo.ViewModels
       else
       {
         IsLoggingIn = true;
-        WebView!.Source = new Uri(_authorization.LoginURL);
+        WebView!.Source = new Uri(_authorizationService.LoginURL);
       }
     }
 
@@ -154,13 +155,13 @@ namespace ZoNo.ViewModels
       {
         case State.LoggedOut:
           {
-            sender.Source = new Uri(_authorization.LoginURL);
+            sender.Source = new Uri(_authorizationService.LoginURL);
             _state = State.LoggingIn;
             break;
           }
         case State.LoggingIn:
           {
-            if (CurrentURL == _authorization.LoginURL)
+            if (CurrentURL == _authorizationService.LoginURL)
             {
               // Fill login details
               await sender.ExecuteScriptAsync($"document.querySelector('#credentials_identity').value = '{Email}'");
@@ -268,7 +269,7 @@ namespace ZoNo.ViewModels
           }
         case State.LoggedIn:
           {
-            if (_authorization.IsWrongCredentials(CurrentURL))
+            if (_authorizationService.IsWrongCredentials(CurrentURL))
             {
               IsLoggingIn = false;
               IsWrongCredentials = true;
@@ -277,14 +278,14 @@ namespace ZoNo.ViewModels
             }
             else
             {
-              sender.Source = new Uri(_authorization.AuthorizationURL);
+              sender.Source = new Uri(_authorizationService.AuthorizationURL);
               _state = State.Authorizing;
             }
             break;
           }
         case State.Authorizing:
           {
-            if (CurrentURL == _authorization.AuthorizationURL)
+            if (CurrentURL == _authorizationService.AuthorizationURL)
             {
               // Click on authorize button
               await sender.ExecuteScriptAsync($"document.querySelector('input[type=\\'submit\\']').click()");
@@ -298,9 +299,9 @@ namespace ZoNo.ViewModels
           }
         case State.Authorized:
           {
-            if (_authorization.IsAccessGranted(CurrentURL, out var wAuthorizationCode))
+            if (_authorizationService.ExtractAuthorizationCode(CurrentURL, out var wAuthorizationCode))
             {
-              var token = await _authorization.GetTokenAsync(wAuthorizationCode);
+              var token = await _authorizationService.GetTokenAsync(wAuthorizationCode);
               await _tokenService.SetTokenAsync(token);
               if (IsRememberMe)
               {

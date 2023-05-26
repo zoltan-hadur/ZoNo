@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Splitwise;
+using Splitwise.Contracts;
+using System.Net.Http;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
@@ -56,7 +58,16 @@ namespace ZoNo
       // Other Activation Handlers
 
       // Services
-      services.AddSingleton(new Authorization(consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"), consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")));
+      services.AddHttpClient();
+      services.AddSingleton<ISplitwiseAuthorizationService>(provider =>
+      {
+        return new SplitwiseAuthorizationService(
+          httpClientFactory: provider.GetService<IHttpClientFactory>()!,
+          consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
+          consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
+        );
+      });
+      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>()!, provider.GetService<ITokenService>()!.GetTokenAsync().Result));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();

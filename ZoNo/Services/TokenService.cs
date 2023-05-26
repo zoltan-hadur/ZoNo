@@ -29,7 +29,7 @@ namespace ZoNo.Services
     {
       if (_token == null)
       {
-        await DeleteSavedTokenAsync();
+        await _localSettingsService.RemoveSettingAsync(SettingToken);
       }
       else
       {
