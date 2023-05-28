@@ -1,7 +1,6 @@
 ﻿using Splitwise.Contracts;
 using Splitwise.Models;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -32,8 +31,10 @@ namespace Splitwise
     }
 
     private record class UserWrapper(User User);
-
     public async Task<User> GetCurrentUserAsync() => (await SendRequest<UserWrapper>(HttpMethod.Get, "get_current_user")).User;
+
+    private record GroupsWrapper(Group[] Groups);
+    public async Task<Group[]> GetGroupsAsync() => (await SendRequest<GroupsWrapper>(HttpMethod.Get, "get_groups")).Groups;
 
     private async Task<T> SendRequest<T>(HttpMethod method, string resource)
     {

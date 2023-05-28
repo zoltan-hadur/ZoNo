@@ -1,32 +1,48 @@
 <Page x:Class="ZoNo.Views.AccountPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:ZoNo.Views"
+      xmlns:splitwise="using:Splitwise.Models"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
       Loading="Page_Loading">
   <Grid>
-    <ContentControl IsEnabled="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
+    <ContentControl HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch"
+                    IsEnabled="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
       <Grid>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition />
-          <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Width="200" HorizontalAlignment="Left">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
           <StackPanel.Resources>
-            <Style TargetType="TextBox">
-              <Setter Property="Margin" Value="0,0,0,15"/>
+            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+              <Setter Property="Margin" Value="12,0,0,0"/>
               <Setter Property="IsReadOnly" Value="True"/>
             </Style>
           </StackPanel.Resources>
+          <Border Width="60" Height="60" CornerRadius="8" VerticalAlignment="Top">
+            <Image Source="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
+          </Border>
           <TextBox x:Uid="Account_FirstName" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
           <TextBox x:Uid="Account_LastName" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
           <TextBox x:Uid="Account_Email" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
-          <TextBox x:Uid="Account_CountryCode" Text="{x:Bind ViewModel.CountryCode, Mode=OneWay}"/>
           <TextBox x:Uid="Account_DefaultCurrency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
-          <Button x:Uid="Account_Logout" Command="{x:Bind ViewModel.LogoutCommand}"/>
         </StackPanel>
-        <PersonPicture Grid.Column="1" VerticalAlignment="Top" Margin="15,0,0,0" ProfilePicture="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,12,0,0">
+          <TextBlock x:Uid="Account_Groups"/>
+          <ListView SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="splitwise:Group">
+                <local:GroupView Group="{x:Bind (splitwise:Group), Mode=OneWay}"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
+          </ListView>
+        </StackPanel>
+        <Button x:Uid="Account_Logout" Grid.Row="2" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
       </Grid>
     </ContentControl>
     <ProgressRing Width="100" Height="100" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>

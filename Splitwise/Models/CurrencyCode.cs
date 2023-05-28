@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Splitwise.Models
+﻿namespace Splitwise.Models
 {
-  public enum CountryCode
-  {
-    CA,
-    HU
-  }
-
   public enum CurrencyCode
   {
     USD,
@@ -146,39 +134,4 @@ namespace Splitwise.Models
     BTN,
     WST
   }
-
-  public record class Picture(string Small, string Medium, string Large);
-
-  public enum RegistrationStatus
-  {
-    Dummy,
-    Invited,
-    Confirmed
-  }
-
-  public record class Token(string AccessToken, TokenType TokenType);
-
-  public enum TokenType
-  {
-    Bearer
-  }
-
-  public record class User(
-    int Id,
-    string FirstName,
-    string LastName,
-    Picture Picture,
-    bool CustomPicture,
-    string Email,
-    RegistrationStatus RegistrationStatus,
-    object ForceRefreshAt,
-    string Locale,
-    CountryCode CountryCode,
-    string DateFormat,
-    CurrencyCode DefaultCurrency,
-    int DefaultGroupId,
-    DateTime NotificationsRead,
-    int NotificationsCount,
-    Dictionary<string, bool> Notifications
-  );
 }

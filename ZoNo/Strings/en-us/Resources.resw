@@ -180,9 +180,6 @@
   <data name="Login_RememberMe.Content" xml:space="preserve">
     <value>Remember me!</value>
   </data>
-  <data name="Account_CountryCode.Header" xml:space="preserve">
-    <value>Country Code</value>
-  </data>
   <data name="Account_DefaultCurrency.Header" xml:space="preserve">
     <value>Default Currency</value>
   </data>
@@ -326,5 +323,8 @@
   </data>
   <data name="Settings_Rules_Import.Content" xml:space="preserve">
     <value>Import</value>
+  </data>
+  <data name="Account_Groups.Text" xml:space="preserve">
+    <value>Groups</value>
   </data>
 </root>

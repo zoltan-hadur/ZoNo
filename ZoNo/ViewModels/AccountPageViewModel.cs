@@ -31,13 +31,13 @@ namespace ZoNo.ViewModels
     private string? _email;
 
     [ObservableProperty]
-    private CountryCode? _countryCode;
-
-    [ObservableProperty]
     private CurrencyCode? _defaultCurrency;
 
     [ObservableProperty]
     private bool _isLoading = false;
+
+    [ObservableProperty]
+    private Group[] _groups = null;
 
     public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ISplitwiseService splitwiseService, IMessenger messenger) : base(messenger)
     {
@@ -50,12 +50,12 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
       IsLoading = true;
 
+      Groups = await _splitwiseService.GetGroupsAsync();
       var user = await _splitwiseService.GetCurrentUserAsync();
       ProfilePicture = user.Picture.Medium;
       FirstName = user.FirstName;
       LastName = user.LastName;
       Email = user.Email;
-      CountryCode = user.CountryCode;
       DefaultCurrency = user.DefaultCurrency;
       _isLoaded = true;
 
