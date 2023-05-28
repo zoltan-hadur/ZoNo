@@ -19,5 +19,7 @@ namespace Splitwise.Contracts
     Task<User> GetCurrentUserAsync();
 
     Task<Group[]> GetGroupsAsync();
+
+    Task<Category[]> GetCategoriesAsync();
   }
 }

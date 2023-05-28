@@ -36,6 +36,9 @@ namespace Splitwise
     private record GroupsWrapper(Group[] Groups);
     public async Task<Group[]> GetGroupsAsync() => (await SendRequest<GroupsWrapper>(HttpMethod.Get, "get_groups")).Groups;
 
+    private record CategoriesWrapper(Category[] Categories);
+    public async Task<Category[]> GetCategoriesAsync() => (await SendRequest<CategoriesWrapper>(HttpMethod.Get, "get_categories")).Categories;
+
     private async Task<T> SendRequest<T>(HttpMethod method, string resource)
     {
       var request = new HttpRequestMessage(method, $"{_baseURL}/{resource}");
