@@ -6,7 +6,7 @@ namespace ZoNo.Views
 {
   public sealed partial class GroupView : UserControl
   {
-    public static readonly DependencyProperty GroupProperty = DependencyProperty.Register(nameof(Group), typeof(string), typeof(GroupView), null);
+    public static readonly DependencyProperty GroupProperty = DependencyProperty.Register(nameof(Group), typeof(Group), typeof(GroupView), null);
 
     public Group Group
     {

@@ -6,7 +6,7 @@ namespace ZoNo.Views
 {
   public sealed partial class UserView : UserControl
   {
-    public static readonly DependencyProperty UserProperty = DependencyProperty.Register(nameof(User), typeof(string), typeof(UserView), null);
+    public static readonly DependencyProperty UserProperty = DependencyProperty.Register(nameof(User), typeof(User), typeof(UserView), null);
 
     public User User
     {
