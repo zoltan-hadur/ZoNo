@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Splitwise.Models;
 
-namespace ZoNo.Views
+namespace ZoNo.Views.Account
 {
   public sealed partial class GroupView : UserControl
   {
