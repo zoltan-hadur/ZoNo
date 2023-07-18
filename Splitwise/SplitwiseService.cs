@@ -1,6 +1,7 @@
 ﻿using Splitwise.Contracts;
 using Splitwise.Models;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -48,7 +49,9 @@ namespace Splitwise
       if (response.IsSuccessStatusCode)
       {
         using var contentStream = await response.Content.ReadAsStreamAsync();
-        var result = await JsonSerializer.DeserializeAsync<T>(contentStream, new JsonSerializerOptions()
+        using var streamReader = new StreamReader(contentStream);
+        var str = streamReader.ReadToEnd();
+        var result = JsonSerializer.Deserialize<T>(str, new JsonSerializerOptions()
         {
           PropertyNamingPolicy = new SnakeCasePolicy(),
           Converters = { new JsonStringEnumConverter() }
