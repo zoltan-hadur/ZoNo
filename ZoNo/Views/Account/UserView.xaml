@@ -20,10 +20,10 @@
       <ColumnDefinition Width="Auto"/>
     </Grid.ColumnDefinitions>
     <Border Grid.Column="0" CornerRadius="8">
-      <Image Width="30" Height="30" Source="{x:Bind User.Picture.Medium, Mode=OneWay}"/>
+      <Image Width="30" Height="30" Source="{x:Bind Picture, Mode=OneWay}"/>
     </Border>
-    <TextBlock Grid.Column="1" Text="{x:Bind User.FirstName, Mode=OneWay}"/>
-    <TextBlock Grid.Column="2" Text="{x:Bind User.LastName, Mode=OneWay}"/>
-    <TextBlock Grid.Column="3" Text="{x:Bind User.Email, Mode=OneWay}"/>
+    <TextBlock Grid.Column="1" Text="{x:Bind FirstName, Mode=OneWay}"/>
+    <TextBlock Grid.Column="2" Text="{x:Bind LastName, Mode=OneWay}"/>
+    <TextBlock Grid.Column="3" Text="{x:Bind Email, Mode=OneWay}"/>
   </Grid>
 </UserControl>
