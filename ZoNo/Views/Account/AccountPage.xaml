@@ -3,54 +3,52 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:ZoNo.Views.Account"
       xmlns:splitwise="using:Splitwise.Models"
+      xmlns:controls="using:ZoNo.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
       Loading="Page_Loading">
-  <Grid>
-    <ContentControl HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    IsEnabled="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
-      <Grid>
+  <controls:LoaderContentControl HorizontalContentAlignment="Stretch"
+                                 VerticalContentAlignment="Stretch"
+                                 IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel.Resources>
+          <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+            <Setter Property="Margin" Value="12,0,0,0"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+          </Style>
+        </StackPanel.Resources>
+        <Border Width="60" Height="60" CornerRadius="8" VerticalAlignment="Top">
+          <Image Source="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
+        </Border>
+        <TextBox x:Uid="Account_FirstName" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
+        <TextBox x:Uid="Account_LastName" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
+        <TextBox x:Uid="Account_Email" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
+        <TextBox x:Uid="Account_DefaultCurrency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
+      </StackPanel>
+      <Grid Grid.Row="1" Margin="0,12,0,0">
         <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="*"/>
-          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-          <StackPanel.Resources>
-            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-              <Setter Property="Margin" Value="12,0,0,0"/>
-              <Setter Property="IsReadOnly" Value="True"/>
-            </Style>
-          </StackPanel.Resources>
-          <Border Width="60" Height="60" CornerRadius="8" VerticalAlignment="Top">
-            <Image Source="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
-          </Border>
-          <TextBox x:Uid="Account_FirstName" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
-          <TextBox x:Uid="Account_LastName" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
-          <TextBox x:Uid="Account_Email" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
-          <TextBox x:Uid="Account_DefaultCurrency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
-        </StackPanel>
-        <Grid Grid.Row="1" Margin="0,12,0,0">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
-          <TextBlock x:Uid="Account_Groups" Grid.Row="0"/>
-          <ListView Grid.Row="1" SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
-            <ListView.ItemTemplate>
-              <DataTemplate x:DataType="splitwise:Group">
-                <local:GroupView Picture="{x:Bind Avatar.Medium, Mode=OneWay}"
-                                 Name="{x:Bind Name, Mode=OneWay}"
-                                 Members="{x:Bind Members, Mode=OneWay}"/>
-              </DataTemplate>
-            </ListView.ItemTemplate>
-          </ListView>
-        </Grid>
-        <Button x:Uid="Account_Logout" Grid.Row="2" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
+        <TextBlock x:Uid="Account_Groups" Grid.Row="0"/>
+        <ListView Grid.Row="1" SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
+          <ListView.ItemTemplate>
+            <DataTemplate x:DataType="splitwise:Group">
+              <local:GroupView Picture="{x:Bind Avatar.Medium, Mode=OneWay}"
+                               Name="{x:Bind Name, Mode=OneWay}"
+                               Members="{x:Bind Members, Mode=OneWay}"/>
+            </DataTemplate>
+          </ListView.ItemTemplate>
+        </ListView>
       </Grid>
-    </ContentControl>
-    <ProgressRing Width="100" Height="100" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
-  </Grid>
+      <Button x:Uid="Account_Logout" Grid.Row="2" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
+    </Grid>
+  </controls:LoaderContentControl>
 </Page>
