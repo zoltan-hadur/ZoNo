@@ -1,6 +1,6 @@
 ﻿namespace Splitwise.Models
 {
-  public record class Picture(
+  public record Picture(
     string Small,
     string Medium,
     string Large

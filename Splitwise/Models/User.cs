@@ -1,6 +1,6 @@
 ﻿namespace Splitwise.Models
 {
-  public record class User(
+  public record User(
     int Id,
     string FirstName,
     string LastName,

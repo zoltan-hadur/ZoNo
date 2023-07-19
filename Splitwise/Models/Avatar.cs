@@ -1,6 +1,6 @@
 ﻿namespace Splitwise.Models
 {
-  public record class Avatar(
+  public record Avatar(
     string Original,
     string XXLarge,
     string XLarge,

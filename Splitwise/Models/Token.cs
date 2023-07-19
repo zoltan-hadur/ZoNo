@@ -1,6 +1,6 @@
 ﻿namespace Splitwise.Models
 {
-  public record class Token(
+  public record Token(
     string AccessToken,
     TokenType TokenType
   );
