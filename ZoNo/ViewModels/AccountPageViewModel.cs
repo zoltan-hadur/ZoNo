@@ -50,13 +50,13 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
       IsLoading = true;
 
-      Groups = await _splitwiseService.GetGroupsAsync();
       var user = await _splitwiseService.GetCurrentUserAsync();
       ProfilePicture = user.Picture.Medium;
       FirstName = user.FirstName;
       LastName = user.LastName;
       Email = user.Email;
       DefaultCurrency = user.DefaultCurrency;
+      Groups = await _splitwiseService.GetGroupsAsync();
       _isLoaded = true;
 
       IsLoading = false;
