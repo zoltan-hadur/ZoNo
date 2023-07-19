@@ -5,7 +5,7 @@ namespace ZoNo.Views.Account
 {
   public sealed partial class UserView : UserControl
   {
-    public static readonly DependencyProperty PictureProperty = DependencyProperty.Register(nameof(Picture), typeof(string), typeof(UserView), null);
+    public static readonly DependencyProperty PictureProperty = DependencyProperty.Register(nameof(Picture), typeof(string), typeof(UserView), new PropertyMetadata("invalid"));
     public static readonly DependencyProperty FirstNameProperty = DependencyProperty.Register(nameof(FirstName), typeof(string), typeof(UserView), null);
     public static readonly DependencyProperty LastNameProperty = DependencyProperty.Register(nameof(LastName), typeof(string), typeof(UserView), null);
     public static readonly DependencyProperty EmailProperty = DependencyProperty.Register(nameof(Email), typeof(string), typeof(UserView), null);

@@ -19,7 +19,7 @@ namespace ZoNo.ViewModels
     private bool _isLoaded = false;
 
     [ObservableProperty]
-    private string _profilePicture = " ";
+    private string _profilePicture = "invalid";
 
     [ObservableProperty]
     private string? _firstName;
