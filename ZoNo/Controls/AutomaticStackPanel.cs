@@ -57,12 +57,7 @@ namespace ZoNo.Controls
       VerticalContentAlignment = VerticalAlignment.Stretch;
       HorizontalContentAlignment = HorizontalAlignment.Stretch;
       Children = new ObservableCollection<object>();
-
-      var grid = new Grid();
-      grid.Children.Add(_grid);
-      grid.Children.Add(_canvas);
-      Content = grid;
-
+      Content = new Grid() { Children = { _grid, _canvas } };
       SizeChanged += AutomaticStackPanel_SizeChanged;
     }
 
