@@ -41,9 +41,9 @@
         <ListView Grid.Row="1" SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="splitwise:Group">
-              <local:GroupView Picture="{x:Bind Avatar.Medium, Mode=OneWay}"
-                               Name="{x:Bind Name, Mode=OneWay}"
-                               Members="{x:Bind Members, Mode=OneWay}"/>
+              <local:GroupView Picture="{x:Bind Avatar.Medium}"
+                               Name="{x:Bind Name}"
+                               Members="{x:Bind Members}"/>
             </DataTemplate>
           </ListView.ItemTemplate>
         </ListView>

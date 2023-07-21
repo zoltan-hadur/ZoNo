@@ -37,7 +37,7 @@ namespace ZoNo.ViewModels
     private bool _isLoading = false;
 
     [ObservableProperty]
-    private Group[] _groups = null;
+    private Group[] _groups = Array.Empty<Group>();
 
     public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ISplitwiseService splitwiseService, IMessenger messenger) : base(messenger)
     {

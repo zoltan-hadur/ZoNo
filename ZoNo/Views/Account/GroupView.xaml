@@ -27,10 +27,10 @@
       <ItemsRepeater.ItemTemplate>
         <DataTemplate x:DataType="splitwise:User">
           <local:UserView Margin="0,8,0,0"
-                          Picture="{x:Bind Picture.Medium, Mode=OneWay}"
-                          FirstName="{x:Bind FirstName, Mode=OneWay}"
-                          LastName="{x:Bind LastName, Mode=OneWay}"
-                          Email="{x:Bind Email, Mode=OneWay}"/>
+                          Picture="{x:Bind Picture.Medium}"
+                          FirstName="{x:Bind FirstName}"
+                          LastName="{x:Bind LastName}"
+                          Email="{x:Bind Email}"/>
         </DataTemplate>
       </ItemsRepeater.ItemTemplate>
     </ItemsRepeater>

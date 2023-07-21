@@ -278,7 +278,7 @@ namespace ZoNo.Views.Import
       return header;
     }
 
-    private async void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
+    private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
       _lastSort.Restart();
 
@@ -327,7 +327,7 @@ namespace ZoNo.Views.Import
           {
             Transactions.Source.Remove(selectedItem);
           }
-          catch (ArgumentOutOfRangeException ex)
+          catch (ArgumentOutOfRangeException)
           {
             // When deleting last item, there is an exception
             Transactions.Refresh();

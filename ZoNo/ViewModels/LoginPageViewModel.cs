@@ -127,7 +127,7 @@ namespace ZoNo.ViewModels
     }
 
     [RelayCommand]
-    private async void Login()
+    private async Task Login()
     {
       IsWrongCredentials = false;
 

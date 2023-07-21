@@ -58,7 +58,7 @@ namespace ZoNo.ViewModels.Rules
     }
 
     [RelayCommand]
-    private async void NewRule()
+    private async Task NewRule()
     {
       var rule = new RuleViewModel()
       {
@@ -73,7 +73,7 @@ namespace ZoNo.ViewModels.Rules
     }
 
     [RelayCommand]
-    private async void EditRule(RuleViewModel rule)
+    private async Task EditRule(RuleViewModel rule)
     {
       var index = Rules.IndexOf(rule);
       var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);

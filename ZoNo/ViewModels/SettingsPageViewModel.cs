@@ -78,10 +78,10 @@ namespace ZoNo.ViewModels
     }
 
     [RelayCommand]
-    private async void ImportRules()
+    private async Task ImportRules()
     {
       var openPicker = new FileOpenPicker();
-      var hWnd = App.MainWindow.GetWindowHandle();
+      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
       InitializeWithWindow.Initialize(openPicker, hWnd);
       openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       openPicker.FileTypeFilter.Add(".json");
@@ -107,10 +107,10 @@ namespace ZoNo.ViewModels
     }
 
     [RelayCommand]
-    private async void ExportRules()
+    private async Task ExportRules()
     {
       var savePicker = new FileSavePicker();
-      var hWnd = App.MainWindow.GetWindowHandle();
+      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
       InitializeWithWindow.Initialize(savePicker, hWnd);
       savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       savePicker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
