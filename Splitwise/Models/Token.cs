@@ -1,7 +1,13 @@
 ﻿namespace Splitwise.Models
 {
-  public record Token(
-    string AccessToken,
-    TokenType TokenType
-  );
+  public class Token
+  {
+    public string AccessToken { get; set; }
+    public TokenType TokenType { get; set; }
+  };
+
+  public enum TokenType
+  {
+    Bearer
+  }
 }

@@ -2,9 +2,12 @@
 using Splitwise.Models;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -31,36 +34,94 @@ namespace Splitwise
       _token = token;
     }
 
-    private record class UserWrapper(User User);
-    public async Task<User> GetCurrentUserAsync() => (await SendRequest<UserWrapper>(HttpMethod.Get, "get_current_user")).User;
-
-    private record GroupsWrapper(Group[] Groups);
-    public async Task<Group[]> GetGroupsAsync() => (await SendRequest<GroupsWrapper>(HttpMethod.Get, "get_groups")).Groups;
-
-    private record CategoriesWrapper(Category[] Categories);
-    public async Task<Category[]> GetCategoriesAsync() => (await SendRequest<CategoriesWrapper>(HttpMethod.Get, "get_categories")).Categories;
-
-    private async Task<T> SendRequest<T>(HttpMethod method, string resource)
+    public async Task<User> GetCurrentUserAsync()
     {
-      var request = new HttpRequestMessage(method, $"{_baseURL}/{resource}");
+      return await SendRequest(HttpMethod.Get, "get_current_user", (node, options) =>
+      {
+        return node["user"].Deserialize<User>(options);
+      });
+    }
+
+    public async Task<Group[]> GetGroupsAsync()
+    {
+      return await SendRequest(HttpMethod.Get, "get_groups", (node, options) =>
+      {
+        return node["groups"].Deserialize<Group[]>(options);
+      });
+    }
+
+    public async Task<Category[]> GetCategoriesAsync()
+    {
+      return await SendRequest(HttpMethod.Get, "get_categories", (node, options) =>
+      {
+        return node["categories"].Deserialize<Category[]>(options);
+      });
+    }
+
+    public async Task<Expense[]> CreateExpense(Expense expense)
+    {
+      return await SendRequest(HttpMethod.Post, "create_expense", (node, options) =>
+      {
+        if (node["errors"]?.AsObject().Count != 0)
+        {
+          throw new Exception(node["errors"].ToJsonString());
+        }
+        else
+        {
+          return node["expenses"].Deserialize<Expense[]>(options);
+        }
+      },
+      $$$""""
+      {
+        "cost": "{{{expense.Cost}}}",
+        "description": "{{{expense.Description}}}",
+        "date": "{{{expense.Date.ToString("o")}}}",
+        "currency_code": "{{{expense.CurrencyCode}}}",
+        "category_id": {{{expense.CategoryId}}},
+        "group_id": {{{expense.GroupId}}},
+      {{{string.Join($",{Environment.NewLine}", expense.Users.Select((user, index) =>
+        $$"""
+          "users__{{index}}__user_id": {{user.UserId}},
+          "users__{{index}}__paid_share": "{{user.PaidShare}}",
+          "users__{{index}}__owed_share": "{{user.OwedShare}}"
+        """))}}}
+      }
+      """");
+    }
+
+    private async Task<T> SendRequest<T>(HttpMethod method, string resource, Func<JsonNode, JsonSerializerOptions, T> deserialize, string? content = null)
+    {
       var client = _httpClientFactory.CreateClient();
       client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(_token.TokenType.ToString(), _token.AccessToken);
+      var request = new HttpRequestMessage(method, $"{_baseURL}/{resource}")
+      {
+        Content = content != null ? new StringContent(content, Encoding.UTF8, "application/json") : null
+      };
       var response = await client.SendAsync(request);
+      using var contentStream = await response.Content.ReadAsStreamAsync();
+      using var streamReader = new StreamReader(contentStream);
+      var responseString = streamReader.ReadToEnd();
       if (response.IsSuccessStatusCode)
       {
-        using var contentStream = await response.Content.ReadAsStreamAsync();
-        using var streamReader = new StreamReader(contentStream);
-        var str = streamReader.ReadToEnd();
-        var result = JsonSerializer.Deserialize<T>(str, new JsonSerializerOptions()
+        try
         {
-          PropertyNamingPolicy = new SnakeCasePolicy(),
-          Converters = { new JsonStringEnumConverter() }
-        });
-        return result;
+          var options = new JsonSerializerOptions()
+          {
+            PropertyNamingPolicy = new SnakeCasePolicy(),
+            Converters = { new JsonStringEnumConverter() }
+          };
+          var node = JsonNode.Parse(responseString);
+          var result = deserialize(node, options);
+          return result;
+        }
+        catch (Exception e)
+        {
+          throw new Exception($"Could not execute '{response.RequestMessage}', status code: {response.StatusCode}, response: {responseString}", e);
+        }
       }
       else
       {
-        throw new Exception($"Could not execute '{request}', status code: {response.StatusCode}");
+        throw new Exception($"Could not execute '{response.RequestMessage}', status code: {response.StatusCode}, response: {responseString}");
       }
     }
   }
