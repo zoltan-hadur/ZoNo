@@ -82,7 +82,7 @@ namespace ZoNo.Models
     public static Category Bicycle { get; } = new Transportation("Bicycle");
     public static Category BusTrain { get; } = new Transportation("Bus/train");
     public static Category Car { get; } = new Transportation("Car");
-    public static Category GasFuels { get; } = new Transportation("Gas/fuels");
+    public static Category GasFuels { get; } = new Transportation("Gas/fuel");
     public static Category Hotel { get; } = new Transportation("Hotel");
     public static Category Other { get; } = new Transportation("Other");
     public static Category Parking { get; } = new Transportation("Parking");

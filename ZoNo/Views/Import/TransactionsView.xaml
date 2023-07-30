@@ -30,6 +30,7 @@
       </interactivity:Interaction.Behaviors>
     </TextBlock>
     <controls:DataGrid x:Name="DataGrid"
+                       SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
                        GridLinesVisibility="All"
                        AutoGenerateColumns="False"
                        Sorting="DataGrid_Sorting"

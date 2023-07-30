@@ -20,18 +20,18 @@ namespace ZoNo.Models
 
   public class Transaction
   {
-    public required DateTime TransactionTime { get; set; }
-    public required DateOnly AccountingDate { get; set; }
-    public required string Type { get; set; }
-    public required IncomeOutcome IncomeOutcome { get; set; }
-    public required string PartnerName { get; set; }
-    public required string PartnerAccountId { get; set; }
-    public required string SpendingCategory { get; set; }
-    public required string Description { get; set; }
-    public required string AccountName { get; set; }
-    public required string AccountId { get; set; }
-    public required double Amount { get; set; }
-    public required Currency Currency { get; set; }
+    public DateTime TransactionTime { get; set; }
+    public DateOnly AccountingDate { get; set; }
+    public string Type { get; set; }
+    public IncomeOutcome IncomeOutcome { get; set; }
+    public string PartnerName { get; set; }
+    public string PartnerAccountId { get; set; }
+    public string SpendingCategory { get; set; }
+    public string Description { get; set; }
+    public string AccountName { get; set; }
+    public string AccountId { get; set; }
+    public double Amount { get; set; }
+    public Currency Currency { get; set; }
 
     public static string GetProperty(ColumnHeader columnHeader) => columnHeader switch
     {

@@ -20,5 +20,11 @@ namespace ZoNo.Views.Import
       await ViewModel.ExpensesViewModel.Load();
       await ViewModel.Load();
     }
+
+    private void Expenses_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (e.AddedItems.Count == 0) return;
+      Expenses.ScrollIntoView(e.AddedItems[0]);
+    }
   }
 }

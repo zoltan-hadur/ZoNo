@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="using:ZoNo.Views.Import"
       xmlns:controls="using:ZoNo.Controls"
+      xmlns:models="using:ZoNo.Models"
       xmlns:viewmodels="using:ZoNo.ViewModels.Import"
       mc:Ignorable="d"
       Loading="Page_Loading">
@@ -23,13 +24,16 @@
       </controls:AutomaticStackPanel.Resources>
       <Border>
         <local:TransactionsView Transactions="{x:Bind ViewModel.TransactionsViewModel.TransactionsView}"
+                                SelectedItem="{x:Bind ViewModel.SelectedTransaction, Mode=TwoWay}"
                                 Columns="{x:Bind ViewModel.TransactionsViewModel.Columns}"
                                 LoadExcelDocumentsCommand="{x:Bind ViewModel.TransactionsViewModel.LoadExcelDocumentsCommand}"/>
       </Border>
       <Border>
         <ListView x:Name="Expenses"
                   DataContext="{x:Bind ViewModel.ExpensesViewModel}"
-                  ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}">
+                  ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
+                  SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"
+                  SelectionChanged="Expenses_SelectionChanged">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
               <local:ExpenseView Date="{x:Bind Date, Mode=OneWay}"

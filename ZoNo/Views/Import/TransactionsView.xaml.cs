@@ -33,6 +33,7 @@ namespace ZoNo.Views.Import
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
     public static readonly DependencyProperty LoadExcelDocumentsCommandProperty = DependencyProperty.Register(nameof(LoadExcelDocumentsCommand), typeof(ICommand), typeof(TransactionsView), null);
+    public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(Transaction), typeof(TransactionsView), new PropertyMetadata(null, OnSelectedItemChanged));
 
     public AdvancedCollectionView Transactions
     {
@@ -50,6 +51,12 @@ namespace ZoNo.Views.Import
     {
       get => (ICommand)GetValue(LoadExcelDocumentsCommandProperty);
       set => SetValue(LoadExcelDocumentsCommandProperty, value);
+    }
+
+    public Transaction SelectedItem
+    {
+      get => (Transaction)GetValue(SelectedItemProperty);
+      set => SetValue(SelectedItemProperty, value);
     }
 
     public TransactionsView()
@@ -334,6 +341,15 @@ namespace ZoNo.Views.Import
           }
           await Task.Delay(1);
         }
+      }
+    }
+
+    private static async void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+      if (sender is TransactionsView view && e.NewValue is Transaction transaction)
+      {
+        await Task.Delay(100);
+        view.DataGrid.ScrollIntoView(transaction, null);
       }
     }
   }

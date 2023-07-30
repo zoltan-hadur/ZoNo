@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Windows.Foundation.Collections;
 using ZoNo.Contracts.Services;
@@ -17,6 +18,24 @@ namespace ZoNo.ViewModels.Import
 
     public TransactionsViewModel TransactionsViewModel { get; }
     public ExpensesViewModel ExpensesViewModel { get; }
+
+    [ObservableProperty]
+    private Transaction _selectedTransaction;
+
+    partial void OnSelectedTransactionChanged(Transaction value)
+    {
+      if (value == null) return;
+      SelectedExpense = _transactionToExpenseViewModel[value];
+    }
+
+    [ObservableProperty]
+    private ExpenseViewModel _selectedExpense;
+
+    partial void OnSelectedExpenseChanged(ExpenseViewModel value)
+    {
+      if (value == null) return;
+      SelectedTransaction = _transactionToExpenseViewModel.Single(x => x.Value == value).Key;
+    }
 
     public ImportPageViewModel(
       IRulesService rulesService,
@@ -48,6 +67,14 @@ namespace ZoNo.ViewModels.Import
               ExpensesViewModel.Expenses.Insert(newIndex, newExpense);
             }
             break;
+          case CollectionChange.ItemRemoved:
+            {
+              var expense = expensesViewModel.Expenses[(int)e.Index];
+              var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
+              expensesViewModel.Expenses.Remove(expense);
+              _transactionToExpenseViewModel.Remove(transaction);
+            }
+            break;
           case CollectionChange.Reset:
             {
               if (TransactionsViewModel.TransactionsView.Count > 0)
@@ -66,26 +93,6 @@ namespace ZoNo.ViewModels.Import
             break;
         }
       };
-
-      if (TransactionsViewModel.TransactionsView.Source is INotifyCollectionChanged source)
-      {
-        source.CollectionChanged += (s, e) =>
-        {
-          foreach (Transaction oldItem in e.OldItems ?? Array.Empty<Transaction>())
-          {
-            expensesViewModel.Expenses.Remove(_transactionToExpenseViewModel[oldItem]);
-            _transactionToExpenseViewModel.Remove(oldItem);
-          }
-          foreach (Transaction newItem in e.NewItems ?? Array.Empty<Transaction>())
-          {
-            //_transactionToExpenseViewModel[newItem] = new ExpenseViewModel()
-            //{
-            //  Date = newItem.TransactionTime
-            //};
-            //ExpensesViewModel.Expenses.Add(_transactionToExpenseViewModel[newItem]);
-          }
-        };
-      }
     }
 
     public async Task Load()
