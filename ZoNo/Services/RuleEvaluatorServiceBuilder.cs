@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using System.Reflection;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
@@ -43,7 +44,13 @@ namespace ZoNo.Services
                             _ => throw new NotImplementedException()
                           }
                           """;
-          var inputScript = CSharpScript.Create<bool>(inputCode, options: ScriptOptions.Default.WithImports("System"), globalsType: typeof(InputType<Input>));
+          var inputScript = CSharpScript.Create<bool>(
+            inputCode,
+            options: ScriptOptions.Default
+              .WithReferences("System.Core")
+              .WithImports("System", "System.Linq"),
+            globalsType: typeof(InputType<Input>)
+          );
           _inputEvaluator = inputScript.CreateDelegate();
 
           var outputCode = $$"""
@@ -55,7 +62,13 @@ namespace ZoNo.Services
                            _ => throw new NotImplementedException()
                          })()
                          """;
-          var outputScript = CSharpScript.Create<object>(outputCode, options: ScriptOptions.Default.WithImports("System"), globalsType: typeof(OutputType<Input, Output>));
+          var outputScript = CSharpScript.Create<object>(
+            outputCode,
+            options: ScriptOptions.Default
+              .WithReferences("Splitwise", "ZoNo")
+              .WithImports("System", "System.Linq", "Splitwise.Models", "ZoNo.Models"),
+            globalsType: typeof(OutputType<Input, Output>)
+          );
           _outputEvaluator = outputScript.CreateDelegate();
         });
       }
