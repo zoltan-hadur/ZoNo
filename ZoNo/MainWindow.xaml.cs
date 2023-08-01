@@ -9,7 +9,6 @@ namespace ZoNo
       InitializeComponent();
 
       AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
-      Title = "AppDisplayName".GetLocalized();
     }
   }
 }

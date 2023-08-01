@@ -6,6 +6,7 @@
                    xmlns:windowex="using:WinUIEx"
                    MinWidth="500"
                    MinHeight="500"
+                   Title="ZoNo"
                    PersistenceId="MainWindow"
                    mc:Ignorable="d">
   <Window.SystemBackdrop>

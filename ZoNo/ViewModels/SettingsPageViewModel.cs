@@ -74,7 +74,7 @@ namespace ZoNo.ViewModels
         version = Assembly.GetExecutingAssembly().GetName().Version!;
       }
 
-      return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+      return $"ZoNo - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
 
     [RelayCommand]
@@ -97,11 +97,11 @@ namespace ZoNo.ViewModels
           {
             await _rulesService.SaveRulesAsync(rule.Key, rule.Value);
           }
-          await ShowMessage("Import", "Success", file.Path);
+          await ShowMessage($"Import from {file.Path} was successful!");
         }
         else
         {
-          await ShowMessage("Import", "Failure", file.Path);
+          await ShowMessage($"Import from {file.Path} was not successful!");
         }
       }
     }
@@ -130,18 +130,18 @@ namespace ZoNo.ViewModels
         {
           case FileUpdateStatus.Complete:
           case FileUpdateStatus.CompleteAndRenamed:
-            await ShowMessage("Export", "Success", file.Path);
+            await ShowMessage($"Export to {file.Path} was successful!");
             break;
           default:
-            await ShowMessage("Export", "Failure", file.Path);
+            await ShowMessage($"Export to {file.Path} was not successful!");
             break;
         }
       }
     }
 
-    private async Task ShowMessage(string importExport, string successFailure, string path)
+    private async Task ShowMessage(string message)
     {
-      await _dialogService.ShowDialogAsync(DialogType.Ok, "Settings_Dialog_Message".GetLocalized(), string.Format($"Settings_Dialog_{importExport}_{successFailure}".GetLocalized(), path));
+      await _dialogService.ShowDialogAsync(DialogType.Ok, "Message", message);
     }
   }
 }

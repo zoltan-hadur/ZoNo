@@ -14,11 +14,11 @@
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBlock Grid.Row="0" Margin="0,0,0,6" x:Uid="RuleEditor_If"/>
+    <TextBlock Grid.Row="0" Margin="0,0,0,6" Text="If"/>
     <TextBox Grid.Row="1" Margin="0,0,0,12" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}"/>
     <Grid Grid.Row="2" Margin="0,0,0,6">
-      <TextBlock x:Uid="RuleEditor_Then" VerticalAlignment="Center"/>
-      <Button x:Uid="RuleEditor_NewOutputExpression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
+      <TextBlock Text="Then" VerticalAlignment="Center"/>
+      <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
     </Grid>
     <ListView Grid.Row="3" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" AllowDrop="True" CanReorderItems="True" ItemsSource="{x:Bind ViewModel.OutputExpressions, Mode=OneWay}">
       <ListView.ItemContainerStyle>
@@ -42,8 +42,8 @@
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{x:Bind Index, Mode=OneWay}" VerticalAlignment="Center"/>
-            <TextBlock x:Uid="RuleEditor_Let" Grid.Column="1" VerticalAlignment="Center"/>
-            <TextBox Margin="6,0,0,0" Grid.Column="2" Text="{x:Bind OutputExpression, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="1" Text=", let" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="2" Text="{x:Bind OutputExpression, Mode=TwoWay}" Margin="6,0,0,0"/>
           </Grid>
         </DataTemplate>
       </ListView.ItemTemplate>

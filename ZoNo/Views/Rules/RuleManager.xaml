@@ -20,7 +20,7 @@
       <ListViewHeaderItem Grid.Row="0" HorizontalContentAlignment="Stretch">
         <Grid>
           <TextBlock Text="{x:Bind Header, Mode=OneWay}"/>
-          <Button x:Uid="RuleManager_NewRule" HorizontalAlignment="Right" Command="{x:Bind NewRuleCommand, Mode=OneWay}"/>
+          <Button Content="New Rule" HorizontalAlignment="Right" Command="{x:Bind NewRuleCommand, Mode=OneWay}"/>
         </Grid>
       </ListViewHeaderItem>
       <ListView Grid.Row="1" CanReorderItems="True" AllowDrop="True" ItemsSource="{x:Bind Rules, Mode=OneWay}" DoubleTapped="ListView_DoubleTapped">
@@ -29,9 +29,9 @@
             <Setter Property="ContextFlyout">
               <Setter.Value>
                 <MenuFlyout Opening="MenuFlyout_Opening">
-                  <MenuFlyoutItem x:Uid="RuleManager_EditRule" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
-                  <MenuFlyoutItem x:Uid="RuleManager_DuplicateRule" Icon="Copy" Command="{x:Bind DuplicateRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
-                  <MenuFlyoutItem x:Uid="RuleManager_DeleteRule" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem Text="Edit" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem Text="Duplicate" Icon="Copy" Command="{x:Bind DuplicateRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                 </MenuFlyout>
               </Setter.Value>
             </Setter>
@@ -42,9 +42,9 @@
             <StackPanel Orientation="Horizontal">
               <TextBlock>
                 <Run Text="{x:Bind Index, Mode=OneWay}"/><!--
-             --><Run x:Uid="RuleManager_If" /><!--
+             --><Run Text=", If "/><!--
              --><Run Text="{x:Bind InputExpression, Mode=OneWay}" Foreground="Green"/><!--
-             --><Run x:Uid="RuleManager_ThenLet"/>
+             --><Run Text=", then let "/>
               </TextBlock>
               <ItemsRepeater ItemsSource="{x:Bind OutputExpressions, Mode=OneWay}">
                 <ItemsRepeater.Layout>
@@ -59,7 +59,7 @@
                             <core:ChangePropertyAction TargetObject="{Binding ElementName=Separator}" PropertyName="Text" Value=" "/>
                           </core:DataTriggerBehavior>
                           <core:DataTriggerBehavior Binding="{x:Bind Index, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="1">
-                            <core:ChangePropertyAction x:Uid="RuleManager_And" TargetObject="{Binding ElementName=Separator}" PropertyName="Text"/>
+                            <core:ChangePropertyAction TargetObject="{Binding ElementName=Separator}" PropertyName="Text" Value=" and "/>
                           </core:DataTriggerBehavior>
                         </interactivity:Interaction.Behaviors>
                       </Run><!--

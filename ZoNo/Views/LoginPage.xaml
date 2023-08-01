@@ -12,14 +12,14 @@
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <InfoBar x:Uid="Login_InfoBar" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+    <InfoBar Grid.Row="0" Title="Wrong Credentials" Message="Incorrect e-mail or password!" HorizontalAlignment="Center" VerticalAlignment="Bottom"
              Width="350" Severity="Error" IsOpen="{x:Bind ViewModel.IsWrongCredentials, Mode=OneWay}" Margin="0,0,0,15"/>
     <controls:LoaderContentControl Grid.Row="1" IsLoading="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}" HorizontalAlignment="Center">
       <StackPanel Width="200">
-        <TextBox Name="Email" x:Uid="Login_Email" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
-        <PasswordBox x:Uid="Login_Password" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
-        <CheckBox x:Uid="Login_RememberMe" IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
-        <Button Name="Login" x:Uid="Login_Login" HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.LoginCommand}"/>
+        <TextBox Name="Email" Header="E-mail" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Text="{x:Bind ViewModel.Email, Mode=TwoWay}"/>
+        <PasswordBox Header="Password" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
+        <CheckBox Content="Remember me!" IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
+        <Button Name="Login" Content="Login" HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.LoginCommand}"/>
       </StackPanel>
     </controls:LoaderContentControl>
     <WebView2 x:Name="WebView" Grid.Row="2" VerticalAlignment="Top" Width="302" Height="76"

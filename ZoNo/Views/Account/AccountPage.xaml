@@ -27,17 +27,17 @@
         <Border Width="60" Height="60" CornerRadius="8" VerticalAlignment="Top">
           <Image Source="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
         </Border>
-        <TextBox x:Uid="Account_FirstName" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
-        <TextBox x:Uid="Account_LastName" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
-        <TextBox x:Uid="Account_Email" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
-        <TextBox x:Uid="Account_DefaultCurrency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
+        <TextBox Header="First Name" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
+        <TextBox Header="Last Name" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
+        <TextBox Header="E-mail" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
+        <TextBox Header="Default Currency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
       </StackPanel>
       <Grid Grid.Row="1" Margin="0,12,0,0">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock x:Uid="Account_Groups" Grid.Row="0"/>
+        <TextBlock Grid.Row="0" Text="Groups"/>
         <ListView Grid.Row="1" SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="splitwise:Group">
@@ -48,7 +48,7 @@
           </ListView.ItemTemplate>
         </ListView>
       </Grid>
-      <Button x:Uid="Account_Logout" Grid.Row="2" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
+      <Button Grid.Row="2" Content="Logout" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
     </Grid>
   </controls:LoaderContentControl>
 </Page>

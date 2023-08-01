@@ -252,7 +252,7 @@ namespace ZoNo.Views.Import
     private void Grid_DragOver(object sender, DragEventArgs e)
     {
       e.AcceptedOperation = DataPackageOperation.Copy;
-      e.DragUIOverride.Caption = "Import_Add".GetLocalized();
+      e.DragUIOverride.Caption = "Add";
     }
 
     private async void Grid_Drop(object sender, DragEventArgs e)

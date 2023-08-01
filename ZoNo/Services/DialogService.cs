@@ -31,8 +31,8 @@ namespace ZoNo.Services
         XamlRoot = App.MainWindow.Content.XamlRoot,
         RequestedTheme = _themeSelectorService.Theme,
         Title = title,
-        PrimaryButtonText = "Dialog_OK".GetLocalized(),
-        CloseButtonText = type == DialogType.OkCancel ? "Dialog_Cancel".GetLocalized() : string.Empty,
+        PrimaryButtonText = "OK",
+        CloseButtonText = type == DialogType.OkCancel ? "Cancel" : string.Empty,
         Content = content
       };
       dialog.Resources["ContentDialogMinWidth"] = 0.0;

@@ -17,17 +17,17 @@
                     ExpandedModeThresholdWidth="1280"
                     Header="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}">
       <NavigationView.MenuItems>
-        <NavigationViewItem x:Uid="Shell_Import" Icon="Import" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Import.ImportPageViewModel"/>
-        <NavigationViewItem x:Uid="Shell_Rules" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Rules.RulesPageViewModel">
+        <NavigationViewItem Content="Import" Icon="Import" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Import.ImportPageViewModel"/>
+        <NavigationViewItem Content="Rules" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Rules.RulesPageViewModel">
           <NavigationViewItem.Icon>
             <!-- Handwriting -->
             <FontIcon Glyph="&#xe929;"/>
           </NavigationViewItem.Icon>
         </NavigationViewItem>
-        <NavigationViewItem x:Uid="Shell_Query" Icon="Filter" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.QueryPageViewModel"/>
+        <NavigationViewItem Content="Query" Icon="Filter" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.QueryPageViewModel"/>
       </NavigationView.MenuItems>
       <NavigationView.FooterMenuItems>
-        <NavigationViewItem x:Uid="Shell_Account" Icon="Contact" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.AccountPageViewModel"/>
+        <NavigationViewItem Content="Account" Icon="Contact" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.AccountPageViewModel"/>
       </NavigationView.FooterMenuItems>
       <NavigationView.HeaderTemplate>
         <DataTemplate>

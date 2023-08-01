@@ -135,7 +135,7 @@ namespace ZoNo
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
       e.Handled = true;
-      await GetService<IDialogService>().ShowDialogAsync(DialogType.Ok, "App_UnhandledException".GetLocalized(), new TextBlock()
+      await GetService<IDialogService>().ShowDialogAsync(DialogType.Ok, "Unhandled Exception", new TextBlock()
       {
         Text = e.Exception.ToString(),
         IsTextSelectionEnabled = true
