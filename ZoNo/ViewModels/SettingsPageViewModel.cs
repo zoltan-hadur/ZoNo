@@ -118,7 +118,6 @@ namespace ZoNo.ViewModels
 
       if (await savePicker.PickSaveFileAsync() is var file && file != null)
       {
-        CachedFileManager.DeferUpdates(file);
         var rules = new Dictionary<RuleType, IList<Rule>>();
         foreach (var ruleType in Enum.GetValues<RuleType>())
         {
