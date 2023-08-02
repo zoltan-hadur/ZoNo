@@ -10,6 +10,7 @@
   <UserControl.Resources>
     <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
       <Setter Property="IsSpellCheckEnabled" Value="False"/>
+      <Setter Property="FontFamily" Value="Cascade Mono"/>
     </Style>
   </UserControl.Resources>
   <Grid>
