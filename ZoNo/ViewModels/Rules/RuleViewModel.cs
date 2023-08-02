@@ -20,6 +20,9 @@ namespace ZoNo.ViewModels.Rules
     private int _index;
 
     [ObservableProperty]
+    private string _description = string.Empty;
+
+    [ObservableProperty]
     private string _inputExpression = string.Empty;
 
     [ObservableProperty]
@@ -51,6 +54,7 @@ namespace ZoNo.ViewModels.Rules
       {
         Id = model.Id,
         Index = index + 1,
+        Description = model.Description,
         InputExpression = model.InputExpression,
         OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(model.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
       };
@@ -61,6 +65,7 @@ namespace ZoNo.ViewModels.Rules
       return new Rule()
       {
         Id = vm.Id,
+        Description = vm.Description,
         InputExpression = vm.InputExpression,
         OutputExpressions = vm.OutputExpressions.Select(OutputExpressionViewModel.ToModel).ToArray()
       };

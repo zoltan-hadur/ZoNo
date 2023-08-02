@@ -4,8 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:rules="using:ZoNo.ViewModels.Rules"
-             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-             xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+             xmlns:sys="using:System"
              mc:Ignorable="d">
   <Border Background="{x:Bind Background, Mode=OneWay}"
           Padding="{x:Bind Padding, Mode=OneWay}"
@@ -39,36 +38,7 @@
         </ListView.ItemContainerStyle>
         <ListView.ItemTemplate>
           <DataTemplate x:DataType="rules:RuleViewModel">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock>
-                <Run Text="{x:Bind Index, Mode=OneWay}"/><!--
-             --><Run Text=", If "/><!--
-             --><Run Text="{x:Bind InputExpression, Mode=OneWay}" Foreground="Green"/><!--
-             --><Run Text=", then let "/>
-              </TextBlock>
-              <ItemsRepeater ItemsSource="{x:Bind OutputExpressions, Mode=OneWay}">
-                <ItemsRepeater.Layout>
-                  <StackLayout Orientation="Horizontal"/>
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
-                  <DataTemplate x:DataType="rules:OutputExpressionViewModel">
-                    <TextBlock>
-                      <Run x:Name="Separator">
-                        <interactivity:Interaction.Behaviors>
-                          <core:DataTriggerBehavior Binding="{x:Bind Index, Mode=OneWay}" ComparisonCondition="Equal" Value="1">
-                            <core:ChangePropertyAction TargetObject="{Binding ElementName=Separator}" PropertyName="Text" Value=" "/>
-                          </core:DataTriggerBehavior>
-                          <core:DataTriggerBehavior Binding="{x:Bind Index, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="1">
-                            <core:ChangePropertyAction TargetObject="{Binding ElementName=Separator}" PropertyName="Text" Value=" and "/>
-                          </core:DataTriggerBehavior>
-                        </interactivity:Interaction.Behaviors>
-                      </Run><!--
-                   --><Run Text="{x:Bind OutputExpression, Mode=OneWay}" Foreground="Green"/>
-                    </TextBlock>
-                  </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-              </ItemsRepeater>
-            </StackPanel>
+            <TextBlock Text="{x:Bind sys:String.Format(x:Null, '{0}, {1}', Index, Description), Mode=OneWay}"/>
           </DataTemplate>
         </ListView.ItemTemplate>
       </ListView>

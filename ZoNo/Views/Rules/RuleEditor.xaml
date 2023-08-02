@@ -16,17 +16,17 @@
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBlock Grid.Row="0" Margin="0,0,0,6" Text="If"/>
-    <TextBox Grid.Row="1" Margin="0,0,0,12" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
-    <Grid Grid.Row="2" Margin="0,0,0,6">
-      <TextBlock Text="Then" VerticalAlignment="Center"/>
-      <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
-    </Grid>
-    <ListView Grid.Row="3" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" AllowDrop="True" CanReorderItems="True" ItemsSource="{x:Bind ViewModel.OutputExpressions, Mode=OneWay}">
+    <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="12">
+      <TextBox Header="Description" Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
+      <TextBox Header="If" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
+      <Grid Margin="0,0,0,6">
+        <TextBlock Text="Then" VerticalAlignment="Center"/>
+        <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
+      </Grid>
+    </StackPanel>
+    <ListView Grid.Row="1" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" AllowDrop="True" CanReorderItems="True" ItemsSource="{x:Bind ViewModel.OutputExpressions, Mode=OneWay}">
       <ListView.ItemContainerStyle>
         <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
           <Setter Property="Padding" Value="16,0,0,0"/>
