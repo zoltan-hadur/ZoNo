@@ -5,8 +5,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:rules="using:ZoNo.ViewModels.Rules"
              mc:Ignorable="d"
-             Width="600"
-             Height="300">
+             MinWidth="600"
+             MinHeight="300">
+  <UserControl.Resources>
+    <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+      <Setter Property="IsSpellCheckEnabled" Value="False"/>
+    </Style>
+  </UserControl.Resources>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -15,7 +20,7 @@
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
     <TextBlock Grid.Row="0" Margin="0,0,0,6" Text="If"/>
-    <TextBox Grid.Row="1" Margin="0,0,0,12" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}"/>
+    <TextBox Grid.Row="1" Margin="0,0,0,12" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
     <Grid Grid.Row="2" Margin="0,0,0,6">
       <TextBlock Text="Then" VerticalAlignment="Center"/>
       <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
