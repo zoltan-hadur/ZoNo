@@ -21,22 +21,22 @@
             <xaml:ElementTheme x:Key="Dark">Dark</xaml:ElementTheme>
             <xaml:ElementTheme x:Key="Default">Default</xaml:ElementTheme>
           </StackPanel.Resources>
-          <RadioButton Content="Light"
+          <RadioButton Content="{x:Bind xaml:ElementTheme.Light.ToString()}"
                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                       CommandParameter="{StaticResource Light}"
-                       IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}"
+                       CommandParameter="{x:Bind xaml:ElementTheme.Light}"
+                       IsChecked="{x:Bind ViewModel.ElementTheme.Equals(xaml:ElementTheme.Light), Mode=OneWay}"
                        FontSize="15"
                        GroupName="AppTheme"/>
-          <RadioButton Content="Dark"
+          <RadioButton Content="{x:Bind xaml:ElementTheme.Dark.ToString()}"
                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                       CommandParameter="{StaticResource Dark}"
-                       IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}"
+                       CommandParameter="{x:Bind xaml:ElementTheme.Dark}"
+                       IsChecked="{x:Bind ViewModel.ElementTheme.Equals(xaml:ElementTheme.Dark), Mode=OneWay}"
                        FontSize="15"
                        GroupName="AppTheme"/>
-          <RadioButton Content="Default"
+          <RadioButton Content="{x:Bind xaml:ElementTheme.Default.ToString()}"
                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                       CommandParameter="{StaticResource Default}"
-                       IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}"
+                       CommandParameter="{x:Bind xaml:ElementTheme.Default}"
+                       IsChecked="{x:Bind ViewModel.ElementTheme.Equals(xaml:ElementTheme.Default), Mode=OneWay}"
                        FontSize="15"
                        GroupName="AppTheme"/>
         </StackPanel>

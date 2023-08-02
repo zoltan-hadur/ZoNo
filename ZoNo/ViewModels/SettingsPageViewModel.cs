@@ -21,22 +21,13 @@ namespace ZoNo.ViewModels
     private readonly IRulesService _rulesService;
     private readonly IDialogService _dialogService;
     private readonly IThemeSelectorService _themeSelectorService;
+
+    [ObservableProperty]
+
     private ElementTheme _elementTheme;
+
+    [ObservableProperty]
     private string _versionDescription;
-
-    public ElementTheme ElementTheme
-    {
-      get => _elementTheme;
-      set => SetProperty(ref _elementTheme, value);
-    }
-
-    public string VersionDescription
-    {
-      get => _versionDescription;
-      set => SetProperty(ref _versionDescription, value);
-    }
-
-    public ICommand SwitchThemeCommand { get; }
 
     public SettingsPageViewModel(
       IRulesService rulesService,
@@ -47,17 +38,9 @@ namespace ZoNo.ViewModels
       _rulesService = rulesService;
       _dialogService = dialogService;
       _themeSelectorService = themeSelectorService;
+
       _elementTheme = _themeSelectorService.Theme;
       _versionDescription = GetVersionDescription();
-
-      SwitchThemeCommand = new RelayCommand<ElementTheme>(async (param) =>
-      {
-        if (ElementTheme != param)
-        {
-          ElementTheme = param;
-          await _themeSelectorService.SetThemeAsync(param);
-        }
-      });
     }
 
     private static string GetVersionDescription()
@@ -75,6 +58,16 @@ namespace ZoNo.ViewModels
       }
 
       return $"ZoNo - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+    }
+
+    [RelayCommand]
+    private async Task SwitchTheme(ElementTheme elementTheme)
+    {
+      if (ElementTheme != elementTheme)
+      {
+        ElementTheme = elementTheme;
+        await _themeSelectorService.SetThemeAsync(elementTheme);
+      }
     }
 
     [RelayCommand]
