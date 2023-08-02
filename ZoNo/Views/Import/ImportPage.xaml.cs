@@ -18,7 +18,6 @@ namespace ZoNo.Views.Import
     {
       await ViewModel.TransactionsViewModel.Load();
       await ViewModel.ExpensesViewModel.Load();
-      await ViewModel.Load();
     }
 
     private void Expenses_SelectionChanged(object sender, SelectionChangedEventArgs e)

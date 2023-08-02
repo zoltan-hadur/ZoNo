@@ -21,6 +21,8 @@ namespace ZoNo.ViewModels.Import
 
     public Dictionary<string, ColumnViewModel>? Columns { get; private set; } = null;
 
+    public event EventHandler LoadExcelDocumentsStarted;
+
     public TransactionsViewModel(
       ILocalSettingsService localSettingsService,
       IExcelDocumentLoader excelDocumentLoader,
@@ -72,6 +74,7 @@ namespace ZoNo.ViewModels.Import
     [RelayCommand]
     private async Task LoadExcelDocuments(IList<string> paths)
     {
+      LoadExcelDocumentsStarted?.Invoke(this, EventArgs.Empty);
       var rules = await _rulesService.GetRulesAsync(RuleType.Import);
       var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
       foreach (var path in paths)
