@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using System.Reflection;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
@@ -37,11 +36,10 @@ namespace ZoNo.Services
         await Task.Run(() =>
         {
           var inputCode = $$"""
-                          RuleId switch
+                          switch (RuleId)
                           {
-                            "JustToHaveReturnType" => true,
-                            {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"\"{rule.Id}\" => {rule.InputExpression},"))}}
-                            _ => throw new NotImplementedException()
+                            {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"case \"{rule.Id}\": {{ {rule.InputExpression} }} break;"))}}
+                            default: throw new NotImplementedException();
                           }
                           """;
           var inputScript = CSharpScript.Create<bool>(
@@ -54,14 +52,12 @@ namespace ZoNo.Services
           _inputEvaluator = inputScript.CreateDelegate();
 
           var outputCode = $$"""
-                         (RuleId switch
-                         {
-                           "JustToHaveReturnType" => (Action)(() => { }),
-                           {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"\"{rule.Id}\" => (Action)(() => {{{Environment.NewLine}" +
-                             $"{string.Join(Environment.NewLine, rule.OutputExpressions.Select(expression => $"    {expression};"))}{Environment.NewLine}  }}),"))}}
-                           _ => throw new NotImplementedException()
-                         })()
-                         """;
+                           switch (RuleId)
+                           {
+                             {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"case \"{rule.Id}\": {{ {string.Join(" ", rule.OutputExpressions)} }} break;"))}}
+                             default: throw new NotImplementedException();
+                           }
+                           """;
           var outputScript = CSharpScript.Create<object>(
             outputCode,
             options: ScriptOptions.Default
