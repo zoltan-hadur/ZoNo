@@ -5,7 +5,6 @@
   <Application.Resources>
     <ResourceDictionary>
       <converters:ThousandsSeparatorConverter x:Key="ThousandsSeparatorConverter"/>
-      <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
       <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
       <ResourceDictionary.MergedDictionaries>
         <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
