@@ -10,7 +10,9 @@
   <UserControl.Resources>
     <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
       <Setter Property="IsSpellCheckEnabled" Value="False"/>
-      <Setter Property="FontFamily" Value="Cascade Mono"/>
+      <Setter Property="FontFamily" Value="Cascadia Mono"/>
+      <Setter Property="FontWeight" Value="Light"/>
+      <Setter Property="Padding" Value="8,8,0,6"/>
     </Style>
   </UserControl.Resources>
   <Grid>
@@ -19,8 +21,10 @@
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
     <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="12">
-      <TextBox Header="Description" Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
-      <TextBox Header="If" Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
+      <TextBlock Text="Description"/>
+      <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
+      <TextBlock Text="If"/>
+      <TextBox Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
       <Grid Margin="0,0,0,6">
         <TextBlock Text="Then" VerticalAlignment="Center"/>
         <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
