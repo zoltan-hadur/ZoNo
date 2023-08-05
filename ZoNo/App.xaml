@@ -1,11 +1,13 @@
 ﻿<Application x:Class="ZoNo.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="using:ZoNo.Converters">
+             xmlns:converters="using:ZoNo.Converters"
+             xmlns:controls="using:ZoNo.Controls">
   <Application.Resources>
     <ResourceDictionary>
       <converters:ThousandsSeparatorConverter x:Key="ThousandsSeparatorConverter"/>
       <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+      <Style TargetType="controls:ValidationTextBox" BasedOn="{StaticResource DefaultTextBoxStyle}"/>
       <ResourceDictionary.MergedDictionaries>
         <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
         <ResourceDictionary Source="/Styles/FontSizes.xaml"/>
