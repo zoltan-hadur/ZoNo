@@ -38,6 +38,7 @@ namespace ZoNo.Services
           var inputCode = $$"""
                           switch (RuleId)
                           {
+                            case "ForDefaultType": return false;
                             {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"case \"{rule.Id}\": {{ {rule.InputExpression} }} break;"))}}
                             default: throw new NotImplementedException();
                           }

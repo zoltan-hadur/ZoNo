@@ -1,35 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Globalization.DateTimeFormatting;
 using ZoNo.Contracts.Services;
-using ZoNo.Helpers;
 using ZoNo.Models;
-using ZoNo.Services;
 using ZoNo.Views.Rules;
 
 namespace ZoNo.ViewModels.Rules
 {
   public partial class RulesViewModel : ObservableObject
   {
+    private readonly IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService;
     private readonly IDialogService _dialogService;
     private readonly IRulesService _rulesService;
     private readonly RuleType _ruleType;
 
     public ObservableCollection<RuleViewModel> Rules { get; } = new ObservableCollection<RuleViewModel>();
 
-    public RulesViewModel(IDialogService dialogService, IRulesService rulesService, RuleType ruleType)
+    public RulesViewModel(
+      IRuleExpressionSyntaxCheckerService ruleExpressionSyntaxCheckerService,
+      IDialogService dialogService,
+      IRulesService rulesService, RuleType ruleType)
     {
+      _ruleExpressionSyntaxCheckerService = ruleExpressionSyntaxCheckerService;
       _dialogService = dialogService;
       _rulesService = rulesService;
       _ruleType = ruleType;
@@ -57,6 +52,36 @@ namespace ZoNo.ViewModels.Rules
       await _rulesService.SaveRulesAsync(_ruleType, rules);
     }
 
+    private async void Rule_InputExpressionChanged(object? sender, string e)
+    {
+      if (sender is RuleViewModel rule)
+      {
+        switch (_ruleType)
+        {
+          case RuleType.Import:
+          case RuleType.Splitwise:
+            (rule.IsInputSyntaxValid, rule.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction>(e);
+            break;
+        }
+      }
+    }
+
+    private async void Rule_OutputExpressionChanged(object? sender, string e)
+    {
+      if (sender is OutputExpressionViewModel outputExpression)
+      {
+        switch (_ruleType)
+        {
+          case RuleType.Import:
+            (outputExpression.IsSyntaxValid, outputExpression.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction, Transaction>(e);
+            break;
+          case RuleType.Splitwise:
+            (outputExpression.IsSyntaxValid, outputExpression.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction, Expense>(e);
+            break;
+        }
+      }
+    }
+
     [RelayCommand]
     private async Task NewRule()
     {
@@ -65,11 +90,21 @@ namespace ZoNo.ViewModels.Rules
         Index = Rules.Count + 1,
         OutputExpressions = new ObservableCollection<OutputExpressionViewModel> { new OutputExpressionViewModel() { Index = 1 } }
       };
-      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"New {_ruleType} Rule", new RuleEditor(rule));
+      rule.InputExpressionChanged += Rule_InputExpressionChanged;
+      rule.OutputExpressionChanged += Rule_OutputExpressionChanged;
+      var isPrimaryButtonEnabledBinding = new Binding()
+      {
+        Path = new PropertyPath(nameof(RuleViewModel.IsSyntaxValid)),
+        Mode = BindingMode.OneWay,
+        Source = rule
+      };
+      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"New {_ruleType} Rule", new RuleEditor(rule), isPrimaryButtonEnabledBinding);
       if (ok)
       {
         Rules.Add(rule);
       }
+      rule.InputExpressionChanged -= Rule_InputExpressionChanged;
+      rule.OutputExpressionChanged -= Rule_OutputExpressionChanged;
     }
 
     [RelayCommand]
@@ -77,11 +112,21 @@ namespace ZoNo.ViewModels.Rules
     {
       var index = Rules.IndexOf(rule);
       var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);
-      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule));
+      copiedRule.InputExpressionChanged += Rule_InputExpressionChanged;
+      copiedRule.OutputExpressionChanged += Rule_OutputExpressionChanged;
+      var isPrimaryButtonEnabledBinding = new Binding()
+      {
+        Path = new PropertyPath(nameof(RuleViewModel.IsSyntaxValid)),
+        Mode = BindingMode.OneWay,
+        Source = copiedRule
+      };
+      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule), isPrimaryButtonEnabledBinding);
       if (ok)
       {
         Rules[index] = copiedRule;
       }
+      copiedRule.InputExpressionChanged -= Rule_InputExpressionChanged;
+      copiedRule.OutputExpressionChanged -= Rule_OutputExpressionChanged;
     }
 
     [RelayCommand]

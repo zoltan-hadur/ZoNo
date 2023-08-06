@@ -1,13 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels.Rules
@@ -26,25 +21,71 @@ namespace ZoNo.ViewModels.Rules
     private string _inputExpression = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSyntaxValid))]
+    private bool _isInputSyntaxValid = false;
+
+    [ObservableProperty]
+    private string _errorMessage = string.Empty;
+
+    public bool IsOutputExpressionsSyntaxValid => OutputExpressions?.All(outputExpression => outputExpression.IsSyntaxValid) ?? false;
+    public bool IsSyntaxValid => IsInputSyntaxValid && IsOutputExpressionsSyntaxValid;
+
+    [ObservableProperty]
     private ObservableCollection<OutputExpressionViewModel> _outputExpressions = new ObservableCollection<OutputExpressionViewModel>();
+
+    public event EventHandler<string>? InputExpressionChanged;
+    public event EventHandler<string>? OutputExpressionChanged;
+
+    partial void OnInputExpressionChanged(string value)
+    {
+      InputExpressionChanged?.Invoke(this, value);
+    }
 
     partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel>? oldValue, ObservableCollection<OutputExpressionViewModel> newValue)
     {
       if (oldValue != null)
       {
         oldValue.CollectionChanged -= OutputExpressions_CollectionChanged;
+        foreach (var outputExpression in oldValue)
+        {
+          outputExpression.PropertyChanged -= OutputExpression_PropertyChanged;
+        }
       }
       if (newValue != null)
       {
         newValue.CollectionChanged += OutputExpressions_CollectionChanged;
+        foreach (var outputExpression in newValue)
+        {
+          outputExpression.PropertyChanged += OutputExpression_PropertyChanged;
+        }
       }
+      OnPropertyChanged(nameof(IsOutputExpressionsSyntaxValid));
+      OnPropertyChanged(nameof(IsSyntaxValid));
     }
 
     private void OutputExpressions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+      foreach (OutputExpressionViewModel outputExpression in e.OldItems ?? Array.Empty<OutputExpressionViewModel>())
+      {
+        outputExpression.PropertyChanged -= OutputExpression_PropertyChanged;
+      }
+      foreach (OutputExpressionViewModel outputExpression in e.NewItems ?? Array.Empty<OutputExpressionViewModel>())
+      {
+        outputExpression.PropertyChanged += OutputExpression_PropertyChanged;
+      }
       for (int i = 0; i < OutputExpressions.Count; ++i)
       {
         OutputExpressions[i].Index = i + 1;
+      }
+      OnPropertyChanged(nameof(IsOutputExpressionsSyntaxValid));
+      OnPropertyChanged(nameof(IsSyntaxValid));
+    }
+
+    private void OutputExpression_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(OutputExpressionViewModel.OutputExpression))
+      {
+        OutputExpressionChanged?.Invoke(sender, (sender as OutputExpressionViewModel)!.OutputExpression);
       }
     }
 
@@ -56,6 +97,7 @@ namespace ZoNo.ViewModels.Rules
         Index = index + 1,
         Description = model.Description,
         InputExpression = model.InputExpression,
+        IsInputSyntaxValid = true,
         OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(model.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
       };
     }

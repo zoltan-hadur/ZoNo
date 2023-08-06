@@ -5,11 +5,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:rules="using:ZoNo.ViewModels.Rules"
              xmlns:sys="using:System"
+             xmlns:controls="using:ZoNo.Controls"
              mc:Ignorable="d"
              MinWidth="600"
              MinHeight="300">
   <UserControl.Resources>
-    <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+    <Style TargetType="controls:ValidationTextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
       <Setter Property="IsSpellCheckEnabled" Value="False"/>
       <Setter Property="FontFamily" Value="Cascadia Mono"/>
       <Setter Property="FontWeight" Value="Light"/>
@@ -25,7 +26,11 @@
       <TextBlock Text="Description"/>
       <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"/>
       <TextBlock Text="If"/>
-      <TextBox Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap"/>
+      <controls:ValidationTextBox Text="{x:Bind ViewModel.InputExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsValid="{x:Bind ViewModel.IsInputSyntaxValid, Mode=OneWay}"
+                                  ErrorMessage="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                                  AcceptsReturn="True"
+                                  TextWrapping="NoWrap"/>
       <Grid Margin="0,0,0,6">
         <TextBlock Text="Then" VerticalAlignment="Center"/>
         <Button Content="New Output Expression" HorizontalAlignment="Right" Command="{x:Bind ViewModel.NewOutputExpressionCommand}"/>
@@ -52,7 +57,10 @@
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{x:Bind sys:String.Format('{0}, let', Index), Mode=OneWay}" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Text="{x:Bind OutputExpression, Mode=TwoWay}"/>
+            <controls:ValidationTextBox Grid.Column="1"
+                                        Text="{x:Bind OutputExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        IsValid="{x:Bind IsSyntaxValid, Mode=OneWay}"
+                                        ErrorMessage="{x:Bind ErrorMessage, Mode=OneWay}"/>
           </Grid>
         </DataTemplate>
       </ListView.ItemTemplate>

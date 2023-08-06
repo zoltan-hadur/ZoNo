@@ -5,10 +5,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Splitwise;
 using Splitwise.Contracts;
-using System.Net.Http;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
-using ZoNo.Helpers;
 using ZoNo.Messages;
 using ZoNo.Models;
 using ZoNo.Services;
@@ -107,6 +105,7 @@ namespace ZoNo
       services.AddSingleton<IRulesService, RulesService>();
       services.AddSingleton<IRuleEvaluatorServiceBuilder, RuleEvaluatorServiceBuilder>();
       services.AddSingleton<IDialogService, DialogService>();
+      services.AddSingleton<IRuleExpressionSyntaxCheckerService, RuleExpressionSyntaxCheckerService>();
 
       // Views and ViewModels
       services.AddScoped<LoginPageViewModel>();
@@ -114,8 +113,16 @@ namespace ZoNo
       services.AddScoped<TransactionsViewModel>();
       services.AddScoped<ExpensesViewModel>();
       services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
-        new RulesViewModel(provider.GetService<IDialogService>()!, provider.GetService<IRulesService>()!, RuleType.Import),
-        new RulesViewModel(provider.GetService<IDialogService>()!, provider.GetService<IRulesService>()!, RuleType.Splitwise))
+        new RulesViewModel(
+          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
+          provider.GetService<IDialogService>()!,
+          provider.GetService<IRulesService>()!,
+          RuleType.Import),
+        new RulesViewModel(
+          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
+          provider.GetService<IDialogService>()!,
+          provider.GetService<IRulesService>()!,
+          RuleType.Splitwise))
       );
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();
