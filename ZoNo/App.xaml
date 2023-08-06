@@ -8,6 +8,10 @@
       <converters:ThousandsSeparatorConverter x:Key="ThousandsSeparatorConverter"/>
       <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
       <Style TargetType="controls:ValidationTextBox" BasedOn="{StaticResource DefaultTextBoxStyle}"/>
+      <Style TargetType="ToolTip" BasedOn="{StaticResource DefaultToolTipStyle}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MaxWidth" Value="600"/>
+      </Style>
       <ResourceDictionary.MergedDictionaries>
         <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
         <ResourceDictionary Source="/Styles/FontSizes.xaml"/>
