@@ -1,13 +1,8 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.WinUI.UI.Animations;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Markup;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ZoNo.Controls
 {
@@ -39,12 +34,26 @@ namespace ZoNo.Controls
     {
       Width = 100,
       Height = 100,
-      IsActive = false
+      IsActive = true,
+      Visibility = Visibility.Collapsed
     };
 
     public LoaderContentControl()
     {
       base.Content = new Grid() { Children = { _contentControl, _progressRing } };
+
+      ElementCompositionPreview.SetImplicitShowAnimation(_progressRing, new OpacityAnimation()
+      {
+        Duration = TimeSpan.FromMilliseconds(300),
+        From = 0,
+        To = 1
+      }.GetAnimation(_progressRing, out _));
+      ElementCompositionPreview.SetImplicitHideAnimation(_progressRing, new OpacityAnimation()
+      {
+        Duration = TimeSpan.FromMilliseconds(300),
+        From = 1,
+        To = 0
+      }.GetAnimation(_progressRing, out _));
     }
 
     public static void OnContentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -60,7 +69,7 @@ namespace ZoNo.Controls
       if (sender is LoaderContentControl loaderContentControl && e.NewValue is bool isLoading)
       {
         loaderContentControl._contentControl.IsEnabled = !isLoading;
-        loaderContentControl._progressRing.IsActive = isLoading;
+        loaderContentControl._progressRing.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
       }
     }
   }
