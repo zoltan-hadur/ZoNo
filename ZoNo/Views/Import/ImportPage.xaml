@@ -6,6 +6,9 @@
       xmlns:local="using:ZoNo.Views.Import"
       xmlns:controls="using:ZoNo.Controls"
       xmlns:viewmodels="using:ZoNo.ViewModels.Import"
+      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       mc:Ignorable="d"
       Loading="Page_Loading">
   <controls:LoaderContentControl HorizontalContentAlignment="Stretch"
@@ -32,25 +35,53 @@
           
         </Border>
         <Border Style="{StaticResource BorderStyle}">
-          <ListView x:Name="Expenses"
-                    DataContext="{x:Bind ViewModel.ExpensesViewModel}"
-                    ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
-                    SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"
-                    SelectionChanged="Expenses_SelectionChanged">
-            <ListView.ItemTemplate>
-              <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                <local:ExpenseView Date="{x:Bind Date, Mode=OneWay}"
-                                   Category="{x:Bind Category, Mode=OneWay}"
-                                   Description="{x:Bind Description, Mode=OneWay}"
-                                   Group="{x:Bind Group.Name, Mode=OneWay}"
-                                   Paid="{x:Bind With[0].Item1.Email, Mode=OneWay}"
-                                   Currency="{x:Bind CurrencyCode, Mode=OneWay}"
-                                   Cost="{x:Bind Cost, Mode=OneWay}"
-                                   Categories="{Binding ElementName=Expenses, Path=DataContext.Categories, Mode=OneWay}"
-                                   Margin="0,8,0,8"/>
-              </DataTemplate>
-            </ListView.ItemTemplate>
-          </ListView>
+          <Grid>
+            <Border x:Name="ExpensesHereBorder">
+              <TextBlock x:Name="ExpensesHereText" Text="Expenses will be displayed here" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <interactivity:Interaction.Behaviors>
+                  <core:DataTriggerBehavior Binding="{x:Bind IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="True">
+                    <core:ChangePropertyAction TargetObject="{Binding ElementName=ExpensesHereText}" PropertyName="Opacity" Value="1"/>
+                  </core:DataTriggerBehavior>
+                  <core:DataTriggerBehavior Binding="{x:Bind IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="False">
+                    <core:ChangePropertyAction TargetObject="{Binding ElementName=ExpensesHereText}" PropertyName="Opacity" Value="0.3" />
+                  </core:DataTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+              </TextBlock>
+              <animations:Implicit.ShowAnimations>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1"/>
+              </animations:Implicit.ShowAnimations>
+              <animations:Implicit.HideAnimations>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="1" To="0"/>
+              </animations:Implicit.HideAnimations>
+              <interactivity:Interaction.Behaviors>
+                <core:DataTriggerBehavior Binding="{x:Bind ViewModel.ExpensesViewModel.Expenses.Count, Mode=OneWay}" ComparisonCondition="Equal" Value="0">
+                  <core:ChangePropertyAction TargetObject="{Binding ElementName=ExpensesHereBorder}" PropertyName="Visibility" Value="Visible"/>
+                </core:DataTriggerBehavior>
+                <core:DataTriggerBehavior Binding="{x:Bind ViewModel.ExpensesViewModel.Expenses.Count, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="0">
+                  <core:ChangePropertyAction TargetObject="{Binding ElementName=ExpensesHereBorder}" PropertyName="Visibility" Value="Collapsed" />
+                </core:DataTriggerBehavior>
+              </interactivity:Interaction.Behaviors>
+            </Border>
+            <ListView x:Name="Expenses"
+                      DataContext="{x:Bind ViewModel.ExpensesViewModel}"
+                      ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
+                      SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"
+                      SelectionChanged="Expenses_SelectionChanged">
+              <ListView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <local:ExpenseView Date="{x:Bind Date, Mode=OneWay}"
+                                     Category="{x:Bind Category, Mode=OneWay}"
+                                     Description="{x:Bind Description, Mode=OneWay}"
+                                     Group="{x:Bind Group.Name, Mode=OneWay}"
+                                     Paid="{x:Bind With[0].Item1.Email, Mode=OneWay}"
+                                     Currency="{x:Bind CurrencyCode, Mode=OneWay}"
+                                     Cost="{x:Bind Cost, Mode=OneWay}"
+                                     Categories="{Binding ElementName=Expenses, Path=DataContext.Categories, Mode=OneWay}"
+                                     Margin="0,8,0,8"/>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+          </Grid>
         </Border>
       </controls:AutomaticStackPanel>
       <Button Grid.Row="1"
