@@ -1,18 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.Mvvm.Input;
 using Splitwise.Contracts;
 using Splitwise.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZoNo.ViewModels.Import
 {
-  public class ExpensesViewModel : ObservableObject
+  public partial class ExpensesViewModel : ObservableObject
   {
     private readonly ISplitwiseService _splitwiseService;
     private Group[] _groups;
@@ -22,6 +17,13 @@ namespace ZoNo.ViewModels.Import
     public ObservableCollection<ExpenseViewModel> Expenses { get; } = new ObservableCollection<ExpenseViewModel>();
 
     public Category[] Categories => _categories;
+
+    [ObservableProperty]
+    private bool _isUploadingToSplitwise = false;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UploadExpensesToSplitwiseCommand))]
+    private bool _isExpensesNotEmpty = false;
 
     public ExpensesViewModel(ISplitwiseService splitwiseService)
     {
@@ -58,6 +60,22 @@ namespace ZoNo.ViewModels.Import
             .Subcategories.Single(subcategory => subcategory.Name == newItem.Category!.Subcategories[0].Name);
         }
       }
+      IsExpensesNotEmpty = Expenses.Count != 0;
+    }
+
+    [RelayCommand(CanExecute = nameof(IsExpensesNotEmpty))]
+    private async Task UploadExpensesToSplitwise()
+    {
+      IsUploadingToSplitwise = true;
+
+      foreach (var expense in Expenses.ToArray())
+      {
+        // TODO real upload
+        await Task.Delay(100);
+        Expenses.Remove(expense);
+      }
+
+      IsUploadingToSplitwise = false;
     }
   }
 }

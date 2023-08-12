@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using Windows.Foundation.Collections;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
-using ZoNo.Services;
 
 namespace ZoNo.ViewModels.Import
 {
@@ -13,8 +12,9 @@ namespace ZoNo.ViewModels.Import
   {
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-    private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
     private IRuleEvaluatorService<Transaction, Expense>? _ruleEvaluatorService;
+    private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
+    private BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction Transaction)>();
 
     private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
@@ -50,11 +50,18 @@ namespace ZoNo.ViewModels.Import
       TransactionsViewModel = transactionsViewModel;
       ExpensesViewModel = expensesViewModel;
 
-      transactionsViewModel.LoadExcelDocumentsStarted += TransactionsViewModel_LoadExcelDocumentsStarted;
-      transactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
+      TransactionsViewModel.LoadExcelDocumentsStarted += TransactionsViewModel_LoadExcelDocumentsStarted;
+      TransactionsViewModel.TransactionsView.VectorChanged += (s, e) =>
+      {
+        if (e.CollectionChange == CollectionChange.ItemInserted)
+        {
+          // To track order of insertions
+          _newTransactions.Add(((int)e.Index, TransactionsViewModel.TransactionsView[(int)e.Index] as Transaction));
+        }
+      };
+      TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
+      ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
     }
-
-
 
     private async void TransactionsViewModel_LoadExcelDocumentsStarted(object? sender, EventArgs e)
     {
@@ -70,41 +77,73 @@ namespace ZoNo.ViewModels.Import
       {
         case CollectionChange.ItemInserted:
           {
-            var newIndex = (int)e.Index;
-            var newTransaction = (TransactionsViewModel.TransactionsView[newIndex] as Transaction)!;
-
+            var (index, newTransaction) = _newTransactions.Take();
             var evaluatedExpense = new Expense();
             await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
             var newExpense = new ExpenseViewModel(evaluatedExpense);
-
             _transactionToExpenseViewModel[newTransaction] = newExpense;
-            ExpensesViewModel.Expenses.Insert(newIndex, newExpense);
+            ExpensesViewModel.Expenses.Insert(index, newExpense);
           }
           break;
         case CollectionChange.ItemRemoved:
           {
-            var expense = ExpensesViewModel.Expenses[(int)e.Index];
-            var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
-            ExpensesViewModel.Expenses.Remove(expense);
-            _transactionToExpenseViewModel.Remove(transaction);
+            // Transaction is already removed, need to remove expense too
+            if (TransactionsViewModel.TransactionsView.Count < ExpensesViewModel.Expenses.Count)
+            {
+              var oldIndex = (int)e.Index;
+              var expense = ExpensesViewModel.Expenses[oldIndex];
+              var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
+              _transactionToExpenseViewModel.Remove(transaction);
+              ExpensesViewModel.Expenses.Remove(expense);
+            }
           }
           break;
         case CollectionChange.Reset:
           {
             if (TransactionsViewModel.TransactionsView.Count > 0)
             {
-              foreach (var (transaction, expense) in _transactionToExpenseViewModel.OrderBy(pair => TransactionsViewModel.TransactionsView.IndexOf(pair.Key)))
+              // If transactions were reordered
+              if (TransactionsViewModel.TransactionsView.Count == ExpensesViewModel.Expenses.Count)
               {
-                var oldIndex = ExpensesViewModel.Expenses.IndexOf(expense);
-                var newIndex = TransactionsViewModel.TransactionsView.IndexOf(transaction);
-                if (newIndex != oldIndex)
+                foreach (var (transaction, expense) in _transactionToExpenseViewModel.OrderBy(pair => TransactionsViewModel.TransactionsView.IndexOf(pair.Key)))
                 {
-                  ExpensesViewModel.Expenses.Move(oldIndex, newIndex);
+                  var oldIndex = ExpensesViewModel.Expenses.IndexOf(expense);
+                  var newIndex = TransactionsViewModel.TransactionsView.IndexOf(transaction);
+                  if (newIndex != oldIndex)
+                  {
+                    ExpensesViewModel.Expenses.Move(oldIndex, newIndex);
+                  }
                 }
               }
             }
           }
           break;
+      }
+    }
+
+    private async void Expenses_CollectionChangedAsync(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+      if (e.Action == NotifyCollectionChangedAction.Remove)
+      {
+        using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+        foreach (ExpenseViewModel expense in e.OldItems ?? Array.Empty<ExpenseViewModel>())
+        {
+          // Expense is already removed, need to remove transaction too
+          if (ExpensesViewModel.Expenses.Count < TransactionsViewModel.TransactionsView.Count)
+          {
+            var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
+            _transactionToExpenseViewModel.Remove(transaction);
+            try
+            {
+              TransactionsViewModel.TransactionsView.Source.Remove(transaction);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+              // When deleting last item, there is an exception
+              TransactionsViewModel.TransactionsView.Refresh();
+            }
+          }
+        }
       }
     }
   }
