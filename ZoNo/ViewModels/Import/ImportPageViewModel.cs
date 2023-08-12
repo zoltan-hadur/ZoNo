@@ -15,6 +15,7 @@ namespace ZoNo.ViewModels.Import
     private IRuleEvaluatorService<Transaction, Expense>? _ruleEvaluatorService;
     private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
     private BlockingCollection<(int Index, Transaction? Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction? Transaction)>();
+    private BlockingCollection<Transaction> _transactionsToRemove = new BlockingCollection<Transaction>();
     private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
     public TransactionsViewModel TransactionsViewModel { get; }
@@ -48,6 +49,7 @@ namespace ZoNo.ViewModels.Import
       ExpensesViewModel = expensesViewModel;
 
       TransactionsViewModel.LoadExcelDocumentsStarted += TransactionsViewModel_LoadExcelDocumentsStarted;
+      TransactionsViewModel.LoadExcelDocumentsFinished += TransactionsViewModel_LoadExcelDocumentsFinished;
       TransactionsViewModel.TransactionsView.VectorChanged += (s, e) =>
       {
         if (e.CollectionChange == CollectionChange.ItemInserted)
@@ -67,6 +69,23 @@ namespace ZoNo.ViewModels.Import
       _ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(rules);
     }
 
+    private async void TransactionsViewModel_LoadExcelDocumentsFinished(object? sender, EventArgs e)
+    {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      while (_transactionsToRemove.TryTake(out var transaction))
+      {
+        try
+        {
+          TransactionsViewModel.TransactionsView.Source.Remove(transaction);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+          // When deleting last item, there is an exception
+          TransactionsViewModel.TransactionsView.Refresh();
+        }
+      }
+    }
+
     private async void TransactionsView_VectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
@@ -80,10 +99,14 @@ namespace ZoNo.ViewModels.Import
               throw new Exception($"Transaction for index \"{index}\" is null!");
             }
             var evaluatedExpense = new Expense();
-            await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
+            var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
             var newExpense = new ExpenseViewModel(evaluatedExpense);
             _transactionToExpenseViewModel[newTransaction] = newExpense;
             ExpensesViewModel.Expenses.Insert(index, newExpense);
+            if (result.RemoveThisElementFromList)
+            {
+              _transactionsToRemove.Add(newTransaction);
+            }
           }
           break;
         case CollectionChange.ItemRemoved:

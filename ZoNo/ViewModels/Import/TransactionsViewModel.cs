@@ -22,6 +22,7 @@ namespace ZoNo.ViewModels.Import
     public Dictionary<string, ColumnViewModel>? Columns { get; private set; } = null;
 
     public event EventHandler? LoadExcelDocumentsStarted;
+    public event EventHandler? LoadExcelDocumentsFinished;
 
     public TransactionsViewModel(
       ILocalSettingsService localSettingsService,
@@ -81,11 +82,15 @@ namespace ZoNo.ViewModels.Import
       {
         foreach (var transaction in await _excelDocumentLoader.LoadAsync(path))
         {
-          await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
-          _transactions.Add(transaction);
+          var result = await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
+          if (!result.RemoveThisElementFromList)
+          {
+            _transactions.Add(transaction);
+          }
           await Task.Delay(1);
         }
       }
+      LoadExcelDocumentsFinished?.Invoke(this, EventArgs.Empty);
     }
 
     private string SettingColumnIsVisible(ColumnHeader columnHeader) => $"Import_Columns_{columnHeader}_IsVisible";

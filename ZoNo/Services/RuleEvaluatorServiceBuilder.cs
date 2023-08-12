@@ -18,6 +18,12 @@ namespace ZoNo.Services
       public required string RuleId { get; set; }
       public required T1 Input { get; set; }
       public required T2 Output { get; set; }
+      public bool RemoveThisElementFromList { get; set; } = false;
+    }
+
+    public class EvaluationResult
+    {
+      public required bool RemoveThisElementFromList { get; set; }
     }
 
     private class RuleEvaluatorService<Input, Output> : IRuleEvaluatorService<Input, Output>
@@ -46,8 +52,8 @@ namespace ZoNo.Services
           var inputScript = CSharpScript.Create<bool>(
             inputCode,
             options: ScriptOptions.Default
-              .WithReferences("System.Core")
-              .WithImports("System", "System.Linq"),
+              .WithReferences("System.Core", "ZoNo")
+              .WithImports("System", "System.Linq", "ZoNo.Models"),
             globalsType: typeof(InputType<Input>)
           );
           _inputEvaluator = inputScript.CreateDelegate();
@@ -70,15 +76,22 @@ namespace ZoNo.Services
         });
       }
 
-      public async Task EvaluateRulesAsync(Input input, Output output)
+      public async Task<EvaluationResult> EvaluateRulesAsync(Input input, Output output)
       {
         foreach (var rule in _rules)
         {
-          if (await _inputEvaluator!(new InputType<Input>() { RuleId = rule.Id.ToString(), Input = input }))
+          var scriptInput = new InputType<Input>() { RuleId = rule.Id.ToString(), Input = input };
+          if (await _inputEvaluator!(scriptInput))
           {
-            await _outputEvaluator!(new OutputType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output });
+            var scriptOutput = new OutputType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output };
+            await _outputEvaluator!(scriptOutput);
+            if (scriptOutput.RemoveThisElementFromList)
+            {
+              return new EvaluationResult() { RemoveThisElementFromList = true };
+            }
           }
         }
+        return new EvaluationResult() { RemoveThisElementFromList = false };
       }
     }
 

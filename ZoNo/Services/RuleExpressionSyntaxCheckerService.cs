@@ -14,8 +14,8 @@ namespace ZoNo.Services
         var script = CSharpScript.Create<bool>(
           inputExpression,
           options: ScriptOptions.Default
-            .WithReferences("System.Core")
-            .WithImports("System", "System.Linq"),
+            .WithReferences("System.Core", "ZoNo")
+            .WithImports("System", "System.Linq", "ZoNo.Models"),
           globalsType: typeof(InputType<Input>)
         );
         var compilationResult = script.Compile();
