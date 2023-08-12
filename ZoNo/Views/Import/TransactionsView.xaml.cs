@@ -15,7 +15,6 @@ using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels.Import;
 
@@ -350,6 +349,48 @@ namespace ZoNo.Views.Import
       {
         await Task.Delay(100);
         view.DataGrid.ScrollIntoView(transaction, null);
+      }
+    }
+
+    private void DataGrid_Loaded(object sender, RoutedEventArgs e)
+    {
+      // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
+      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
+      if (border == null)
+      {
+        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
+      }
+      border.Visibility = Visibility.Collapsed;
+
+      // Set default DataGridTextOpacity
+      DataGrid_IsEnabledChanged(null, null);
+    }
+
+    private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+      var opacity = DataGrid.Resources["DataGridTextOpacity"] as double?;
+      if (opacity == null)
+      {
+        throw new Exception("Double with key \"DataGridTextOpacity\" does not exist");
+      }
+      DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
+
+      // Force resource reload
+      if (DataGrid.ActualTheme == ElementTheme.Light)
+      {
+        DataGrid.RequestedTheme = ElementTheme.Dark;
+        DataGrid.RequestedTheme = ElementTheme.Light;
+      }
+      else if (DataGrid.ActualTheme == ElementTheme.Dark)
+      {
+        DataGrid.RequestedTheme = ElementTheme.Light;
+        DataGrid.RequestedTheme = ElementTheme.Dark;
+      }
+      else
+      {
+        DataGrid.RequestedTheme = ElementTheme.Light;
+        DataGrid.RequestedTheme = ElementTheme.Dark;
+        DataGrid.RequestedTheme = ElementTheme.Default;
       }
     }
   }
