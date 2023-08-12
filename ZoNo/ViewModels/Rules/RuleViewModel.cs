@@ -84,9 +84,19 @@ namespace ZoNo.ViewModels.Rules
 
     private void OutputExpression_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-      if (e.PropertyName == nameof(OutputExpressionViewModel.OutputExpression))
+      switch (e.PropertyName)
       {
-        OutputExpressionChanged?.Invoke(sender, (sender as OutputExpressionViewModel)!.OutputExpression);
+        case nameof(OutputExpressionViewModel.OutputExpression):
+          {
+            OutputExpressionChanged?.Invoke(sender, (sender as OutputExpressionViewModel)!.OutputExpression);
+          }
+          break;
+        case nameof(OutputExpressionViewModel.IsSyntaxValid):
+          {
+            OnPropertyChanged(nameof(IsOutputExpressionsSyntaxValid));
+            OnPropertyChanged(nameof(IsSyntaxValid));
+          }
+          break;
       }
     }
 
