@@ -4,19 +4,21 @@ using Splitwise.Contracts;
 using Splitwise.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using ZoNo.Helpers;
 
 namespace ZoNo.ViewModels.Import
 {
   public partial class ExpensesViewModel : ObservableObject
   {
     private readonly ISplitwiseService _splitwiseService;
-    private Group[] _groups;
-    private Category[] _categories;
+    private Group[]? _groups;
+    private Category[]? _categories;
     private bool _isLoaded = false;
+    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
     public ObservableCollection<ExpenseViewModel> Expenses { get; } = new ObservableCollection<ExpenseViewModel>();
 
-    public Category[] Categories => _categories;
+    public Category[]? Categories => _categories;
 
     [ObservableProperty]
     private bool _isUploadingToSplitwise = false;
@@ -34,6 +36,7 @@ namespace ZoNo.ViewModels.Import
 
     public async Task Load()
     {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       if (_isLoaded) return;
 
       _groups = await _splitwiseService.GetGroupsAsync();
@@ -44,11 +47,18 @@ namespace ZoNo.ViewModels.Import
 
     private async void Expenses_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-      if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+      if (e.Action == NotifyCollectionChangedAction.Add)
       {
-        await Load();
-
-        foreach (ExpenseViewModel newItem in e.NewItems)
+        using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+        if (_groups == null)
+        {
+          throw new Exception($"{nameof(_groups)} is null!");
+        }
+        if (_categories == null)
+        {
+          throw new Exception($"{nameof(_categories)} is null!");
+        }
+        foreach (ExpenseViewModel newItem in e.NewItems.OrEmpty())
         {
           newItem.Group = _groups.Single(group => group.Name == newItem.Group!.Name);
           for (int i = 0; i < newItem.With.Count; i++)

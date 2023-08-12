@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using ZoNo.Helpers;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels.Rules
@@ -65,11 +66,11 @@ namespace ZoNo.ViewModels.Rules
 
     private void OutputExpressions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-      foreach (OutputExpressionViewModel outputExpression in e.OldItems ?? Array.Empty<OutputExpressionViewModel>())
+      foreach (OutputExpressionViewModel outputExpression in e.OldItems.OrEmpty())
       {
         outputExpression.PropertyChanged -= OutputExpression_PropertyChanged;
       }
-      foreach (OutputExpressionViewModel outputExpression in e.NewItems ?? Array.Empty<OutputExpressionViewModel>())
+      foreach (OutputExpressionViewModel outputExpression in e.NewItems.OrEmpty())
       {
         outputExpression.PropertyChanged += OutputExpression_PropertyChanged;
       }

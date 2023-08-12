@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels.Import;
 
@@ -90,7 +91,7 @@ namespace ZoNo.Views.Import
 
     private void Transactions_CollectionChanged_BeforeDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
     {
-      foreach (Transaction transaction in e.OldItems ?? Array.Empty<Transaction>())
+      foreach (Transaction transaction in e.OldItems.OrEmpty())
       {
         _lastDeletion.Restart();
         _loadTimes.Remove(transaction);
@@ -123,7 +124,7 @@ namespace ZoNo.Views.Import
           }
         }
       }
-      foreach (Transaction transaction in e.NewItems ?? Array.Empty<Transaction>())
+      foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
         _lastAddition.Restart();
         _loadTimes[transaction] = DateTime.Now;
@@ -132,7 +133,7 @@ namespace ZoNo.Views.Import
 
     private async void Transactions_CollectionChanged_AfterDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
     {
-      foreach (Transaction transaction in e.NewItems ?? Array.Empty<Transaction>())
+      foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
         var addedRow = _rows.FirstOrDefault(row => row.DataContext == transaction);
         if (addedRow != null)
@@ -366,7 +367,7 @@ namespace ZoNo.Views.Import
       DataGrid_IsEnabledChanged(null, null);
     }
 
-    private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private void DataGrid_IsEnabledChanged(object? sender, DependencyPropertyChangedEventArgs? e)
     {
       var opacity = DataGrid.Resources["DataGridTextOpacity"] as double?;
       if (opacity == null)

@@ -6,12 +6,12 @@ namespace ZoNo.Models
   public class Expense
   {
     public List<(string User, double Percentage)> With { get; } = new List<(string User, double Percentage)>();
-    public Category Category { get; set; }
-    public string Description { get; set; }
-    public CurrencyCode CurrencyCode { get; set; }
-    public double Cost { get; set; }
-    public DateTime Date { get; set; }
-    public string Group { get; set; }
+    public Category Category { get; set; } = Uncategorized.General;
+    public string Description { get; set; } = string.Empty;
+    public CurrencyCode CurrencyCode { get; set; } = CurrencyCode.HUF;
+    public double Cost { get; set; } = 0;
+    public DateTime Date { get; set; } = DateTime.MinValue;
+    public string Group { get; set; } = string.Empty;
   }
 
   [DebuggerDisplay("{MainCategory,nq}/{SubCategory,nq}")]

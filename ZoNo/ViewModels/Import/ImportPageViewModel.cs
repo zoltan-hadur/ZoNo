@@ -14,29 +14,26 @@ namespace ZoNo.ViewModels.Import
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
     private IRuleEvaluatorService<Transaction, Expense>? _ruleEvaluatorService;
     private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
-    private BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction Transaction)>();
-
+    private BlockingCollection<(int Index, Transaction? Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction? Transaction)>();
     private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
     public TransactionsViewModel TransactionsViewModel { get; }
     public ExpensesViewModel ExpensesViewModel { get; }
 
     [ObservableProperty]
-    private Transaction _selectedTransaction;
+    private Transaction? _selectedTransaction;
 
-    partial void OnSelectedTransactionChanged(Transaction value)
+    partial void OnSelectedTransactionChanged(Transaction? value)
     {
-      if (value == null) return;
-      SelectedExpense = _transactionToExpenseViewModel[value];
+      SelectedExpense = value == null ? null : _transactionToExpenseViewModel[value];
     }
 
     [ObservableProperty]
-    private ExpenseViewModel _selectedExpense;
+    private ExpenseViewModel? _selectedExpense;
 
-    partial void OnSelectedExpenseChanged(ExpenseViewModel value)
+    partial void OnSelectedExpenseChanged(ExpenseViewModel? value)
     {
-      if (value == null) return;
-      SelectedTransaction = _transactionToExpenseViewModel.Single(x => x.Value == value).Key;
+      SelectedTransaction = value == null ? null : _transactionToExpenseViewModel.Single(x => x.Value == value).Key;
     }
 
     public ImportPageViewModel(
@@ -78,6 +75,10 @@ namespace ZoNo.ViewModels.Import
         case CollectionChange.ItemInserted:
           {
             var (index, newTransaction) = _newTransactions.Take();
+            if (newTransaction == null)
+            {
+              throw new Exception($"Transaction for index \"{index}\" is null!");
+            }
             var evaluatedExpense = new Expense();
             await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
             var newExpense = new ExpenseViewModel(evaluatedExpense);
@@ -126,7 +127,7 @@ namespace ZoNo.ViewModels.Import
       if (e.Action == NotifyCollectionChangedAction.Remove)
       {
         using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
-        foreach (ExpenseViewModel expense in e.OldItems ?? Array.Empty<ExpenseViewModel>())
+        foreach (ExpenseViewModel expense in e.OldItems.OrEmpty())
         {
           // Expense is already removed, need to remove transaction too
           if (ExpensesViewModel.Expenses.Count < TransactionsViewModel.TransactionsView.Count)

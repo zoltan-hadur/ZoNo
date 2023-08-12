@@ -89,7 +89,7 @@ namespace Splitwise
       """");
     }
 
-    private async Task<T> SendRequest<T>(HttpMethod method, string resource, Func<JsonNode, JsonSerializerOptions, T> deserialize, string? content = null)
+    private async Task<T> SendRequest<T>(HttpMethod method, string resource, Func<JsonNode, JsonSerializerOptions, T> deserialize, string content = null)
     {
       var client = _httpClientFactory.CreateClient();
       client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(_token.TokenType.ToString(), _token.AccessToken);

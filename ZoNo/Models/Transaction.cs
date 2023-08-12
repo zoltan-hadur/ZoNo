@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoNo.ViewModels.Import;
+﻿using ZoNo.ViewModels.Import;
 
 namespace ZoNo.Models
 {
@@ -20,18 +15,18 @@ namespace ZoNo.Models
 
   public class Transaction
   {
-    public DateTime TransactionTime { get; set; }
-    public DateOnly AccountingDate { get; set; }
-    public string Type { get; set; }
-    public IncomeOutcome IncomeOutcome { get; set; }
-    public string PartnerName { get; set; }
-    public string PartnerAccountId { get; set; }
-    public string SpendingCategory { get; set; }
-    public string Description { get; set; }
-    public string AccountName { get; set; }
-    public string AccountId { get; set; }
-    public double Amount { get; set; }
-    public Currency Currency { get; set; }
+    public DateTime TransactionTime { get; set; } = DateTime.MinValue;
+    public DateOnly AccountingDate { get; set; } = DateOnly.MinValue;
+    public string Type { get; set; } = string.Empty;
+    public IncomeOutcome IncomeOutcome { get; set; } = IncomeOutcome.Outcome;
+    public string PartnerName { get; set; } = string.Empty;
+    public string PartnerAccountId { get; set; } = string.Empty;
+    public string SpendingCategory { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
+    public string AccountId { get; set; } = string.Empty;
+    public double Amount { get; set; } = 0;
+    public Currency Currency { get; set; } = Currency.HUF;
 
     public static string GetProperty(ColumnHeader columnHeader) => columnHeader switch
     {

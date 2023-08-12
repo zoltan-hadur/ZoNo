@@ -21,7 +21,7 @@ namespace ZoNo.ViewModels.Import
 
     public Dictionary<string, ColumnViewModel>? Columns { get; private set; } = null;
 
-    public event EventHandler LoadExcelDocumentsStarted;
+    public event EventHandler? LoadExcelDocumentsStarted;
 
     public TransactionsViewModel(
       ILocalSettingsService localSettingsService,
