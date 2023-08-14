@@ -80,8 +80,7 @@ namespace ZoNo.ViewModels.Import
 
       foreach (var expense in Expenses.ToArray())
       {
-        // TODO real upload
-        await Task.Delay(100);
+        await _splitwiseService.CreateExpense(ExpenseViewModel.ToModel(expense));
         Expenses.Remove(expense);
       }
 
