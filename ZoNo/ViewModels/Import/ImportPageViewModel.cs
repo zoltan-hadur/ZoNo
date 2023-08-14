@@ -71,7 +71,7 @@ namespace ZoNo.ViewModels.Import
 
     private async void TransactionsViewModel_LoadExcelDocumentsFinished(object? sender, EventArgs e)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
       while (_transactionsToRemove.TryTake(out var transaction))
       {
         try
