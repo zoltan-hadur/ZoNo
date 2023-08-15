@@ -1,12 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Messaging.Messages;
-using ZoNo.Models;
-
-namespace ZoNo.Messages
+﻿namespace ZoNo.Messages
 {
-  public class UserLoggedOutMessage : ValueChangedMessage<User>
+  public class UserLoggedOutMessage
   {
-    public UserLoggedOutMessage(User value) : base(value)
-    {
-    }
   }
 }

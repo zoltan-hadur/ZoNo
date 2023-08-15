@@ -1,46 +1,173 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO.Abstractions;
-using System.Windows;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Splitwise;
+using Splitwise.Contracts;
+using ZoNo.Activation;
+using ZoNo.Contracts.Services;
+using ZoNo.Messages;
+using ZoNo.Models;
+using ZoNo.Services;
 using ZoNo.ViewModels;
+using ZoNo.ViewModels.Import;
+using ZoNo.ViewModels.Rules;
 using ZoNo.Views;
+using ZoNo.Views.Account;
+using ZoNo.Views.Import;
+using ZoNo.Views.Rules;
 
 namespace ZoNo
 {
-  /// <summary>
-  /// Interaction logic for App.xaml
-  /// </summary>
   public partial class App : Application
   {
-    /// <summary>
-    /// Gets the current <see cref="App"/> instance in use.
-    /// </summary>
-    public new static App Current => (App)Application.Current;
+    private new static App Current => (App)Application.Current;
+    private IServiceScope ServiceScope { get; set; }
 
-    /// <summary>
-    /// Gets the <see cref="IServiceProvider"/> instance to resolve application services.
-    /// </summary>
-    public IServiceProvider Services { get; }
+    public static WindowEx MainWindow { get; } = new MainWindow();
+
+    public static T GetService<T>() where T : class
+    {
+      if (Current.ServiceScope.ServiceProvider.GetService<T>() is not T service)
+      {
+        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      }
+      return service;
+    }
 
     public App()
     {
-      Services = new ServiceCollection()
-        .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
-        .AddSingleton<IFileSystem, FileSystem>()
-        .AddSingleton<ISettings, Settings>(factory => new Settings(factory.GetService<IFileSystem>(), "settings"))
-        .AddSingleton<MainWindowVM>()
-        .AddSingleton<LoginVM>()
-        .AddSingleton<HomeVM>()
-        .AddSingleton<MainWindow>()
-        .BuildServiceProvider();
+      // By default, ExcelDataReader throws a NotSupportedException "No data is available for encoding 1252." on .NET Core.
+      // This fixes that.
+      System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
       InitializeComponent();
+
+      var configuration = new ConfigurationBuilder()
+        .SetBasePath(AppContext.BaseDirectory)
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+      var services = new ServiceCollection();
+
+      // Default Activation Handler
+      services.AddSingleton<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+
+      // Other Activation Handlers
+
+      // Services
+      services.AddHttpClient();
+      services.AddSingleton<ISplitwiseAuthorizationService>(provider =>
+      {
+        return new SplitwiseAuthorizationService(
+          httpClientFactory: provider.GetService<IHttpClientFactory>()!,
+          consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
+          consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
+        );
+      });
+      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>()!, provider.GetService<ITokenService>()!.GetTokenAsync().Result));
+      services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
+      services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+      services.AddSingleton<ITokenService, TokenService>();
+      services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+      services.AddScoped<INavigationViewService, NavigationViewService>();
+
+      services.AddSingleton<IActivationService, ActivationService>();
+      services.AddSingleton<ITopLevelPageService, PageService>(provider =>
+      {
+        return new PageService.Builder()
+          .Configure<LoginPageViewModel, LoginPage>()
+          .Configure<ShellPageViewModel, ShellPage>()
+          .Build();
+      });
+      services.AddSingleton<IPageService, PageService>(provider =>
+      {
+        return new PageService.Builder()
+          .Configure<ImportPageViewModel, ImportPage>()
+          .Configure<RulesPageViewModel, RulesPage>()
+          .Configure<QueryPageViewModel, QueryPage>()
+          .Configure<AccountPageViewModel, AccountPage>()
+          .Configure<SettingsPageViewModel, SettingsPage>()
+          .Build();
+      });
+      services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
+      {
+        return new NavigationService(provider.GetService<ITopLevelPageService>()!)
+        {
+          Frame = MainWindow.Content as Frame
+        };
+      });
+      services.AddScoped<INavigationService, NavigationService>();
+
+      services.AddSingleton<IFileService, FileService>();
+      services.AddSingleton<IExcelDocumentLoader, ExcelDocumentLoader>();
+      services.AddSingleton<IRulesService, RulesService>();
+      services.AddSingleton<IRuleEvaluatorServiceBuilder, RuleEvaluatorServiceBuilder>();
+      services.AddSingleton<IDialogService, DialogService>();
+      services.AddSingleton<IRuleExpressionSyntaxCheckerService, RuleExpressionSyntaxCheckerService>();
+
+      // Views and ViewModels
+      services.AddScoped<LoginPageViewModel>();
+      services.AddScoped<ImportPageViewModel>();
+      services.AddScoped<TransactionsViewModel>();
+      services.AddScoped<ExpensesViewModel>();
+      services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
+        new RulesViewModel(
+          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
+          provider.GetService<IDialogService>()!,
+          provider.GetService<IRulesService>()!,
+          RuleType.Import),
+        new RulesViewModel(
+          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
+          provider.GetService<IDialogService>()!,
+          provider.GetService<IRulesService>()!,
+          RuleType.Splitwise))
+      );
+      services.AddScoped<QueryPageViewModel>();
+      services.AddScoped<AccountPageViewModel>();
+      services.AddScoped<SettingsPageViewModel>();
+      services.AddScoped<ShellPageViewModel>();
+
+      // Configuration
+      services.Configure<LocalSettingsOptions>(configuration.GetSection(nameof(LocalSettingsOptions)));
+
+      ServiceScope = services.BuildServiceProvider().CreateScope();
+
+      UnhandledException += App_UnhandledException;
+
+      ServiceScope.ServiceProvider.GetService<IMessenger>()!.Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
     }
 
-    private void Application_Startup(object sender, StartupEventArgs e)
+    private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-      Services.GetService<MainWindow>().Show();
+      e.Handled = true;
+      await GetService<IDialogService>().ShowDialogAsync(DialogType.Ok, "Unhandled Exception", new TextBlock()
+      {
+        Text = e.Exception.ToString(),
+        IsTextSelectionEnabled = true
+      });
+      Exit();
+    }
+
+    private async void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
+    {
+      ReplaceServiceScope();
+      await App.GetService<ITokenService>().SetTokenAsync(null);
+    }
+
+    private void ReplaceServiceScope()
+    {
+      var newScope = ServiceScope.ServiceProvider.CreateScope();
+      ServiceScope?.Dispose();
+      ServiceScope = newScope;
+    }
+
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+      base.OnLaunched(args);
+
+      await App.GetService<IActivationService>().ActivateAsync(args);
     }
   }
 }
