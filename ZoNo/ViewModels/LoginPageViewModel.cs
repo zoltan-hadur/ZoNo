@@ -4,12 +4,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.Web.WebView2.Core;
-using Newtonsoft.Json.Linq;
-using Splitwise;
 using Splitwise.Contracts;
-using Splitwise.Models;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Nodes;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.ViewModels
@@ -190,7 +188,7 @@ namespace ZoNo.ViewModels
                 {
                   await Task.Delay(10);
                   var json = await sender.CoreWebView2.CallDevToolsProtocolMethodAsync("Page.captureScreenshot", "{}");
-                  var dataStr = JObject.Parse(json)["data"]?.Value<string>();
+                  var dataStr = JsonNode.Parse(json)?["data"]?.GetValue<string>();
                   if (dataStr == null)
                   {
                     throw new Exception($"Following json does not have 'data' key: {json}");

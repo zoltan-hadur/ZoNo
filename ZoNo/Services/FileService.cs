@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Text;
+﻿using System.Text;
+using System.Text.Json;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
@@ -12,7 +12,7 @@ namespace ZoNo.Services
       if (File.Exists(path))
       {
         var json = File.ReadAllText(path);
-        return JsonConvert.DeserializeObject<T>(json);
+        return JsonSerializer.Deserialize<T>(json);
       }
 
       return default;
@@ -25,7 +25,7 @@ namespace ZoNo.Services
         Directory.CreateDirectory(folderPath);
       }
 
-      var fileContent = JsonConvert.SerializeObject(content);
+      var fileContent = JsonSerializer.Serialize(content);
       File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
     }
 

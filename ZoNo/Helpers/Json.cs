@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 
 namespace ZoNo.Helpers
 {
@@ -8,7 +8,7 @@ namespace ZoNo.Helpers
     {
       return await Task.Run(() =>
       {
-        return JsonConvert.DeserializeObject<T>(value);
+        return JsonSerializer.Deserialize<T>(value);
       });
     }
 
@@ -16,7 +16,7 @@ namespace ZoNo.Helpers
     {
       return await Task.Run(() =>
       {
-        return JsonConvert.SerializeObject(value);
+        return JsonSerializer.Serialize(value);
       });
     }
   }
