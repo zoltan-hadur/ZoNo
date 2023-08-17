@@ -1,12 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Splitwise.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZoNo.ViewModels.Import
 {
@@ -49,10 +44,10 @@ namespace ZoNo.ViewModels.Import
           }
         }
       };
-      Description = expense.Description;
-      CurrencyCode = expense.CurrencyCode;
-      Cost = expense.Cost;
-      Date = expense.Date;
+      Description = expense.Description!;
+      CurrencyCode = expense.CurrencyCode!.Value;
+      Cost = expense.Cost!.Value;
+      Date = expense.Date!.Value;
       Group = new Group()
       {
         Name = expense.Group

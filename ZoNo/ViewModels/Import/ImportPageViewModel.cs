@@ -98,7 +98,15 @@ namespace ZoNo.ViewModels.Import
             {
               throw new Exception($"Transaction for index \"{index}\" is null!");
             }
-            var evaluatedExpense = new Expense();
+            var evaluatedExpense = new Expense()
+            {
+              Category = Uncategorized.General,
+              Description = newTransaction.PartnerName,
+              CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(newTransaction.Currency.ToString()),
+              Group = "Non-group expenses",
+              Cost = -newTransaction.Amount,
+              Date = newTransaction.TransactionTime
+            };
             var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
             var newExpense = new ExpenseViewModel(evaluatedExpense);
             _transactionToExpenseViewModel[newTransaction] = newExpense;
