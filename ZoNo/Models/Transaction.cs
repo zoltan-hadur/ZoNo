@@ -10,7 +10,9 @@ namespace ZoNo.Models
 
   public enum Currency
   {
-    HUF
+    HUF,
+    EUR,
+    CAD
   }
 
   public class Transaction
