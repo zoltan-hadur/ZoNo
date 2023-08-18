@@ -9,6 +9,7 @@
       xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:helpers="using:ZoNo.Helpers"
       mc:Ignorable="d"
       Loading="Page_Loading">
   <controls:LoaderContentControl HorizontalContentAlignment="Stretch"
@@ -63,6 +64,7 @@
               </interactivity:Interaction.Behaviors>
             </Border>
             <ListView x:Name="Expenses"
+                      helpers:Grid.IsSharedSizeScope="True"
                       DataContext="{x:Bind ViewModel.ExpensesViewModel}"
                       ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
                       SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"

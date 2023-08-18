@@ -1,21 +1,8 @@
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Navigation;
 using Splitwise.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using ZoNo.ViewModels.Import;
 
 namespace ZoNo.Views.Import
 {
@@ -102,6 +89,29 @@ namespace ZoNo.Views.Import
       if (sender is Image image)
       {
         image.Opacity = 1;
+      }
+    }
+
+    private void StackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      if (sender is StackPanel stackPanel &&
+          stackPanel.GetValue(Grid.ColumnProperty) is int column &&
+          stackPanel.FindAscendants().FirstOrDefault(ascendant => ascendant.GetValue(Helpers.Grid.IsSharedSizeScopeProperty) is true) is DependencyObject element &&
+          element.GetValue(Helpers.Grid.SharedSizeScopeProperty) is Dictionary<int, double> sharedSizeScope)
+      {
+        var maxWidth = sharedSizeScope.ContainsKey(column) ? sharedSizeScope[column] : 0;
+        if (stackPanel.ActualWidth > maxWidth)
+        {
+          sharedSizeScope[column] = maxWidth = stackPanel.ActualWidth;
+          foreach (ExpenseView expense in element.FindDescendants().Where(descendant => descendant is ExpenseView))
+          {
+            expense.Grid.ColumnDefinitions[column].Width = new GridLength(maxWidth, GridUnitType.Pixel);
+          }
+        }
+        else
+        {
+          Grid.ColumnDefinitions[column].Width = new GridLength(maxWidth, GridUnitType.Pixel);
+        }
       }
     }
   }

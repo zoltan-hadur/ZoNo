@@ -9,7 +9,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
-  <Grid ColumnSpacing="12">
+  <Grid x:Name="Grid" ColumnSpacing="12">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>
       <ColumnDefinition Width="Auto"/>
@@ -17,7 +17,7 @@
       <ColumnDefinition Width="Auto"/>
     </Grid.ColumnDefinitions>
     <!-- Date -->
-    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" SizeChanged="StackPanel_SizeChanged">
       <TextBlock Text="{x:Bind Date.ToString('MMM', {x:Null}), Mode=OneWay}" FontSize="12" HorizontalAlignment="Center"/>
       <TextBlock Text="{x:Bind sys:String.Format('{0:D2}', Date.Day), Mode=OneWay}" FontSize="18" HorizontalAlignment="Center"/>
     </StackPanel>
@@ -70,7 +70,7 @@
       </Border>
     </StackPanel>
     <!-- Who paid and how much -->
-    <StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center" Spacing="3">
+    <StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="3" SizeChanged="StackPanel_SizeChanged">
       <TextBlock>
         <Run Text="Paid: "/><Run Text="{x:Bind Paid, Mode=OneWay}"/>
       </TextBlock>
