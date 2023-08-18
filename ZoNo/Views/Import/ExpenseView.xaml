@@ -23,7 +23,7 @@
     </StackPanel>
     <!-- Category button/image and categories selector -->
     <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind Category.Name, Mode=OneWay}">
-      <Image Height="36" Source="{x:Bind Category.IconTypes.Square.Large, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+      <Image Width="36" Height="36" Source="{x:Bind Category.IconTypes.Square.Large, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
       <Button.Flyout>
         <Flyout x:Name="CategoriesFlyout">
           <Flyout.FlyoutPresenterStyle>
@@ -50,7 +50,7 @@
                                 Click="SubCategoryButton_Click"
                                 Command="{Binding SwitchCategoryCommand, Mode=OneTime}"
                                 CommandParameter="{x:Bind (splitwise:Category), Mode=OneTime}">
-                          <Image Height="36" Source="{x:Bind IconTypes.Square.Large}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+                          <Image Width="36" Height="36" Source="{x:Bind IconTypes.Square.Large}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
                         </Button>
                       </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
