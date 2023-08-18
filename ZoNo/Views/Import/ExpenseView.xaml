@@ -18,8 +18,8 @@
     </Grid.ColumnDefinitions>
     <!-- Date -->
     <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
-      <TextBlock Text="{x:Bind Date.ToString('MMM', {x:Null}), Mode=OneWay}" FontSize="12"/>
-      <TextBlock Text="{x:Bind sys:String.Format('{0:D2}', Date.Day), Mode=OneWay}" FontSize="18"/>
+      <TextBlock Text="{x:Bind Date.ToString('MMM', {x:Null}), Mode=OneWay}" FontSize="12" HorizontalAlignment="Center"/>
+      <TextBlock Text="{x:Bind sys:String.Format('{0:D2}', Date.Day), Mode=OneWay}" FontSize="18" HorizontalAlignment="Center"/>
     </StackPanel>
     <!-- Category button/image and categories selector -->
     <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind Category.Name, Mode=OneWay}">
