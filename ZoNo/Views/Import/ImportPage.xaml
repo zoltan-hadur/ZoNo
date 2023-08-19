@@ -11,7 +11,8 @@
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       xmlns:helpers="using:ZoNo.Helpers"
       mc:Ignorable="d"
-      Loading="Page_Loading">
+      Loading="Page_Loading"
+      NavigationCacheMode="Required">
   <controls:LoaderContentControl HorizontalContentAlignment="Stretch"
                                  VerticalContentAlignment="Stretch"
                                  IsLoading="{x:Bind ViewModel.ExpensesViewModel.IsUploadingToSplitwise, Mode=OneWay}">

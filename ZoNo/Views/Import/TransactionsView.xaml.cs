@@ -29,6 +29,7 @@ namespace ZoNo.Views.Import
     private Stopwatch _lastSort = Stopwatch.StartNew();
     private Stopwatch _lastAddition = Stopwatch.StartNew();
     private Stopwatch _lastDeletion = Stopwatch.StartNew();
+    private bool _isLoaded = false;
 
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
@@ -230,23 +231,30 @@ namespace ZoNo.Views.Import
       _rows.Remove((DataGridRow)sender);
     }
 
-    private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+    private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
+      if (_isLoaded) return;
+
+      // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
+      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
+      if (border == null)
+      {
+        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
+      }
+      border.Visibility = Visibility.Collapsed;
+
+      // Set default DataGridTextOpacity
+      DataGrid_IsEnabledChanged(null, null);
+
       DataGrid.LoadingRow += DataGrid_LoadingRow;
       _scrollBar = DataGrid.FindDescendant("VerticalScrollBar") as ScrollBar;
       _scrollBar!.ValueChanged += ScrollBar_ValueChanged;
 
-      await Task.Delay(1);
-      DataGrid.ItemsSource = Transactions;
-
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
-    }
 
-    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-    {
-      Transactions = new AdvancedCollectionView();
+      _isLoaded = true;
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
@@ -351,20 +359,6 @@ namespace ZoNo.Views.Import
         await Task.Delay(100);
         view.DataGrid.ScrollIntoView(transaction, null);
       }
-    }
-
-    private void DataGrid_Loaded(object sender, RoutedEventArgs e)
-    {
-      // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
-      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
-      if (border == null)
-      {
-        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
-      }
-      border.Visibility = Visibility.Collapsed;
-
-      // Set default DataGridTextOpacity
-      DataGrid_IsEnabledChanged(null, null);
     }
 
     private void DataGrid_IsEnabledChanged(object? sender, DependencyPropertyChangedEventArgs? e)
