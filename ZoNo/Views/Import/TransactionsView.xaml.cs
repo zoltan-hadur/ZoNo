@@ -331,7 +331,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private async void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
+    private void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
       if (e.Key == VirtualKey.Delete)
       {
@@ -347,7 +347,6 @@ namespace ZoNo.Views.Import
             // When deleting last item, there is an exception
             Transactions.Refresh();
           }
-          await Task.Delay(1);
         }
       }
     }

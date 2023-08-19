@@ -87,7 +87,6 @@ namespace ZoNo.ViewModels.Import
           {
             _transactions.Add(transaction);
           }
-          await Task.Delay(1);
         }
       }
       LoadExcelDocumentsFinished?.Invoke(this, EventArgs.Empty);
