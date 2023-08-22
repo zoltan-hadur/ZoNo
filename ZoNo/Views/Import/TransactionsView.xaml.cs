@@ -297,8 +297,6 @@ namespace ZoNo.Views.Import
     {
       _lastSort.Restart();
 
-      Transactions.SortDescriptions.Clear();
-
       GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);
 
       switch (e.Column.SortDirection)
@@ -306,20 +304,20 @@ namespace ZoNo.Views.Import
         // Descending after Ascending
         case DataGridSortDirection.Ascending:
           e.Column.SortDirection = DataGridSortDirection.Descending;
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Descending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Descending);
           break;
 
         // Default after Descending
         case DataGridSortDirection.Descending:
           e.Column.SortDirection = null;
           GetHeader(e.Column).Padding = new Thickness(12, 0, -20, 0);
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending);
           break;
 
         // Ascending after default
         default:
           e.Column.SortDirection = DataGridSortDirection.Ascending;
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Ascending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Ascending);
           break;
       }
 
