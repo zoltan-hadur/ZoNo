@@ -14,6 +14,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation.Collections;
 using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -26,10 +27,11 @@ namespace ZoNo.Views.Import
     private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
     private ScrollBar? _scrollBar;
-    private Stopwatch _lastSort = Stopwatch.StartNew();
+    private Stopwatch _lastSortFinished = Stopwatch.StartNew();
     private Stopwatch _lastAddition = Stopwatch.StartNew();
     private Stopwatch _lastDeletion = Stopwatch.StartNew();
     private bool _isLoaded = false;
+    private bool _isSorting = false;
 
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
@@ -177,10 +179,10 @@ namespace ZoNo.Views.Import
 
     private void ScrollBar_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-      var lastSort = _lastSort.ElapsedMilliseconds;
+      var lastSortFinished = _lastSortFinished.ElapsedMilliseconds;
       var lastAddition = _lastAddition.ElapsedMilliseconds;
       var lastDeletion = _lastDeletion.ElapsedMilliseconds;
-      if (lastSort < 100 || lastAddition < 100 || lastDeletion < 100)
+      if (_isSorting || lastSortFinished < 100 || lastAddition < 100 || lastDeletion < 100)
       {
         return;
       }
@@ -254,6 +256,15 @@ namespace ZoNo.Views.Import
       Transactions.SortDescriptions.Clear();
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
 
+      Transactions.VectorChanged += (s, e) =>
+      {
+        if (_isSorting && e.CollectionChange == CollectionChange.Reset)
+        {
+          _isSorting = false;
+          _lastSortFinished.Restart();
+        }
+      };
+
       _isLoaded = true;
     }
 
@@ -295,7 +306,7 @@ namespace ZoNo.Views.Import
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
-      _lastSort.Restart();
+      _isSorting = true;
 
       GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);
 
@@ -334,27 +345,43 @@ namespace ZoNo.Views.Import
       if (e.Key == VirtualKey.Delete)
       {
         var selectedItems = DataGrid.SelectedItems.Cast<object>().ToList();
-        foreach (var selectedItem in selectedItems)
+        var deferRefresh = selectedItems.Count > 30 ? Transactions.DeferRefresh() : null;
+        try
         {
-          try
+          foreach (var selectedItem in selectedItems)
           {
-            Transactions.Source.Remove(selectedItem);
+            try
+            {
+              Transactions.Source.Remove(selectedItem);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+              // When deleting last item, there is an exception
+              Transactions.Refresh();
+            }
           }
-          catch (ArgumentOutOfRangeException)
-          {
-            // When deleting last item, there is an exception
-            Transactions.Refresh();
-          }
+        }
+        finally
+        {
+          deferRefresh?.Dispose();
         }
       }
     }
 
     private static async void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-      if (sender is TransactionsView view && e.NewValue is Transaction transaction)
+      if (sender is TransactionsView view)
       {
-        await Task.Delay(100);
-        view.DataGrid.ScrollIntoView(transaction, null);
+        if (view._isSorting && e.NewValue is null)
+        {
+          while (view._isSorting) await Task.Delay(10);
+          view.DataGrid.SelectedItem = e.OldValue;
+          view.DataGrid.ScrollIntoView(e.OldValue, null);
+        }
+        else
+        {
+          view.DataGrid.ScrollIntoView(e.NewValue, null);
+        }
       }
     }
 
