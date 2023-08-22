@@ -70,6 +70,11 @@
                       ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
                       SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"
                       SelectionChanged="Expenses_SelectionChanged">
+              <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                  <AddDeleteThemeTransition />
+                </TransitionCollection>
+              </ListView.ItemContainerTransitions>
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
                   <local:ExpenseView Date="{x:Bind Date, Mode=OneWay}"
