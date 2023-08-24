@@ -9,7 +9,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Windows.Input;
@@ -19,6 +18,7 @@ using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels.Import;
+using Grid = Microsoft.UI.Xaml.Controls.Grid;
 
 namespace ZoNo.Views.Import
 {
@@ -27,11 +27,9 @@ namespace ZoNo.Views.Import
     private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
     private ScrollBar? _scrollBar;
-    private Stopwatch _lastSortFinished = Stopwatch.StartNew();
-    private Stopwatch _lastAddition = Stopwatch.StartNew();
-    private Stopwatch _lastDeletion = Stopwatch.StartNew();
     private bool _isLoaded = false;
     private bool _isSorting = false;
+    private bool _isPointerWheelScrolled = false;
 
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
@@ -96,7 +94,6 @@ namespace ZoNo.Views.Import
     {
       foreach (Transaction transaction in e.OldItems.OrEmpty())
       {
-        _lastDeletion.Restart();
         _loadTimes.Remove(transaction);
         var rowToBeDeleted = _rows.FirstOrDefault(row => row.DataContext == transaction);
         if (rowToBeDeleted != null)
@@ -129,7 +126,6 @@ namespace ZoNo.Views.Import
       }
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
-        _lastAddition.Restart();
         _loadTimes[transaction] = DateTime.Now;
       }
     }
@@ -179,13 +175,7 @@ namespace ZoNo.Views.Import
 
     private void ScrollBar_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-      var lastSortFinished = _lastSortFinished.ElapsedMilliseconds;
-      var lastAddition = _lastAddition.ElapsedMilliseconds;
-      var lastDeletion = _lastDeletion.ElapsedMilliseconds;
-      if (_isSorting || lastSortFinished < 100 || lastAddition < 100 || lastDeletion < 100)
-      {
-        return;
-      }
+      if (!_isPointerWheelScrolled) return;
       foreach (var row in _rows)
       {
         AnimationBuilder.Create().Translation(
@@ -195,6 +185,7 @@ namespace ZoNo.Views.Import
           layer: FrameworkLayer.Composition
         ).Start(row);
       }
+      _isPointerWheelScrolled = false;
     }
 
     private void DataGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
@@ -259,6 +250,8 @@ namespace ZoNo.Views.Import
       DataGrid.LoadingRow += DataGrid_LoadingRow;
       _scrollBar = DataGrid.FindDescendant("VerticalScrollBar") as ScrollBar;
       _scrollBar!.ValueChanged += ScrollBar_ValueChanged;
+      var grid = DataGrid.FindDescendant("Root") as Grid;
+      grid!.PointerWheelChanged += Grid_PointerWheelChanged;
 
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
@@ -269,11 +262,27 @@ namespace ZoNo.Views.Import
         if (_isSorting && e.CollectionChange == CollectionChange.Reset)
         {
           _isSorting = false;
-          _lastSortFinished.Restart();
         }
       };
 
       _isLoaded = true;
+    }
+
+    private void Grid_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+      if (_scrollBar!.Minimum < _scrollBar.Value && _scrollBar.Value < _scrollBar.Maximum)
+      {
+        _isPointerWheelScrolled = true;
+      }
+      else
+      {
+        var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
+        if (delta < 0 && _scrollBar.Value == _scrollBar.Minimum ||
+            delta > 0 && _scrollBar.Value == _scrollBar.Maximum)
+        {
+          _isPointerWheelScrolled = true;
+        }
+      }
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
