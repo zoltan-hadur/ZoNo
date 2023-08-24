@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.Xaml.Interactivity;
+using ZoNo.Helpers;
 
 namespace ZoNo.Controls
 {
@@ -83,23 +84,7 @@ namespace ZoNo.Controls
         Resources["TextControlBorderBrushFocused"] = _defaultTextControlBorderBrushFocused;
       }
 
-      // Force resource reload
-      if (ActualTheme == ElementTheme.Light)
-      {
-        RequestedTheme = ElementTheme.Dark;
-        RequestedTheme = ElementTheme.Light;
-      }
-      else if (ActualTheme == ElementTheme.Dark)
-      {
-        RequestedTheme = ElementTheme.Light;
-        RequestedTheme = ElementTheme.Dark;
-      }
-      else
-      {
-        RequestedTheme = ElementTheme.Light;
-        RequestedTheme = ElementTheme.Dark;
-        RequestedTheme = ElementTheme.Default;
-      }
+      this.ReloadThemeResources();
     }
 
     private void UpdateToolTip()

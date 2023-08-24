@@ -235,7 +235,11 @@ namespace ZoNo.Views.Import
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-      if (_isLoaded) return;
+      if (_isLoaded)
+      {
+        DataGrid.ReloadThemeResources();
+        return;
+      }
 
       // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
       var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
@@ -394,23 +398,7 @@ namespace ZoNo.Views.Import
       }
       DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
 
-      // Force resource reload
-      if (DataGrid.ActualTheme == ElementTheme.Light)
-      {
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-        DataGrid.RequestedTheme = ElementTheme.Light;
-      }
-      else if (DataGrid.ActualTheme == ElementTheme.Dark)
-      {
-        DataGrid.RequestedTheme = ElementTheme.Light;
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-      }
-      else
-      {
-        DataGrid.RequestedTheme = ElementTheme.Light;
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-        DataGrid.RequestedTheme = ElementTheme.Default;
-      }
+      DataGrid.ReloadThemeResources();
     }
   }
 }
