@@ -238,6 +238,10 @@ namespace ZoNo.Views.Import
       if (_isLoaded)
       {
         DataGrid.ReloadThemeResources();
+        foreach (DataGridRow dataGridRow in DataGrid.FindDescendants().Where(descendant => descendant is DataGridRow))
+        {
+          _rows.Add(dataGridRow);
+        }
         return;
       }
 
