@@ -12,7 +12,7 @@
   <Identity
     Name="D590054A-4893-4B3B-A7F3-416C85DBCD06"
     Publisher="CN=Zoltan Hadur"
-    Version="1.1.0.0" />
+    Version="1.1.1.0" />
 
   <Properties>
     <DisplayName>ZoNo</DisplayName>
