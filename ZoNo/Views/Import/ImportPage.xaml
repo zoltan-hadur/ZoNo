@@ -10,6 +10,7 @@
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       xmlns:helpers="using:ZoNo.Helpers"
+      xmlns:sys="using:System"
       mc:Ignorable="d"
       Loading="Page_Loading"
       NavigationCacheMode="Required">
@@ -92,11 +93,11 @@
           </Grid>
         </Border>
       </controls:AutomaticStackPanel>
-      <Button Grid.Row="1"
-              Content="Upload to Splitwise"
-              HorizontalAlignment="Right"
-              Margin="{StaticResource SmallTopBottomMargin}"
-              Command="{x:Bind ViewModel.ExpensesViewModel.UploadExpensesToSplitwiseCommand}"/>
+      <Grid Grid.Row="1" Margin="{StaticResource SmallTopBottomMargin}">
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                   Text="{x:Bind sys:String.Format(x:Null, 'Transactions: {0}, Expenses: {1}', ViewModel.TransactionsViewModel.TransactionsView.Count, ViewModel.ExpensesViewModel.Expenses.Count), Mode=OneWay}"/>
+        <Button Content="Upload to Splitwise" HorizontalAlignment="Right" Command="{x:Bind ViewModel.ExpensesViewModel.UploadExpensesToSplitwiseCommand}"/>
+      </Grid>
     </Grid>
   </controls:LoaderContentControl>
 </Page>
