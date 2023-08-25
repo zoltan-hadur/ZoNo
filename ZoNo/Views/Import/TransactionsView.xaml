@@ -10,8 +10,7 @@
              xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
              xmlns:models="using:ZoNo.Models"
              mc:Ignorable="d"
-             Loaded="UserControl_Loaded"
-             Unloaded="UserControl_Unloaded">
+             Loaded="UserControl_Loaded">
   <Grid Background="Transparent" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
     <Border x:Name="DropHereBorder">
       <TextBlock x:Name="DropHereText" Text="Drop Excel document here" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -40,26 +39,37 @@
       </interactivity:Interaction.Behaviors>
     </Border>
     <controls:DataGrid x:Name="DataGrid"
+                       ItemsSource="{x:Bind Transactions, Mode=OneWay}"
                        SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
                        GridLinesVisibility="All"
                        AutoGenerateColumns="False"
                        Sorting="DataGrid_Sorting"
                        KeyDown="DataGrid_KeyDown"
-                       Loaded="DataGrid_Loaded"
                        IsEnabledChanged="DataGrid_IsEnabledChanged">
       <controls:DataGrid.Resources>
-        <x:Double x:Key="DataGridTextOpacity">1</x:Double>
-        <!-- So that it kinda looks like the default DataGridTextColumn -->
-        <Style TargetType="TextBlock">
-          <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-          <Setter Property="Padding" Value="12,0,12,0"/>
-          <Setter Property="VerticalAlignment" Value="Center"/>
-          <Setter Property="FontSize" Value="14"/>
-          <Setter Property="Opacity" Value="{ThemeResource DataGridTextOpacity}"/>
-        </Style>
-        <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
-        <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
-        <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+        <ResourceDictionary>
+          <x:Double x:Key="DataGridTextOpacity">1</x:Double>
+          <!-- So that it kinda looks like the default DataGridTextColumn -->
+          <Style TargetType="TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="Padding" Value="12,0,12,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Opacity" Value="{ThemeResource DataGridTextOpacity}"/>
+          </Style>
+          <ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary x:Key="Light">
+              <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+              <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+              <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="Dark">
+              <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+              <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+              <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+            </ResourceDictionary>
+          </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
       </controls:DataGrid.Resources>
       <controls:DataGrid.ColumnHeaderStyle>
         <Style TargetType="controlsprimitives:DataGridColumnHeader">

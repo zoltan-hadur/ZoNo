@@ -2,13 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Animation;
-using Newtonsoft.Json.Linq;
-using Splitwise;
 using Splitwise.Contracts;
 using Splitwise.Models;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
-using ZoNo.Services;
 
 namespace ZoNo.ViewModels
 {

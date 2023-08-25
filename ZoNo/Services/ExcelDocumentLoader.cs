@@ -74,7 +74,7 @@ namespace ZoNo.Services
       return new Transaction
       {
         TransactionTime = DateTime.Parse(row.Field<string>(0)!),
-        AccountingDate = DateOnly.Parse(row.Field<string>(1)!),
+        AccountingDate = string.IsNullOrEmpty(row.Field<string>(1)) ? null : DateOnly.Parse(row.Field<string>(1)!),
         Type = row.Field<string>(2)!,
         IncomeOutcome = row.Field<string>(3)! == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,
         PartnerName = row.Field<string>(4)!,

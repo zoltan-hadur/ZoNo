@@ -9,15 +9,16 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation.Collections;
 using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels.Import;
+using Grid = Microsoft.UI.Xaml.Controls.Grid;
 
 namespace ZoNo.Views.Import
 {
@@ -26,9 +27,9 @@ namespace ZoNo.Views.Import
     private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
     private ScrollBar? _scrollBar;
-    private Stopwatch _lastSort = Stopwatch.StartNew();
-    private Stopwatch _lastAddition = Stopwatch.StartNew();
-    private Stopwatch _lastDeletion = Stopwatch.StartNew();
+    private bool _isLoaded = false;
+    private bool _isSorting = false;
+    private bool _isPointerWheelScrolled = false;
 
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
@@ -93,7 +94,6 @@ namespace ZoNo.Views.Import
     {
       foreach (Transaction transaction in e.OldItems.OrEmpty())
       {
-        _lastDeletion.Restart();
         _loadTimes.Remove(transaction);
         var rowToBeDeleted = _rows.FirstOrDefault(row => row.DataContext == transaction);
         if (rowToBeDeleted != null)
@@ -126,7 +126,6 @@ namespace ZoNo.Views.Import
       }
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
-        _lastAddition.Restart();
         _loadTimes[transaction] = DateTime.Now;
       }
     }
@@ -176,13 +175,7 @@ namespace ZoNo.Views.Import
 
     private void ScrollBar_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-      var lastSort = _lastSort.ElapsedMilliseconds;
-      var lastAddition = _lastAddition.ElapsedMilliseconds;
-      var lastDeletion = _lastDeletion.ElapsedMilliseconds;
-      if (lastSort < 100 || lastAddition < 100 || lastDeletion < 100)
-      {
-        return;
-      }
+      if (!_isPointerWheelScrolled) return;
       foreach (var row in _rows)
       {
         AnimationBuilder.Create().Translation(
@@ -192,6 +185,7 @@ namespace ZoNo.Views.Import
           layer: FrameworkLayer.Composition
         ).Start(row);
       }
+      _isPointerWheelScrolled = false;
     }
 
     private void DataGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
@@ -230,23 +224,65 @@ namespace ZoNo.Views.Import
       _rows.Remove((DataGridRow)sender);
     }
 
-    private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+    private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
+      if (_isLoaded)
+      {
+        DataGrid.ReloadThemeResources();
+        foreach (DataGridRow dataGridRow in DataGrid.FindDescendants().Where(descendant => descendant is DataGridRow))
+        {
+          _rows.Add(dataGridRow);
+        }
+        return;
+      }
+
+      // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
+      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
+      if (border == null)
+      {
+        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
+      }
+      border.Visibility = Visibility.Collapsed;
+
+      // Set default DataGridTextOpacity
+      DataGrid_IsEnabledChanged(null, null);
+
       DataGrid.LoadingRow += DataGrid_LoadingRow;
       _scrollBar = DataGrid.FindDescendant("VerticalScrollBar") as ScrollBar;
       _scrollBar!.ValueChanged += ScrollBar_ValueChanged;
-
-      await Task.Delay(1);
-      DataGrid.ItemsSource = Transactions;
+      var grid = DataGrid.FindDescendant("Root") as Grid;
+      grid!.PointerWheelChanged += Grid_PointerWheelChanged;
 
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
+
+      Transactions.VectorChanged += (s, e) =>
+      {
+        if (_isSorting && e.CollectionChange == CollectionChange.Reset)
+        {
+          _isSorting = false;
+        }
+      };
+
+      _isLoaded = true;
     }
 
-    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+    private void Grid_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
-      Transactions = new AdvancedCollectionView();
+      if (_scrollBar!.Minimum < _scrollBar.Value && _scrollBar.Value < _scrollBar.Maximum)
+      {
+        _isPointerWheelScrolled = true;
+      }
+      else
+      {
+        var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
+        if (delta < 0 && _scrollBar.Value == _scrollBar.Minimum ||
+            delta > 0 && _scrollBar.Value == _scrollBar.Maximum)
+        {
+          _isPointerWheelScrolled = true;
+        }
+      }
     }
 
     private void Grid_DragOver(object sender, DragEventArgs e)
@@ -287,9 +323,7 @@ namespace ZoNo.Views.Import
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
-      _lastSort.Restart();
-
-      Transactions.SortDescriptions.Clear();
+      _isSorting = true;
 
       GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);
 
@@ -298,20 +332,20 @@ namespace ZoNo.Views.Import
         // Descending after Ascending
         case DataGridSortDirection.Ascending:
           e.Column.SortDirection = DataGridSortDirection.Descending;
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Descending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Descending);
           break;
 
         // Default after Descending
         case DataGridSortDirection.Descending:
           e.Column.SortDirection = null;
           GetHeader(e.Column).Padding = new Thickness(12, 0, -20, 0);
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending);
           break;
 
         // Ascending after default
         default:
           e.Column.SortDirection = DataGridSortDirection.Ascending;
-          Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Ascending));
+          Transactions.SortDescriptions[0] = new SortDescription(Transaction.GetProperty((ColumnHeader)e.Column.Tag), SortDirection.Ascending);
           break;
       }
 
@@ -323,48 +357,49 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private async void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
+    private void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
       if (e.Key == VirtualKey.Delete)
       {
         var selectedItems = DataGrid.SelectedItems.Cast<object>().ToList();
-        foreach (var selectedItem in selectedItems)
+        var deferRefresh = selectedItems.Count > 30 ? Transactions.DeferRefresh() : null;
+        try
         {
-          try
+          foreach (var selectedItem in selectedItems)
           {
-            Transactions.Source.Remove(selectedItem);
+            try
+            {
+              Transactions.Source.Remove(selectedItem);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+              // When deleting last item, there is an exception
+              Transactions.Refresh();
+            }
           }
-          catch (ArgumentOutOfRangeException)
-          {
-            // When deleting last item, there is an exception
-            Transactions.Refresh();
-          }
-          await Task.Delay(1);
+        }
+        finally
+        {
+          deferRefresh?.Dispose();
         }
       }
     }
 
     private static async void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-      if (sender is TransactionsView view && e.NewValue is Transaction transaction)
+      if (sender is TransactionsView view)
       {
-        await Task.Delay(100);
-        view.DataGrid.ScrollIntoView(transaction, null);
+        if (view._isSorting && e.NewValue is null)
+        {
+          while (view._isSorting) await Task.Delay(10);
+          view.DataGrid.SelectedItem = e.OldValue;
+          view.DataGrid.ScrollIntoView(e.OldValue, null);
+        }
+        else
+        {
+          view.DataGrid.ScrollIntoView(e.NewValue, null);
+        }
       }
-    }
-
-    private void DataGrid_Loaded(object sender, RoutedEventArgs e)
-    {
-      // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
-      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
-      if (border == null)
-      {
-        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
-      }
-      border.Visibility = Visibility.Collapsed;
-
-      // Set default DataGridTextOpacity
-      DataGrid_IsEnabledChanged(null, null);
     }
 
     private void DataGrid_IsEnabledChanged(object? sender, DependencyPropertyChangedEventArgs? e)
@@ -376,23 +411,7 @@ namespace ZoNo.Views.Import
       }
       DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
 
-      // Force resource reload
-      if (DataGrid.ActualTheme == ElementTheme.Light)
-      {
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-        DataGrid.RequestedTheme = ElementTheme.Light;
-      }
-      else if (DataGrid.ActualTheme == ElementTheme.Dark)
-      {
-        DataGrid.RequestedTheme = ElementTheme.Light;
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-      }
-      else
-      {
-        DataGrid.RequestedTheme = ElementTheme.Light;
-        DataGrid.RequestedTheme = ElementTheme.Dark;
-        DataGrid.RequestedTheme = ElementTheme.Default;
-      }
+      DataGrid.ReloadThemeResources();
     }
   }
 }

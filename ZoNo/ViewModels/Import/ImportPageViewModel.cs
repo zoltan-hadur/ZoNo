@@ -54,7 +54,7 @@ namespace ZoNo.ViewModels.Import
       {
         if (e.CollectionChange == CollectionChange.ItemInserted)
         {
-          // To track order of insertions
+          // To track order of insertions when less than 30 are added at once
           _newTransactions.Add(((int)e.Index, TransactionsViewModel.TransactionsView[(int)e.Index] as Transaction));
         }
       };
@@ -76,7 +76,7 @@ namespace ZoNo.ViewModels.Import
       {
         try
         {
-          TransactionsViewModel.TransactionsView.Source.Remove(transaction);
+          TransactionsViewModel.TransactionsView.Remove(transaction);
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -86,11 +86,40 @@ namespace ZoNo.ViewModels.Import
       }
     }
 
+    private async Task AddExpenseFromTransaction(Transaction transaction, int? index = null)
+    {
+      var evaluatedExpense = new Expense()
+      {
+        Category = Uncategorized.General,
+        Description = transaction.PartnerName,
+        CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(transaction.Currency.ToString()),
+        Group = "Non-group expenses",
+        Cost = -transaction.Amount,
+        Date = transaction.TransactionTime
+      };
+      var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
+      var epense = new ExpenseViewModel(evaluatedExpense);
+      _transactionToExpenseViewModel[transaction] = epense;
+      if (index.HasValue)
+      {
+        ExpensesViewModel.Expenses.Insert(index.Value, epense);
+      }
+      else
+      {
+        ExpensesViewModel.Expenses.Add(epense);
+      }
+      if (result.RemoveThisElementFromList)
+      {
+        _transactionsToRemove.Add(transaction);
+      }
+    }
+
     private async void TransactionsView_VectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
       switch (e.CollectionChange)
       {
+        // When less than 30 items were added at once
         case CollectionChange.ItemInserted:
           {
             var (index, newTransaction) = _newTransactions.Take();
@@ -98,45 +127,56 @@ namespace ZoNo.ViewModels.Import
             {
               throw new Exception($"Transaction for index \"{index}\" is null!");
             }
-            var evaluatedExpense = new Expense();
-            var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: newTransaction, output: evaluatedExpense);
-            var newExpense = new ExpenseViewModel(evaluatedExpense);
-            _transactionToExpenseViewModel[newTransaction] = newExpense;
-            ExpensesViewModel.Expenses.Insert(index, newExpense);
-            if (result.RemoveThisElementFromList)
-            {
-              _transactionsToRemove.Add(newTransaction);
-            }
+            await AddExpenseFromTransaction(newTransaction, index);
           }
           break;
+        // When less than 30 items were removed at once
         case CollectionChange.ItemRemoved:
           {
             // Transaction is already removed, need to remove expense too
             if (TransactionsViewModel.TransactionsView.Count < ExpensesViewModel.Expenses.Count)
             {
               var oldIndex = (int)e.Index;
-              var expense = ExpensesViewModel.Expenses[oldIndex];
-              var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
-              _transactionToExpenseViewModel.Remove(transaction);
-              ExpensesViewModel.Expenses.Remove(expense);
+              var oldExpense = ExpensesViewModel.Expenses[oldIndex];
+              var oldTransaction = _transactionToExpenseViewModel.Single(x => x.Value == oldExpense).Key;
+              _transactionToExpenseViewModel.Remove(oldTransaction);
+              ExpensesViewModel.Expenses.Remove(oldExpense);
             }
           }
           break;
         case CollectionChange.Reset:
           {
-            if (TransactionsViewModel.TransactionsView.Count > 0)
+            // When 30 or more items were added at once
+            if (TransactionsViewModel.TransactionsView.Count > ExpensesViewModel.Expenses.Count)
             {
-              // If transactions were reordered
-              if (TransactionsViewModel.TransactionsView.Count == ExpensesViewModel.Expenses.Count)
+              var newTransactions = TransactionsViewModel.TransactionsView.Except(_transactionToExpenseViewModel.Keys).Cast<Transaction>().ToArray();
+              foreach (var newTransaction in newTransactions)
               {
-                foreach (var (transaction, expense) in _transactionToExpenseViewModel.OrderBy(pair => TransactionsViewModel.TransactionsView.IndexOf(pair.Key)))
+                await AddExpenseFromTransaction(newTransaction);
+              }
+            }
+            // When 30 or more items were removed at once
+            else if (TransactionsViewModel.TransactionsView.Count < ExpensesViewModel.Expenses.Count)
+            {
+              var oldTransactions = _transactionToExpenseViewModel.Keys.Except(TransactionsViewModel.TransactionsView).Cast<Transaction>().ToArray();
+              foreach (var oldTransaction in oldTransactions)
+              {
+                var oldExpense = _transactionToExpenseViewModel[oldTransaction];
+                _transactionToExpenseViewModel.Remove(oldTransaction);
+                ExpensesViewModel.Expenses.Remove(oldExpense);
+              }
+            }
+
+            // Transactions were reordered
+            if (TransactionsViewModel.TransactionsView.Count == ExpensesViewModel.Expenses.Count)
+            {
+              foreach (var (transaction, expense) in _transactionToExpenseViewModel.OrderBy(pair => TransactionsViewModel.TransactionsView.IndexOf(pair.Key)))
+              {
+                var oldIndex = ExpensesViewModel.Expenses.IndexOf(expense);
+                var newIndex = TransactionsViewModel.TransactionsView.IndexOf(transaction);
+                if (newIndex != oldIndex)
                 {
-                  var oldIndex = ExpensesViewModel.Expenses.IndexOf(expense);
-                  var newIndex = TransactionsViewModel.TransactionsView.IndexOf(transaction);
-                  if (newIndex != oldIndex)
-                  {
-                    ExpensesViewModel.Expenses.Move(oldIndex, newIndex);
-                  }
+                  ExpensesViewModel.Expenses.Move(oldIndex, newIndex);
                 }
               }
             }

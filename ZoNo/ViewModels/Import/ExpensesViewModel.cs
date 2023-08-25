@@ -63,8 +63,14 @@ namespace ZoNo.ViewModels.Import
           newItem.Group = _groups.Single(group => group.Name == newItem.Group!.Name);
           for (int i = 0; i < newItem.With.Count; i++)
           {
-            var user = newItem.Group.Members.Single(user => user.Email == newItem.With[i].User.Email);
+            var user = newItem.Group.Name == "Non-group expenses" ?
+              newItem.With[i].User :
+              newItem.Group.Members.Single(user => user.Email == newItem.With[i].User.Email);
             newItem.With[i] = (user, newItem.With[i].Percentage);
+          }
+          if (newItem.Group.Name == "Non-group expenses" && newItem.With.Count == 0)
+          {
+            newItem.With.Add((newItem.Group.Members.First(), 100));
           }
           newItem.Category = _categories.Single(category => category.Name == newItem.Category!.Name)
             .Subcategories.Single(subcategory => subcategory.Name == newItem.Category!.Subcategories[0].Name);

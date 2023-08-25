@@ -76,20 +76,34 @@ namespace ZoNo.ViewModels.Import
     private async Task LoadExcelDocuments(IList<string> paths)
     {
       LoadExcelDocumentsStarted?.Invoke(this, EventArgs.Empty);
+
       var rules = await _rulesService.GetRulesAsync(RuleType.Import);
       var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
+      var transactions = new List<Transaction>();
       foreach (var path in paths)
       {
         foreach (var transaction in await _excelDocumentLoader.LoadAsync(path))
         {
+          transactions.Add(transaction);
+        }
+      }
+      var deferRefresh = transactions.Count > 30 ? TransactionsView.DeferRefresh() : null;
+      try
+      {
+        foreach (var transaction in transactions)
+        {
           var result = await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
           if (!result.RemoveThisElementFromList)
           {
-            _transactions.Add(transaction);
+            TransactionsView.Add(transaction);
           }
-          await Task.Delay(1);
         }
       }
+      finally
+      {
+        deferRefresh?.Dispose();
+      }
+
       LoadExcelDocumentsFinished?.Invoke(this, EventArgs.Empty);
     }
 

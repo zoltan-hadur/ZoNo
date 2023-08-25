@@ -10,13 +10,15 @@ namespace ZoNo.Models
 
   public enum Currency
   {
-    HUF
+    HUF,
+    EUR,
+    CAD
   }
 
   public class Transaction
   {
     public DateTime TransactionTime { get; set; } = DateTime.MinValue;
-    public DateOnly AccountingDate { get; set; } = DateOnly.MinValue;
+    public DateOnly? AccountingDate { get; set; } = null;
     public string Type { get; set; } = string.Empty;
     public IncomeOutcome IncomeOutcome { get; set; } = IncomeOutcome.Outcome;
     public string PartnerName { get; set; } = string.Empty;
