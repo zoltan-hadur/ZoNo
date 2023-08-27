@@ -107,6 +107,31 @@ namespace ZoNo.ViewModels.Import
       LoadExcelDocumentsFinished?.Invoke(this, EventArgs.Empty);
     }
 
+    [RelayCommand]
+    private void DeleteTransactions(List<Transaction> transactions)
+    {
+      var deferRefresh = transactions.Count > 30 ? TransactionsView.DeferRefresh() : null;
+      try
+      {
+        foreach (var transaction in transactions)
+        {
+          try
+          {
+            TransactionsView.Source.Remove(transaction);
+          }
+          catch (ArgumentOutOfRangeException)
+          {
+            // When deleting last item, there is an exception
+            TransactionsView.Refresh();
+          }
+        }
+      }
+      finally
+      {
+        deferRefresh?.Dispose();
+      }
+    }
+
     private string SettingColumnIsVisible(ColumnHeader columnHeader) => $"Import_Columns_{columnHeader}_IsVisible";
 
     private async void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e)

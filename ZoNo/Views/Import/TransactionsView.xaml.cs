@@ -34,6 +34,7 @@ namespace ZoNo.Views.Import
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
     public static readonly DependencyProperty LoadExcelDocumentsCommandProperty = DependencyProperty.Register(nameof(LoadExcelDocumentsCommand), typeof(ICommand), typeof(TransactionsView), null);
+    public static readonly DependencyProperty DeleteTransactionsCommandProperty = DependencyProperty.Register(nameof(DeleteTransactionsCommand), typeof(ICommand), typeof(TransactionsView), null);
     public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(Transaction), typeof(TransactionsView), new PropertyMetadata(null, OnSelectedItemChanged));
 
     public AdvancedCollectionView Transactions
@@ -52,6 +53,12 @@ namespace ZoNo.Views.Import
     {
       get => (ICommand)GetValue(LoadExcelDocumentsCommandProperty);
       set => SetValue(LoadExcelDocumentsCommandProperty, value);
+    }
+
+    public ICommand DeleteTransactionsCommand
+    {
+      get => (ICommand)GetValue(DeleteTransactionsCommandProperty);
+      set => SetValue(DeleteTransactionsCommandProperty, value);
     }
 
     public Transaction SelectedItem
@@ -361,27 +368,7 @@ namespace ZoNo.Views.Import
     {
       if (e.Key == VirtualKey.Delete)
       {
-        var selectedItems = DataGrid.SelectedItems.Cast<object>().ToList();
-        var deferRefresh = selectedItems.Count > 30 ? Transactions.DeferRefresh() : null;
-        try
-        {
-          foreach (var selectedItem in selectedItems)
-          {
-            try
-            {
-              Transactions.Source.Remove(selectedItem);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-              // When deleting last item, there is an exception
-              Transactions.Refresh();
-            }
-          }
-        }
-        finally
-        {
-          deferRefresh?.Dispose();
-        }
+        DeleteTransactionsCommand?.Execute(DataGrid.SelectedItems.Cast<Transaction>().ToList());
       }
     }
 
@@ -412,6 +399,22 @@ namespace ZoNo.Views.Import
       DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
 
       DataGrid.ReloadThemeResources();
+    }
+
+    private void MenuFlyoutItem_Delete_Click(object sender, RoutedEventArgs e)
+    {
+      if (sender is MenuFlyoutItem menuFlyoutItem &&
+          menuFlyoutItem.DataContext is Transaction transaction)
+      {
+        if (DataGrid.SelectedItems.Contains(transaction))
+        {
+          DeleteTransactionsCommand?.Execute(DataGrid.SelectedItems.Cast<Transaction>().ToList());
+        }
+        else
+        {
+          DeleteTransactionsCommand?.Execute(new List<Transaction>() { transaction });
+        }
+      }
     }
   }
 }

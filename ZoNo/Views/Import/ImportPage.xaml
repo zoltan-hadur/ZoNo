@@ -34,7 +34,8 @@
           <local:TransactionsView Transactions="{x:Bind ViewModel.TransactionsViewModel.TransactionsView}"
                                   SelectedItem="{x:Bind ViewModel.SelectedTransaction, Mode=TwoWay}"
                                   Columns="{x:Bind ViewModel.TransactionsViewModel.Columns}"
-                                  LoadExcelDocumentsCommand="{x:Bind ViewModel.TransactionsViewModel.LoadExcelDocumentsCommand}"/>
+                                  LoadExcelDocumentsCommand="{x:Bind ViewModel.TransactionsViewModel.LoadExcelDocumentsCommand}"
+                                  DeleteTransactionsCommand="{x:Bind ViewModel.TransactionsViewModel.DeleteTransactionsCommand}"/>
           
         </Border>
         <Border Style="{StaticResource BorderStyle}">

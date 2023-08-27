@@ -71,6 +71,17 @@
           </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
       </controls:DataGrid.Resources>
+      <controls:DataGrid.RowStyle>
+        <Style TargetType="controls:DataGridRow">
+          <Setter Property="ContextFlyout">
+            <Setter.Value>
+              <MenuFlyout>
+                <MenuFlyoutItem Text="Delete" Icon="Delete" Click="MenuFlyoutItem_Delete_Click"/>
+              </MenuFlyout>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </controls:DataGrid.RowStyle>
       <controls:DataGrid.ColumnHeaderStyle>
         <Style TargetType="controlsprimitives:DataGridColumnHeader">
           <Setter Property="FontSize" Value="16"/>
