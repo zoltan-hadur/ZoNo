@@ -29,8 +29,8 @@ namespace ZoNo.Services
     private class RuleEvaluatorService<Input, Output> : IRuleEvaluatorService<Input, Output>
     {
       private IList<Rule> _rules;
-      private ScriptRunner<bool>? _inputEvaluator;
-      private ScriptRunner<object>? _outputEvaluator;
+      private ScriptRunner<bool> _inputEvaluator;
+      private ScriptRunner<object> _outputEvaluator;
 
       public RuleEvaluatorService(IList<Rule> rules)
       {

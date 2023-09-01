@@ -12,9 +12,9 @@ namespace ZoNo.ViewModels.Import
   {
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-    private IRuleEvaluatorService<Transaction, Expense>? _ruleEvaluatorService;
+    private IRuleEvaluatorService<Transaction, Expense> _ruleEvaluatorService;
     private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
-    private BlockingCollection<(int Index, Transaction? Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction? Transaction)>();
+    private BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction Transaction)>();
     private BlockingCollection<Transaction> _transactionsToRemove = new BlockingCollection<Transaction>();
     private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
@@ -22,17 +22,17 @@ namespace ZoNo.ViewModels.Import
     public ExpensesViewModel ExpensesViewModel { get; }
 
     [ObservableProperty]
-    private Transaction? _selectedTransaction;
+    private Transaction _selectedTransaction;
 
-    partial void OnSelectedTransactionChanged(Transaction? value)
+    partial void OnSelectedTransactionChanged(Transaction value)
     {
       SelectedExpense = value == null ? null : _transactionToExpenseViewModel[value];
     }
 
     [ObservableProperty]
-    private ExpenseViewModel? _selectedExpense;
+    private ExpenseViewModel _selectedExpense;
 
-    partial void OnSelectedExpenseChanged(ExpenseViewModel? value)
+    partial void OnSelectedExpenseChanged(ExpenseViewModel value)
     {
       SelectedTransaction = value == null ? null : _transactionToExpenseViewModel.Single(x => x.Value == value).Key;
     }
@@ -62,14 +62,14 @@ namespace ZoNo.ViewModels.Import
       ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
     }
 
-    private async void TransactionsViewModel_LoadExcelDocumentsStarted(object? sender, EventArgs e)
+    private async void TransactionsViewModel_LoadExcelDocumentsStarted(object sender, EventArgs e)
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       var rules = await _rulesService.GetRulesAsync(RuleType.Splitwise);
       _ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(rules);
     }
 
-    private async void TransactionsViewModel_LoadExcelDocumentsFinished(object? sender, EventArgs e)
+    private async void TransactionsViewModel_LoadExcelDocumentsFinished(object sender, EventArgs e)
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
       while (_transactionsToRemove.TryTake(out var transaction))
@@ -90,15 +90,16 @@ namespace ZoNo.ViewModels.Import
     {
       var evaluatedExpense = new Expense()
       {
-        Category = Uncategorized.General,
+        With = new List<(string User, double Percentage)>(),
+        Category = Categories.Uncategorized.General,
         Description = transaction.PartnerName,
-        CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(transaction.Currency.ToString()),
-        Group = "Non-group expenses",
+        Currency = transaction.Currency,
         Cost = -transaction.Amount,
-        Date = transaction.TransactionTime
+        Date = transaction.TransactionTime,
+        Group = "Non-group expenses"
       };
       var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
-      var epense = new ExpenseViewModel(evaluatedExpense);
+      var epense = ExpenseViewModel.FromModel(evaluatedExpense);
       _transactionToExpenseViewModel[transaction] = epense;
       if (index.HasValue)
       {
@@ -185,7 +186,7 @@ namespace ZoNo.ViewModels.Import
       }
     }
 
-    private async void Expenses_CollectionChangedAsync(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void Expenses_CollectionChangedAsync(object sender, NotifyCollectionChangedEventArgs e)
     {
       if (e.Action == NotifyCollectionChangedAction.Remove)
       {

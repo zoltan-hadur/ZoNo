@@ -1,11 +1,8 @@
 <UserControl x:Class="ZoNo.Views.Import.ExpenseView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:ZoNo.Views.Import"
              xmlns:sys="using:System"
-             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-             xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-             xmlns:splitwise="using:Splitwise.Models"
+             xmlns:models="using:ZoNo.Models"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
@@ -23,7 +20,7 @@
     </StackPanel>
     <!-- Category button/image and categories selector -->
     <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind Category.Name, Mode=OneWay}">
-      <Image Width="36" Height="36" Source="{x:Bind Category.IconTypes.Square.Large, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+      <Image Width="36" Height="36" Source="{x:Bind Category.Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
       <Button.Flyout>
         <Flyout x:Name="CategoriesFlyout">
           <Flyout.FlyoutPresenterStyle>
@@ -36,21 +33,21 @@
               <StackLayout Orientation="Vertical" Spacing="6"/>
             </ItemsRepeater.Layout>
             <ItemsRepeater.ItemTemplate>
-              <DataTemplate x:DataType="splitwise:Category">
+              <DataTemplate x:DataType="models:Category">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Text="{x:Bind sys:String.Format('{0}:', Name), Mode=OneTime}" Width="110" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  <ItemsRepeater ItemsSource="{x:Bind Subcategories, Mode=OneTime}" UseLayoutRounding="True">
+                  <ItemsRepeater ItemsSource="{x:Bind SubCategories, Mode=OneTime}" UseLayoutRounding="True">
                     <ItemsRepeater.Layout>
                       <StackLayout Orientation="Horizontal" Spacing="6"/>
                     </ItemsRepeater.Layout>
                     <ItemsRepeater.ItemTemplate>
-                      <DataTemplate x:DataType="splitwise:Category">
+                      <DataTemplate x:DataType="models:Category">
                         <Button Padding="3"
                                 ToolTipService.ToolTip="{x:Bind Name, Mode=OneTime}"
                                 Click="SubCategoryButton_Click"
                                 Command="{Binding SwitchCategoryCommand, Mode=OneTime}"
-                                CommandParameter="{x:Bind (splitwise:Category), Mode=OneTime}">
-                          <Image Width="36" Height="36" Source="{x:Bind IconTypes.Square.Large}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+                                CommandParameter="{x:Bind (models:Category), Mode=OneTime}">
+                          <Image Width="36" Height="36" Source="{x:Bind Picture}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
                         </Button>
                       </DataTemplate>
                     </ItemsRepeater.ItemTemplate>

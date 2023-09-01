@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Splitwise.Models;
+using ZoNo.Models;
 
 namespace ZoNo.Views.Account
 {

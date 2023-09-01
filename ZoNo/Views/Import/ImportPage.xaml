@@ -84,7 +84,7 @@
                                      Description="{x:Bind Description, Mode=OneWay}"
                                      Group="{x:Bind Group.Name, Mode=OneWay}"
                                      Paid="{x:Bind With[0].Item1.Email, Mode=OneWay}"
-                                     Currency="{x:Bind CurrencyCode, Mode=OneWay}"
+                                     Currency="{x:Bind Currency, Mode=OneWay}"
                                      Cost="{x:Bind Cost, Mode=OneWay}"
                                      Categories="{Binding ElementName=Expenses, Path=DataContext.Categories, Mode=OneWay}"
                                      Margin="0,8,0,8"/>

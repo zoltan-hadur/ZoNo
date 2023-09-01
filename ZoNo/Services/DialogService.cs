@@ -2,15 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Foundation;
 using ZoNo.Contracts.Services;
-using ZoNo.Helpers;
 
 namespace ZoNo.Services
 {
@@ -23,7 +15,7 @@ namespace ZoNo.Services
       _themeSelectorService = themeSelectorService;
     }
 
-    public async Task<bool> ShowDialogAsync<T>(DialogType type, string title, T content, Binding? isPrimaryButtonEnabled = null)
+    public async Task<DialogResult> ShowDialogAsync<T>(DialogType type, string title, T content, Binding isPrimaryButtonEnabled = null)
     {
       var margin = 12;
       var dialog = new ContentDialog()
@@ -52,7 +44,7 @@ namespace ZoNo.Services
         dialog.SetBinding(ContentDialog.IsPrimaryButtonEnabledProperty, isPrimaryButtonEnabled);
       }
       var result = await dialog.ShowAsync();
-      return result == ContentDialogResult.Primary;
+      return result == ContentDialogResult.Primary ? DialogResult.Ok : DialogResult.Cancel;
     }
   }
 }

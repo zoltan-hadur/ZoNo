@@ -63,7 +63,7 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private double _captchaOpacity = 0.0;
 
-    public WebView2? WebView { get; set; }
+    public WebView2 WebView { get; set; }
 
     public LoginPageViewModel(
       ITopLevelNavigationService topLevelNavigationService,
@@ -99,7 +99,7 @@ namespace ZoNo.ViewModels
       _isLoading = false;
     }
 
-    private async void LoginViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private async void LoginViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       if (_isLoading) return;
 

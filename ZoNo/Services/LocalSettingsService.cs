@@ -46,7 +46,7 @@ namespace ZoNo.Services
       }
     }
 
-    private async Task<string?> ReadStringifiedSettingAsync(string key)
+    private async Task<string> ReadStringifiedSettingAsync(string key)
     {
       if (RuntimeHelper.IsMSIX)
       {
@@ -114,7 +114,7 @@ namespace ZoNo.Services
           DataProtectionScope.CurrentUser));
     }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
+    public async Task<T> ReadSettingAsync<T>(string key)
     {
       var setting = await ReadStringifiedSettingAsync(key);
       if (setting != null)
@@ -125,7 +125,7 @@ namespace ZoNo.Services
       return default;
     }
 
-    public async Task<T?> ReadProtectedSettingAsync<T>(string key)
+    public async Task<T> ReadProtectedSettingAsync<T>(string key)
     {
       var setting = await ReadStringifiedSettingAsync(key);
       if (setting != null)

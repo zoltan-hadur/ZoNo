@@ -26,7 +26,7 @@ namespace ZoNo.Views.Import
   {
     private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
-    private ScrollBar? _scrollBar;
+    private ScrollBar _scrollBar;
     private bool _isLoaded = false;
     private bool _isSorting = false;
     private bool _isPointerWheelScrolled = false;
@@ -97,7 +97,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private void Transactions_CollectionChanged_BeforeDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    private void Transactions_CollectionChanged_BeforeDataContextChanges(object sender, NotifyCollectionChangedEventArgs e)
     {
       foreach (Transaction transaction in e.OldItems.OrEmpty())
       {
@@ -137,7 +137,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private async void Transactions_CollectionChanged_AfterDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void Transactions_CollectionChanged_AfterDataContextChanges(object sender, NotifyCollectionChangedEventArgs e)
     {
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
@@ -195,7 +195,7 @@ namespace ZoNo.Views.Import
       _isPointerWheelScrolled = false;
     }
 
-    private void DataGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
+    private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
     {
       var now = DateTime.Now;
       if (e.Row.DataContext is Transaction transaction &&
@@ -389,7 +389,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private void DataGrid_IsEnabledChanged(object? sender, DependencyPropertyChangedEventArgs? e)
+    private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
       var opacity = DataGrid.Resources["DataGridTextOpacity"] as double?;
       if (opacity == null)
