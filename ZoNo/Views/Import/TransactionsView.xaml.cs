@@ -263,6 +263,7 @@ namespace ZoNo.Views.Import
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
+      Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
 
       Transactions.VectorChanged += (s, e) =>
       {
