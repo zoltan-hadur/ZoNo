@@ -77,13 +77,25 @@
                   <AddDeleteThemeTransition />
                 </TransitionCollection>
               </ListView.ItemContainerTransitions>
+              <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                  <Setter Property="ContextFlyout">
+                    <Setter.Value>
+                      <MenuFlyout Opening="MenuFlyout_Opening">
+                        <MenuFlyoutItem Text="Edit" Icon="Edit" Command="{x:Bind ViewModel.ExpensesViewModel.EditExpenseCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                        <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind ViewModel.ExpensesViewModel.DeleteExpenseCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                      </MenuFlyout>
+                    </Setter.Value>
+                  </Setter>
+                </Style>
+              </ListView.ItemContainerStyle>
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
                   <local:ExpenseView Date="{x:Bind Date, Mode=OneWay}"
                                      Category="{x:Bind Category, Mode=OneWay}"
                                      Description="{x:Bind Description, Mode=OneWay}"
                                      Group="{x:Bind Group.Name, Mode=OneWay}"
-                                     Paid="{x:Bind With[0].Item1.Email, Mode=OneWay}"
+                                     Paid="{x:Bind Shares[0].User.Email, Mode=OneWay}"
                                      Currency="{x:Bind Currency, Mode=OneWay}"
                                      Cost="{x:Bind Cost, Mode=OneWay}"
                                      Categories="{Binding ElementName=Expenses, Path=DataContext.Categories, Mode=OneWay}"

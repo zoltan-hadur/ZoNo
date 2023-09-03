@@ -9,6 +9,7 @@ namespace ZoNo.Views.Account
     public static readonly DependencyProperty FirstNameProperty = DependencyProperty.Register(nameof(FirstName), typeof(string), typeof(UserView), null);
     public static readonly DependencyProperty LastNameProperty = DependencyProperty.Register(nameof(LastName), typeof(string), typeof(UserView), null);
     public static readonly DependencyProperty EmailProperty = DependencyProperty.Register(nameof(Email), typeof(string), typeof(UserView), null);
+    public static readonly DependencyProperty IsTextSelectionEnabledProperty = DependencyProperty.Register(nameof(IsTextSelectionEnabled), typeof(bool), typeof(UserView), new PropertyMetadata(false));
 
     public string Picture
     {
@@ -32,6 +33,12 @@ namespace ZoNo.Views.Account
     {
       get => (string)GetValue(EmailProperty);
       set => SetValue(EmailProperty, value);
+    }
+
+    public bool IsTextSelectionEnabled
+    {
+      get => (bool)GetValue(IsTextSelectionEnabledProperty);
+      set => SetValue(IsTextSelectionEnabledProperty, value);
     }
 
     public UserView()

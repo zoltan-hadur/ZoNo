@@ -8,7 +8,7 @@ namespace ZoNo.Views.Import
 {
   public sealed partial class ExpenseView : UserControl
   {
-    public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTime), typeof(ExpenseView), new PropertyMetadata(DateTime.MinValue));
+    public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTimeOffset), typeof(ExpenseView), new PropertyMetadata(DateTimeOffset.MinValue));
     public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register(nameof(Category), typeof(Category), typeof(ExpenseView), new PropertyMetadata(null));
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(ExpenseView), null);
     public static readonly DependencyProperty GroupProperty = DependencyProperty.Register(nameof(Group), typeof(string), typeof(ExpenseView), null);
@@ -18,9 +18,9 @@ namespace ZoNo.Views.Import
 
     public static readonly DependencyProperty CategoriesProperty = DependencyProperty.Register(nameof(Categories), typeof(Category[]), typeof(ExpenseView), new PropertyMetadata(null));
 
-    public DateTime Date
+    public DateTimeOffset Date
     {
-      get => (DateTime)GetValue(DateProperty);
+      get => (DateTimeOffset)GetValue(DateProperty);
       set => SetValue(DateProperty, value);
     }
 

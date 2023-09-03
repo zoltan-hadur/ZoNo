@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels.Import
@@ -8,35 +11,39 @@ namespace ZoNo.ViewModels.Import
   public partial class ExpenseViewModel : ObservableObject
   {
     [ObservableProperty]
-    public ObservableCollection<(User User, double Percentage)> _with;
+    private ObservableCollection<ShareViewModel> _shares;
 
     [ObservableProperty]
-    public Category _category;
+    private Category _category;
 
     [ObservableProperty]
-    public string _description;
+    private string _description;
 
     [ObservableProperty]
-    public Currency _currency;
+    private Currency _currency;
 
     [ObservableProperty]
-    public double _cost;
+    private double _cost;
 
     [ObservableProperty]
-    public DateTime _date;
+    private DateTimeOffset _date;
 
     [ObservableProperty]
-    public Group _group;
+    private Group _group;
 
     public static ExpenseViewModel FromModel(Expense model)
     {
       return new ExpenseViewModel()
       {
-        With = new ObservableCollection<(User User, double Percentage)>(
-          model.With.Select(with => (new User()
+        Shares = new ObservableCollection<ShareViewModel>(
+          model.With.Select(with => new ShareViewModel
           {
-            Email = with.User
-          }, with.Percentage))),
+            User = new User()
+            {
+              Email = with.User
+            },
+            Percentage = with.Percentage
+          })),
         Category = model.Category,
         Description = model.Description,
         Currency = model.Currency,
@@ -48,44 +55,39 @@ namespace ZoNo.ViewModels.Import
 
     public ExpenseViewModel Clone()
     {
-      return new ExpenseViewModel()
-      {
-        With = new ObservableCollection<(User User, double Percentage)>(
-          With.Select(with => (new User()
-          {
-            Picture = with.User.Picture,
-            FirstName = with.User.FirstName,
-            LastName = with.User.LastName,
-            Email = with.User.Email
-          }, with.Percentage))),
-        Category = new Category()
-        {
-          Picture = Category.Picture,
-          Name = Category.Name
-        },
-        Description = Description,
-        Currency = Currency,
-        Cost = Cost,
-        Date = Date,
-        Group = new Group()
-        {
-          Picture = Group.Picture,
-          Name = Group.Name,
-          Members = Group.Members.Select(user => new User()
-          {
-            Picture = user.Picture,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email
-          }).ToArray()
-        }
-      };
+      return JsonSerializer.Deserialize<ExpenseViewModel>(JsonSerializer.Serialize(this));
     }
 
     [RelayCommand]
     private void SwitchCategory(Category category)
     {
       Category = category;
+    }
+
+    [RelayCommand]
+    private void AddUser(User user)
+    {
+      Shares.Add(new ShareViewModel()
+      {
+        User = new User()
+        {
+          Picture = user.Picture,
+          FirstName = user.FirstName,
+          LastName = user.LastName,
+          Email = user.Email
+        },
+        Percentage = 0
+      });
+    }
+
+    [RelayCommand]
+    private void DeleteShare(ShareViewModel share)
+    {
+      Shares.Remove(share);
+      if (Shares.Count == 1)
+      {
+        Shares[0].Percentage = 100;
+      }
     }
   }
 }

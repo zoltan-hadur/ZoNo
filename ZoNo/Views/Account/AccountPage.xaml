@@ -43,7 +43,8 @@
             <DataTemplate x:DataType="models:Group">
               <local:GroupView Picture="{x:Bind Picture}"
                                Name="{x:Bind Name}"
-                               Members="{x:Bind Members}"/>
+                               Members="{x:Bind Members}"
+                               IsTextSelectionEnabled="True"/>
             </DataTemplate>
           </ListView.ItemTemplate>
         </ListView>

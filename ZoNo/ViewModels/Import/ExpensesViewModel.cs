@@ -13,6 +13,7 @@ namespace ZoNo.ViewModels.Import
   public partial class ExpensesViewModel : ObservableObject
   {
     private readonly ISplitwiseService _splitwiseService;
+    private readonly IDialogService _dialogService;
     private Splitwise.Models.Group[] _groups;
     private Splitwise.Models.Category[] _categories;
     private bool _isLoaded = false;
@@ -30,9 +31,10 @@ namespace ZoNo.ViewModels.Import
     [NotifyCanExecuteChangedFor(nameof(UploadExpensesToSplitwiseCommand))]
     private bool _isExpensesNotEmpty = false;
 
-    public ExpensesViewModel(ISplitwiseService splitwiseService)
+    public ExpensesViewModel(ISplitwiseService splitwiseService, IDialogService dialogService)
     {
       _splitwiseService = splitwiseService;
+      _dialogService = dialogService;
 
       Expenses.CollectionChanged += Expenses_CollectionChanged;
     }
@@ -76,22 +78,26 @@ namespace ZoNo.ViewModels.Import
         using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
         foreach (ExpenseViewModel newItem in e.NewItems.OrEmpty())
         {
-          newItem.Category = Categories.Single(category => category.Name == newItem.Category.ParentCategory.Name)
+          newItem.Category = Categories.Single(category => category.Name == newItem.Category.ParentCategoryName)
             .SubCategories.Single(subCategory => subCategory.Name == newItem.Category.Name);
 
           newItem.Group = Groups.Single(group => group.Name == newItem.Group.Name);
 
-          for (int i = 0; i < newItem.With.Count; i++)
+          for (int i = 0; i < newItem.Shares.Count; i++)
           {
             var user = newItem.Group.Name == "Non-group expenses" ?
-              newItem.With[i].User :
-              newItem.Group.Members.Single(user => user.Email == newItem.With[i].User.Email);
-            newItem.With[i] = (user, newItem.With[i].Percentage);
+              newItem.Shares[i].User :
+              newItem.Group.Members.Single(user => user.Email == newItem.Shares[i].User.Email);
+            newItem.Shares[i].User = user;
           }
 
-          if (newItem.Group.Name == "Non-group expenses" && newItem.With.Count == 0)
+          if (newItem.Group.Name == "Non-group expenses" && newItem.Shares.Count == 0)
           {
-            newItem.With.Add((newItem.Group.Members.First(), 100));
+            newItem.Shares.Add(new ShareViewModel()
+            {
+              User = newItem.Group.Members.First(),
+              Percentage = 100
+            });
           }
         }
       }
@@ -107,10 +113,10 @@ namespace ZoNo.ViewModels.Import
       {
         var group = _groups.Single(group => group.Name == expense.Group.Name);
 
-        var category = _categories.Single(category => category.Name == expense.Category.ParentCategory.Name)
+        var category = _categories.Single(category => category.Name == expense.Category.ParentCategoryName)
           .Subcategories.Single(subcategory => subcategory.Name == expense.Category.Name);
 
-        var users = expense.With.Select(with => new Splitwise.Models.Share()
+        var users = expense.Shares.Select(with => new Splitwise.Models.Share()
         {
           UserId = group.Members.Single(user => user.Email == with.User.Email).Id
         }).ToArray();
@@ -127,7 +133,7 @@ namespace ZoNo.ViewModels.Import
           }
           if (i < users.Length - 1)
           {
-            users[i].OwedShare = (expense.Cost * expense.With[i].Percentage / 100).ToString("0.00");
+            users[i].OwedShare = (expense.Cost * expense.Shares[i].Percentage / 100).ToString("0.00");
           }
           else
           {
@@ -154,6 +160,29 @@ namespace ZoNo.ViewModels.Import
       }
 
       IsUploadingToSplitwise = false;
+    }
+
+    [RelayCommand]
+    private async Task EditExpense(ExpenseViewModel expense)
+    {
+      var index = Expenses.IndexOf(expense);
+      var copiedExpense = expense.Clone();
+      copiedExpense.Group = Groups.Single(group => group.Name == copiedExpense.Group.Name);
+      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit Expense", new ExpenseEditor(copiedExpense)
+      {
+        Categories = Categories,
+        Groups = Groups
+      });
+      if (result == DialogResult.Ok)
+      {
+        Expenses[index] = copiedExpense;
+      }
+    }
+
+    [RelayCommand]
+    private void DeleteExpense(ExpenseViewModel expense)
+    {
+      Expenses.Remove(expense);
     }
   }
 }

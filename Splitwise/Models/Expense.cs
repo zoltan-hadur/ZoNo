@@ -6,7 +6,7 @@ namespace Splitwise.Models
   {
     public string Cost { get; set; }
     public string Description { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public CurrencyCode CurrencyCode { get; set; }
     public int CategoryId { get; set; }
     public int? GroupId { get; set; }

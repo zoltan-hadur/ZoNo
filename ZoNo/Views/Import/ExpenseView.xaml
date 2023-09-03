@@ -19,9 +19,13 @@
       <TextBlock Text="{x:Bind sys:String.Format('{0:D2}', Date.Day), Mode=OneWay}" FontSize="18" HorizontalAlignment="Center"/>
     </StackPanel>
     <!-- Category button/image and categories selector -->
-    <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind Category.Name, Mode=OneWay}">
+    <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategoryName, Category.Name), Mode=OneWay}">
       <Border CornerRadius="3">
-        <Image Width="36" Height="36" Source="{x:Bind Category.Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+        <Image Width="36" Height="36" Source="{x:Bind Category.Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
+          <Image.OpacityTransition>
+            <ScalarTransition Duration="0:0:0.2"/>
+          </Image.OpacityTransition>
+        </Image>
       </Border>
       <Button.Flyout>
         <Flyout x:Name="CategoriesFlyout">
@@ -50,7 +54,11 @@
                                 Command="{Binding SwitchCategoryCommand, Mode=OneTime}"
                                 CommandParameter="{x:Bind (models:Category), Mode=OneTime}">
                           <Border CornerRadius="3">
-                            <Image Width="36" Height="36" Source="{x:Bind Picture}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited"/>
+                            <Image Width="36" Height="36" Source="{x:Bind Picture}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
+                              <Image.OpacityTransition>
+                                <ScalarTransition Duration="0:0:0.2"/>
+                              </Image.OpacityTransition>
+                            </Image>
                           </Border>
                         </Button>
                       </DataTemplate>
@@ -71,12 +79,18 @@
       </Border>
     </StackPanel>
     <!-- Who paid and how much -->
-    <StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="3" SizeChanged="StackPanel_SizeChanged">
-      <TextBlock>
-        <Run Text="Paid: "/><Run Text="{x:Bind Paid, Mode=OneWay}"/>
-      </TextBlock>
-      <TextBlock>
-        <Run Text="{x:Bind Currency, Mode=OneWay}"/> <Run Text="{x:Bind Cost.ToString('0.00', {x:Null}), Mode=OneWay}"/>
+    <StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center"  Spacing="3" SizeChanged="StackPanel_SizeChanged">
+      <Grid ColumnSpacing="3" >
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="Paid:"/>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{x:Bind Paid, Mode=OneWay}"/>
+      </Grid>
+      <TextBlock HorizontalAlignment="Right">
+        <Run Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+        <Run Text="{x:Bind Currency, Mode=OneWay}"/>
       </TextBlock>
     </StackPanel>
   </Grid>

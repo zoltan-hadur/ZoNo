@@ -7,7 +7,7 @@
     public string Description { get; set; }
     public Currency Currency { get; set; }
     public double Cost { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Group { get; set; }
   }
 
@@ -15,7 +15,7 @@
   {
     public string Picture { get; set; } = "invalid";
     public string Name { get; set; }
-    public Category ParentCategory { get; private set; } = null;
+    public string ParentCategoryName { get; set; }
     private Category[] _subCategories = Array.Empty<Category>();
     public Category[] SubCategories
     {
@@ -30,7 +30,7 @@
           _subCategories = value;
           foreach (var category in _subCategories)
           {
-            category.ParentCategory = this;
+            category.ParentCategoryName = Name;
           }
         }
       }

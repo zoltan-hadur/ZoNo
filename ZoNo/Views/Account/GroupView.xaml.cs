@@ -9,6 +9,7 @@ namespace ZoNo.Views.Account
     public static readonly DependencyProperty PictureProperty = DependencyProperty.Register(nameof(Picture), typeof(string), typeof(GroupView), new PropertyMetadata("invalid"));
     public static new readonly DependencyProperty NameProperty = DependencyProperty.Register(nameof(Name), typeof(string), typeof(GroupView), null);
     public static readonly DependencyProperty MembersProperty = DependencyProperty.Register(nameof(Members), typeof(IEnumerable<User>), typeof(GroupView), null);
+    public static readonly DependencyProperty IsTextSelectionEnabledProperty = DependencyProperty.Register(nameof(IsTextSelectionEnabled), typeof(bool), typeof(GroupView), new PropertyMetadata(false));
 
     public string Picture
     {
@@ -26,6 +27,12 @@ namespace ZoNo.Views.Account
     {
       get => (IEnumerable<User>)GetValue(MembersProperty);
       set => SetValue(MembersProperty, value);
+    }
+
+    public bool IsTextSelectionEnabled
+    {
+      get => (bool)GetValue(IsTextSelectionEnabledProperty);
+      set => SetValue(IsTextSelectionEnabledProperty, value);
     }
 
     public GroupView()

@@ -24,7 +24,7 @@ namespace ZoNo.Views.Import
 {
   public sealed partial class TransactionsView : UserControl
   {
-    private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
+    private Dictionary<Transaction, DateTimeOffset> _loadTimes = new Dictionary<Transaction, DateTimeOffset>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
     private ScrollBar _scrollBar;
     private bool _isLoaded = false;
@@ -133,7 +133,7 @@ namespace ZoNo.Views.Import
       }
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
-        _loadTimes[transaction] = DateTime.Now;
+        _loadTimes[transaction] = DateTimeOffset.Now;
       }
     }
 
@@ -197,7 +197,7 @@ namespace ZoNo.Views.Import
 
     private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
     {
-      var now = DateTime.Now;
+      var now = DateTimeOffset.Now;
       if (e.Row.DataContext is Transaction transaction &&
           _loadTimes.TryGetValue(transaction, out var loadTime) &&
           (now - loadTime).TotalMilliseconds < 100)
