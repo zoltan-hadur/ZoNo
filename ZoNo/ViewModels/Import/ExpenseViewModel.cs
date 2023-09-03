@@ -11,6 +11,8 @@ namespace ZoNo.ViewModels.Import
 {
   public partial class ExpenseViewModel : ObservableObject
   {
+    public Guid Id { get; set; }
+
     [ObservableProperty]
     private ObservableCollection<ShareViewModel> _shares;
 
@@ -87,6 +89,7 @@ namespace ZoNo.ViewModels.Import
     {
       return new ExpenseViewModel()
       {
+        Id = model.Id,
         Shares = new ObservableCollection<ShareViewModel>(
           model.With.Select(with => new ShareViewModel
           {

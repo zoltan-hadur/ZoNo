@@ -17,6 +17,7 @@ namespace ZoNo.Models
 
   public class Transaction
   {
+    public Guid Id { get; set; }
     public DateTimeOffset TransactionTime { get; set; } = DateTimeOffset.MinValue;
     public DateOnly? AccountingDate { get; set; } = null;
     public string Type { get; set; } = string.Empty;

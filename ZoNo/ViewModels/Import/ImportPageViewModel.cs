@@ -13,7 +13,6 @@ namespace ZoNo.ViewModels.Import
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
     private IRuleEvaluatorService<Transaction, Expense> _ruleEvaluatorService;
-    private Dictionary<Transaction, ExpenseViewModel> _transactionToExpenseViewModel = new Dictionary<Transaction, ExpenseViewModel>();
     private BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction Transaction)>();
     private BlockingCollection<Transaction> _transactionsToRemove = new BlockingCollection<Transaction>();
     private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
@@ -26,7 +25,7 @@ namespace ZoNo.ViewModels.Import
 
     partial void OnSelectedTransactionChanged(Transaction value)
     {
-      SelectedExpense = value == null ? null : _transactionToExpenseViewModel[value];
+      SelectedExpense = value == null ? null : ExpensesViewModel.Expenses.Single(expense => expense.Id == value.Id);
     }
 
     [ObservableProperty]
@@ -34,7 +33,7 @@ namespace ZoNo.ViewModels.Import
 
     partial void OnSelectedExpenseChanged(ExpenseViewModel value)
     {
-      SelectedTransaction = value == null ? null : _transactionToExpenseViewModel.Single(x => x.Value == value).Key;
+      SelectedTransaction = value == null ? null : TransactionsViewModel.TransactionsView.Cast<Transaction>().Single(transaction => transaction.Id == value.Id);
     }
 
     public ImportPageViewModel(
@@ -90,6 +89,7 @@ namespace ZoNo.ViewModels.Import
     {
       var evaluatedExpense = new Expense()
       {
+        Id = transaction.Id,
         With = new List<(string User, double Percentage)>(),
         Category = Categories.Uncategorized.General,
         Description = transaction.PartnerName,
@@ -99,15 +99,14 @@ namespace ZoNo.ViewModels.Import
         Group = "Non-group expenses"
       };
       var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
-      var epense = ExpenseViewModel.FromModel(evaluatedExpense);
-      _transactionToExpenseViewModel[transaction] = epense;
+      var expense = ExpenseViewModel.FromModel(evaluatedExpense);
       if (index.HasValue)
       {
-        ExpensesViewModel.Expenses.Insert(index.Value, epense);
+        ExpensesViewModel.Expenses.Insert(index.Value, expense);
       }
       else
       {
-        ExpensesViewModel.Expenses.Add(epense);
+        ExpensesViewModel.Expenses.Add(expense);
       }
       if (result.RemoveThisElementFromList)
       {
@@ -139,8 +138,6 @@ namespace ZoNo.ViewModels.Import
             {
               var oldIndex = (int)e.Index;
               var oldExpense = ExpensesViewModel.Expenses[oldIndex];
-              var oldTransaction = _transactionToExpenseViewModel.Single(x => x.Value == oldExpense).Key;
-              _transactionToExpenseViewModel.Remove(oldTransaction);
               ExpensesViewModel.Expenses.Remove(oldExpense);
             }
           }
@@ -150,7 +147,7 @@ namespace ZoNo.ViewModels.Import
             // When 30 or more items were added at once
             if (TransactionsViewModel.TransactionsView.Count > ExpensesViewModel.Expenses.Count)
             {
-              var newTransactions = TransactionsViewModel.TransactionsView.Except(_transactionToExpenseViewModel.Keys).Cast<Transaction>().ToArray();
+              var newTransactions = TransactionsViewModel.TransactionsView.Cast<Transaction>().Where(transaction => !ExpensesViewModel.Expenses.Any(expense => expense.Id == transaction.Id)).ToArray();
               foreach (var newTransaction in newTransactions)
               {
                 await AddExpenseFromTransaction(newTransaction);
@@ -159,11 +156,9 @@ namespace ZoNo.ViewModels.Import
             // When 30 or more items were removed at once
             else if (TransactionsViewModel.TransactionsView.Count < ExpensesViewModel.Expenses.Count)
             {
-              var oldTransactions = _transactionToExpenseViewModel.Keys.Except(TransactionsViewModel.TransactionsView).Cast<Transaction>().ToArray();
-              foreach (var oldTransaction in oldTransactions)
+              var oldExpenses = ExpensesViewModel.Expenses.Where(expense => !TransactionsViewModel.TransactionsView.Cast<Transaction>().Any(transaction => transaction.Id == expense.Id)).ToArray();
+              foreach (var oldExpense in oldExpenses)
               {
-                var oldExpense = _transactionToExpenseViewModel[oldTransaction];
-                _transactionToExpenseViewModel.Remove(oldTransaction);
                 ExpensesViewModel.Expenses.Remove(oldExpense);
               }
             }
@@ -171,14 +166,10 @@ namespace ZoNo.ViewModels.Import
             // Transactions were reordered
             if (TransactionsViewModel.TransactionsView.Count == ExpensesViewModel.Expenses.Count)
             {
-              foreach (var (transaction, expense) in _transactionToExpenseViewModel.OrderBy(pair => TransactionsViewModel.TransactionsView.IndexOf(pair.Key)))
+              for (int i = 0; i < TransactionsViewModel.TransactionsView.Count; ++i)
               {
-                var oldIndex = ExpensesViewModel.Expenses.IndexOf(expense);
-                var newIndex = TransactionsViewModel.TransactionsView.IndexOf(transaction);
-                if (newIndex != oldIndex)
-                {
-                  ExpensesViewModel.Expenses.Move(oldIndex, newIndex);
-                }
+                var oldIndex = ExpensesViewModel.Expenses.IndexOf(ExpensesViewModel.Expenses.Single(expense => expense.Id == (TransactionsViewModel.TransactionsView[i] as Transaction).Id));
+                ExpensesViewModel.Expenses.Move(oldIndex, i);
               }
             }
           }
@@ -196,8 +187,7 @@ namespace ZoNo.ViewModels.Import
           // Expense is already removed, need to remove transaction too
           if (ExpensesViewModel.Expenses.Count < TransactionsViewModel.TransactionsView.Count)
           {
-            var transaction = _transactionToExpenseViewModel.Single(x => x.Value == expense).Key;
-            _transactionToExpenseViewModel.Remove(transaction);
+            var transaction = TransactionsViewModel.TransactionsView.Cast<Transaction>().Single(transaction => transaction.Id == expense.Id);
             try
             {
               TransactionsViewModel.TransactionsView.Source.Remove(transaction);

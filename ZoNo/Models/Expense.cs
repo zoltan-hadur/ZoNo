@@ -2,6 +2,7 @@
 {
   public class Expense
   {
+    public Guid Id { get; set; }
     public List<(string User, double Percentage)> With { get; set; }
     public Category Category { get; set; }
     public string Description { get; set; }
