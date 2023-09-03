@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 using Splitwise.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Data;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
+using ZoNo.ViewModels.Rules;
 using ZoNo.Views.Import;
 
 namespace ZoNo.ViewModels.Import
@@ -168,11 +172,17 @@ namespace ZoNo.ViewModels.Import
       var index = Expenses.IndexOf(expense);
       var copiedExpense = expense.Clone();
       copiedExpense.Group = Groups.Single(group => group.Name == copiedExpense.Group.Name);
+      var isPrimaryButtonEnabledBinding = new Binding()
+      {
+        Path = new PropertyPath(nameof(ExpenseViewModel.ArePercentagesAddUp)),
+        Mode = BindingMode.OneWay,
+        Source = copiedExpense
+      };
       var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit Expense", new ExpenseEditor(copiedExpense)
       {
         Categories = Categories,
         Groups = Groups
-      });
+      }, isPrimaryButtonEnabledBinding);
       if (result == DialogResult.Ok)
       {
         Expenses[index] = copiedExpense;

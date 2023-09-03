@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using ZoNo.Helpers;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels.Import
@@ -30,6 +31,57 @@ namespace ZoNo.ViewModels.Import
 
     [ObservableProperty]
     private Group _group;
+
+    public bool ArePercentagesAddUp => Shares?.Sum(share => share.Percentage) == 100;
+
+    partial void OnSharesChanged(ObservableCollection<ShareViewModel> oldValue, ObservableCollection<ShareViewModel> newValue)
+    {
+      if (oldValue != null)
+      {
+        oldValue.CollectionChanged -= Shares_CollectionChanged;
+        foreach (var share in Shares)
+        {
+          share.PropertyChanged -= Share_PropertyChanged;
+        }
+      }
+      if (newValue != null)
+      {
+        newValue.CollectionChanged += Shares_CollectionChanged;
+        foreach (var share in Shares)
+        {
+          share.PropertyChanged += Share_PropertyChanged;
+        }
+      }
+      OnPropertyChanged(nameof(ArePercentagesAddUp));
+    }
+
+    private void Shares_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+      switch (e.Action)
+      {
+        case NotifyCollectionChangedAction.Add:
+        case NotifyCollectionChangedAction.Remove:
+        case NotifyCollectionChangedAction.Replace:
+          foreach (ShareViewModel share in e.OldItems.OrEmpty())
+          {
+            share.PropertyChanged -= Share_PropertyChanged;
+          }
+          foreach (ShareViewModel share in e.NewItems.OrEmpty())
+          {
+            share.PropertyChanged += Share_PropertyChanged;
+          }
+          OnPropertyChanged(nameof(ArePercentagesAddUp));
+          break;
+      }
+    }
+
+    private void Share_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(ShareViewModel.Percentage))
+      {
+        OnPropertyChanged(nameof(ArePercentagesAddUp));
+      }
+    }
 
     public static ExpenseViewModel FromModel(Expense model)
     {
