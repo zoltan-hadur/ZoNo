@@ -10,6 +10,7 @@
              xmlns:views="using:ZoNo.Views.Account"
              xmlns:sys="using:System"
              xmlns:converters="using:ZoNo.Converters"
+             xmlns:helpers="using:ZoNo.Helpers"
              mc:Ignorable="d"
              MinWidth="600"
              MinHeight="300">
@@ -79,7 +80,7 @@
                 <Setter Property="Padding" Value="4"/>
               </Style>
             </Flyout.FlyoutPresenterStyle>
-            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Group.Members, Mode=OneWay}" Margin="0">
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Group.Members, Mode=OneWay}" Margin="0" helpers:Grid.IsSharedSizeScope="True">
               <ItemsRepeater.Layout>
                 <StackLayout Orientation="Vertical" Spacing="4"/>
               </ItemsRepeater.Layout>
@@ -96,7 +97,7 @@
       </DropDownButton>
     </Grid>
     <!-- Shares -->
-    <ListView Grid.Row="3" AllowDrop="True" CanReorderItems="True"  ItemsSource="{x:Bind ViewModel.Shares, Mode=OneWay}">
+    <ListView Grid.Row="3" AllowDrop="True" CanReorderItems="True"  ItemsSource="{x:Bind ViewModel.Shares, Mode=OneWay}" helpers:Grid.IsSharedSizeScope="True">
       <ListView.ItemContainerStyle>
         <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
           <Setter Property="Padding" Value="16,0,0,0"/>

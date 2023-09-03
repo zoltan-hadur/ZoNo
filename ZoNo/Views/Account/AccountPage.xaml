@@ -4,6 +4,7 @@
       xmlns:local="using:ZoNo.Views.Account"
       xmlns:controls="using:ZoNo.Controls"
       xmlns:models="using:ZoNo.Models"
+      xmlns:helpers="using:ZoNo.Helpers"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
@@ -32,7 +33,7 @@
         <TextBox Header="E-mail" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
         <TextBox Header="Default Currency" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
       </StackPanel>
-      <Grid Grid.Row="1" Margin="0,12,0,0">
+      <Grid Grid.Row="1" Margin="0,12,0,0" helpers:Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
