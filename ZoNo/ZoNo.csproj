@@ -12,7 +12,7 @@
     <Nullable>disable</Nullable>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <PackageCertificateThumbprint>002285B768C3D4458786D33042B9D0F683810AE7</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA512</AppxPackageSigningTimestampDigestAlgorithm>
@@ -20,6 +20,8 @@
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
+    <AppxPackageDir>\\RT-AC58U_V3-4A7\ZoNo\</AppxPackageDir>
+    <AppInstallerUri>\\RT-AC58U_V3-4A7\ZoNo\</AppInstallerUri>
   </PropertyGroup>
 
   <ItemGroup>
