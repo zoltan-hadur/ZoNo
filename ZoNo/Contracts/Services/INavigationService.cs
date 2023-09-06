@@ -8,9 +8,9 @@ namespace ZoNo.Contracts.Services
   {
     event NavigatedEventHandler Navigated;
 
-    Frame? Frame { get; set; }
+    Frame Frame { get; set; }
 
-    bool NavigateTo(string pageKey, object? parameter = null, NavigationTransitionInfo? infoOverride = null);
+    bool NavigateTo(string pageKey, object parameter = null, NavigationTransitionInfo infoOverride = null);
   }
 
   public interface ITopLevelNavigationService : INavigationService

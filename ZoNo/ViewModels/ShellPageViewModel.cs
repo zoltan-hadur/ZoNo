@@ -7,13 +7,13 @@ namespace ZoNo.ViewModels
 {
   public class ShellPageViewModel : ObservableRecipient
   {
-    private object? _selected;
+    private object _selected;
 
     public INavigationService NavigationService { get; }
 
     public INavigationViewService NavigationViewService { get; }
 
-    public object? Selected
+    public object Selected
     {
       get => _selected;
       set => SetProperty(ref _selected, value);

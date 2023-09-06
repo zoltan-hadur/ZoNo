@@ -36,7 +36,7 @@ namespace ZoNo.Services
 
     public Type GetPageType(string key)
     {
-      Type? pageType;
+      Type pageType;
       lock (_pages)
       {
         if (!_pages.TryGetValue(key, out pageType))

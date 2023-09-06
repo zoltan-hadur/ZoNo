@@ -73,7 +73,8 @@ namespace ZoNo.Services
     {
       return new Transaction
       {
-        TransactionTime = DateTime.Parse(row.Field<string>(0)!),
+        Id = Guid.NewGuid(),
+        TransactionTime = DateTimeOffset.Parse(row.Field<string>(0)!),
         AccountingDate = string.IsNullOrEmpty(row.Field<string>(1)) ? null : DateOnly.Parse(row.Field<string>(1)!),
         Type = row.Field<string>(2)!,
         IncomeOutcome = row.Field<string>(3)! == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,

@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Animation;
 using Splitwise.Contracts;
-using Splitwise.Models;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
+using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
@@ -19,16 +19,16 @@ namespace ZoNo.ViewModels
     private string _profilePicture = "invalid";
 
     [ObservableProperty]
-    private string? _firstName;
+    private string _firstName;
 
     [ObservableProperty]
-    private string? _lastName;
+    private string _lastName;
 
     [ObservableProperty]
-    private string? _email;
+    private string _email;
 
     [ObservableProperty]
-    private CurrencyCode? _defaultCurrency;
+    private Currency _defaultCurrency;
 
     [ObservableProperty]
     private bool _isLoading = false;
@@ -52,8 +52,20 @@ namespace ZoNo.ViewModels
       FirstName = user.FirstName;
       LastName = user.LastName;
       Email = user.Email;
-      DefaultCurrency = user.DefaultCurrency;
-      Groups = await _splitwiseService.GetGroupsAsync();
+      DefaultCurrency = Enum.Parse<Currency>(user.DefaultCurrency.ToString());
+      var groups = await _splitwiseService.GetGroupsAsync();
+      Groups = groups.Select(group => new Group()
+      {
+        Picture = group.Avatar.Medium,
+        Name = group.Name,
+        Members = group.Members.Select(user => new User()
+        {
+          Picture = user.Picture.Medium,
+          FirstName = user.FirstName,
+          LastName = user.LastName,
+          Email = user.Email
+        }).ToArray()
+      }).ToArray();
       _isLoaded = true;
 
       IsLoading = false;

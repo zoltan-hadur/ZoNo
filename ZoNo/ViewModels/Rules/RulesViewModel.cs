@@ -42,7 +42,7 @@ namespace ZoNo.ViewModels.Rules
       Rules.CollectionChanged += Rules_CollectionChanged;
     }
 
-    private async void Rules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void Rules_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       for (int i = 0; i < Rules.Count; ++i)
       {
@@ -52,7 +52,7 @@ namespace ZoNo.ViewModels.Rules
       await _rulesService.SaveRulesAsync(_ruleType, rules);
     }
 
-    private async void Rule_InputExpressionChanged(object? sender, string e)
+    private async void Rule_InputExpressionChanged(object sender, string e)
     {
       if (sender is RuleViewModel rule)
       {
@@ -66,7 +66,7 @@ namespace ZoNo.ViewModels.Rules
       }
     }
 
-    private async void Rule_OutputExpressionChanged(object? sender, string e)
+    private async void Rule_OutputExpressionChanged(object sender, string e)
     {
       if (sender is OutputExpressionViewModel outputExpression)
       {
@@ -98,8 +98,8 @@ namespace ZoNo.ViewModels.Rules
         Mode = BindingMode.OneWay,
         Source = rule
       };
-      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"New {_ruleType} Rule", new RuleEditor(rule), isPrimaryButtonEnabledBinding);
-      if (ok)
+      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"New {_ruleType} Rule", new RuleEditor(rule), isPrimaryButtonEnabledBinding);
+      if (result == DialogResult.Ok)
       {
         Rules.Add(rule);
       }
@@ -120,8 +120,8 @@ namespace ZoNo.ViewModels.Rules
         Mode = BindingMode.OneWay,
         Source = copiedRule
       };
-      var ok = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule), isPrimaryButtonEnabledBinding);
-      if (ok)
+      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule), isPrimaryButtonEnabledBinding);
+      if (result == DialogResult.Ok)
       {
         Rules[index] = copiedRule;
       }

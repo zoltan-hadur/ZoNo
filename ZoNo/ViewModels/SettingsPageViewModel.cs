@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Reflection;
-using System.Windows.Input;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -13,6 +12,7 @@ using WinRT.Interop;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
+using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
@@ -130,6 +130,12 @@ namespace ZoNo.ViewModels
             break;
         }
       }
+    }
+
+    [RelayCommand]
+    private void ShowReleaseNotes()
+    {
+      _dialogService.ShowDialogAsync(DialogType.Ok, "Release Notes", new ReleaseNotesView());
     }
 
     private async Task ShowMessage(string message)

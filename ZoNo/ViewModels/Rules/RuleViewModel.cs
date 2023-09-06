@@ -34,15 +34,15 @@ namespace ZoNo.ViewModels.Rules
     [ObservableProperty]
     private ObservableCollection<OutputExpressionViewModel> _outputExpressions = new ObservableCollection<OutputExpressionViewModel>();
 
-    public event EventHandler<string>? InputExpressionChanged;
-    public event EventHandler<string>? OutputExpressionChanged;
+    public event EventHandler<string> InputExpressionChanged;
+    public event EventHandler<string> OutputExpressionChanged;
 
     partial void OnInputExpressionChanged(string value)
     {
       InputExpressionChanged?.Invoke(this, value);
     }
 
-    partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel>? oldValue, ObservableCollection<OutputExpressionViewModel> newValue)
+    partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel> oldValue, ObservableCollection<OutputExpressionViewModel> newValue)
     {
       if (oldValue != null)
       {
@@ -64,7 +64,7 @@ namespace ZoNo.ViewModels.Rules
       OnPropertyChanged(nameof(IsSyntaxValid));
     }
 
-    private void OutputExpressions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OutputExpressions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       foreach (OutputExpressionViewModel outputExpression in e.OldItems.OrEmpty())
       {
@@ -82,7 +82,7 @@ namespace ZoNo.ViewModels.Rules
       OnPropertyChanged(nameof(IsSyntaxValid));
     }
 
-    private void OutputExpression_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OutputExpression_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       switch (e.PropertyName)
       {

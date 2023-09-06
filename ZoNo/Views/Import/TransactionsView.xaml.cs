@@ -24,9 +24,9 @@ namespace ZoNo.Views.Import
 {
   public sealed partial class TransactionsView : UserControl
   {
-    private Dictionary<Transaction, DateTime> _loadTimes = new Dictionary<Transaction, DateTime>();
+    private Dictionary<Transaction, DateTimeOffset> _loadTimes = new Dictionary<Transaction, DateTimeOffset>();
     private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
-    private ScrollBar? _scrollBar;
+    private ScrollBar _scrollBar;
     private bool _isLoaded = false;
     private bool _isSorting = false;
     private bool _isPointerWheelScrolled = false;
@@ -34,6 +34,7 @@ namespace ZoNo.Views.Import
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
     public static readonly DependencyProperty LoadExcelDocumentsCommandProperty = DependencyProperty.Register(nameof(LoadExcelDocumentsCommand), typeof(ICommand), typeof(TransactionsView), null);
+    public static readonly DependencyProperty DeleteTransactionsCommandProperty = DependencyProperty.Register(nameof(DeleteTransactionsCommand), typeof(ICommand), typeof(TransactionsView), null);
     public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(Transaction), typeof(TransactionsView), new PropertyMetadata(null, OnSelectedItemChanged));
 
     public AdvancedCollectionView Transactions
@@ -52,6 +53,12 @@ namespace ZoNo.Views.Import
     {
       get => (ICommand)GetValue(LoadExcelDocumentsCommandProperty);
       set => SetValue(LoadExcelDocumentsCommandProperty, value);
+    }
+
+    public ICommand DeleteTransactionsCommand
+    {
+      get => (ICommand)GetValue(DeleteTransactionsCommandProperty);
+      set => SetValue(DeleteTransactionsCommandProperty, value);
     }
 
     public Transaction SelectedItem
@@ -90,7 +97,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private void Transactions_CollectionChanged_BeforeDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    private void Transactions_CollectionChanged_BeforeDataContextChanges(object sender, NotifyCollectionChangedEventArgs e)
     {
       foreach (Transaction transaction in e.OldItems.OrEmpty())
       {
@@ -126,11 +133,11 @@ namespace ZoNo.Views.Import
       }
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
-        _loadTimes[transaction] = DateTime.Now;
+        _loadTimes[transaction] = DateTimeOffset.Now;
       }
     }
 
-    private async void Transactions_CollectionChanged_AfterDataContextChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void Transactions_CollectionChanged_AfterDataContextChanges(object sender, NotifyCollectionChangedEventArgs e)
     {
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
@@ -188,9 +195,9 @@ namespace ZoNo.Views.Import
       _isPointerWheelScrolled = false;
     }
 
-    private void DataGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
+    private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
     {
-      var now = DateTime.Now;
+      var now = DateTimeOffset.Now;
       if (e.Row.DataContext is Transaction transaction &&
           _loadTimes.TryGetValue(transaction, out var loadTime) &&
           (now - loadTime).TotalMilliseconds < 100)
@@ -255,6 +262,7 @@ namespace ZoNo.Views.Import
 
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
+      Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
 
       Transactions.VectorChanged += (s, e) =>
@@ -361,27 +369,7 @@ namespace ZoNo.Views.Import
     {
       if (e.Key == VirtualKey.Delete)
       {
-        var selectedItems = DataGrid.SelectedItems.Cast<object>().ToList();
-        var deferRefresh = selectedItems.Count > 30 ? Transactions.DeferRefresh() : null;
-        try
-        {
-          foreach (var selectedItem in selectedItems)
-          {
-            try
-            {
-              Transactions.Source.Remove(selectedItem);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-              // When deleting last item, there is an exception
-              Transactions.Refresh();
-            }
-          }
-        }
-        finally
-        {
-          deferRefresh?.Dispose();
-        }
+        DeleteTransactionsCommand?.Execute(DataGrid.SelectedItems.Cast<Transaction>().ToList());
       }
     }
 
@@ -402,7 +390,7 @@ namespace ZoNo.Views.Import
       }
     }
 
-    private void DataGrid_IsEnabledChanged(object? sender, DependencyPropertyChangedEventArgs? e)
+    private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
       var opacity = DataGrid.Resources["DataGridTextOpacity"] as double?;
       if (opacity == null)
@@ -412,6 +400,22 @@ namespace ZoNo.Views.Import
       DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
 
       DataGrid.ReloadThemeResources();
+    }
+
+    private void MenuFlyoutItem_Delete_Click(object sender, RoutedEventArgs e)
+    {
+      if (sender is MenuFlyoutItem menuFlyoutItem &&
+          menuFlyoutItem.DataContext is Transaction transaction)
+      {
+        if (DataGrid.SelectedItems.Contains(transaction))
+        {
+          DeleteTransactionsCommand?.Execute(DataGrid.SelectedItems.Cast<Transaction>().ToList());
+        }
+        else
+        {
+          DeleteTransactionsCommand?.Execute(new List<Transaction>() { transaction });
+        }
+      }
     }
   }
 }

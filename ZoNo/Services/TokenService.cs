@@ -7,19 +7,19 @@ namespace ZoNo.Services
   {
     private const string SettingToken = "Protected_Token";
     private readonly ILocalSettingsService _localSettingsService;
-    private Token? _token = null;
+    private Token _token = null;
 
     public TokenService(ILocalSettingsService localSettingsService)
     {
       _localSettingsService = localSettingsService;
     }
 
-    public async Task<Token?> GetTokenAsync()
+    public async Task<Token> GetTokenAsync()
     {
       return _token ?? (_token = await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken));
     }
 
-    public async Task SetTokenAsync(Token? token)
+    public async Task SetTokenAsync(Token token)
     {
       _token = token;
       await Task.CompletedTask;

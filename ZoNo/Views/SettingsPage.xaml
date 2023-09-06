@@ -47,6 +47,7 @@
         <TextBlock Text="TODO: Replace with your app description." Margin="{StaticResource XSmallTopMargin}" Style="{ThemeResource BodyTextBlockStyle}"/>
         <HyperlinkButton Content="Privacy Statement" NavigateUri="https://YourPrivacyUrlGoesHere/" Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"/>
       </StackPanel>
+      <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
     </StackPanel>
   </Grid>
 </Page>

@@ -2,25 +2,25 @@ using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Splitwise.Models;
+using ZoNo.Models;
 
 namespace ZoNo.Views.Import
 {
   public sealed partial class ExpenseView : UserControl
   {
-    public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTime), typeof(ExpenseView), new PropertyMetadata(DateTime.MinValue));
+    public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTimeOffset), typeof(ExpenseView), new PropertyMetadata(DateTimeOffset.MinValue));
     public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register(nameof(Category), typeof(Category), typeof(ExpenseView), new PropertyMetadata(null));
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(ExpenseView), null);
     public static readonly DependencyProperty GroupProperty = DependencyProperty.Register(nameof(Group), typeof(string), typeof(ExpenseView), null);
     public static readonly DependencyProperty PaidProperty = DependencyProperty.Register(nameof(Paid), typeof(string), typeof(ExpenseView), null);
-    public static readonly DependencyProperty CurrencyProperty = DependencyProperty.Register(nameof(Currency), typeof(CurrencyCode), typeof(ExpenseView), new PropertyMetadata(CurrencyCode.HUF));
+    public static readonly DependencyProperty CurrencyProperty = DependencyProperty.Register(nameof(Currency), typeof(Currency), typeof(ExpenseView), new PropertyMetadata(Currency.HUF));
     public static readonly DependencyProperty CostProperty = DependencyProperty.Register(nameof(Cost), typeof(double), typeof(ExpenseView), null);
 
     public static readonly DependencyProperty CategoriesProperty = DependencyProperty.Register(nameof(Categories), typeof(Category[]), typeof(ExpenseView), new PropertyMetadata(null));
 
-    public DateTime Date
+    public DateTimeOffset Date
     {
-      get => (DateTime)GetValue(DateProperty);
+      get => (DateTimeOffset)GetValue(DateProperty);
       set => SetValue(DateProperty, value);
     }
 
@@ -48,9 +48,9 @@ namespace ZoNo.Views.Import
       set => SetValue(PaidProperty, value);
     }
 
-    public CurrencyCode Currency
+    public Currency Currency
     {
-      get => (CurrencyCode)GetValue(CurrencyProperty);
+      get => (Currency)GetValue(CurrencyProperty);
       set => SetValue(CurrencyProperty, value);
     }
 

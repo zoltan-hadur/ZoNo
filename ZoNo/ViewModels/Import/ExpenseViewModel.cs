@@ -1,105 +1,148 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Splitwise.Models;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Text.Json;
+using ZoNo.Helpers;
+using ZoNo.Models;
 
 namespace ZoNo.ViewModels.Import
 {
   public partial class ExpenseViewModel : ObservableObject
   {
-    public ObservableCollection<(User User, double Percentage)> With { get; } = new ObservableCollection<(User User, double Percentage)>();
+    public Guid Id { get; set; }
 
     [ObservableProperty]
-    public Category _category;
+    private ObservableCollection<ShareViewModel> _shares;
 
     [ObservableProperty]
-    public string _description;
+    private Category _category;
 
     [ObservableProperty]
-    public CurrencyCode _currencyCode;
+    private string _description;
 
     [ObservableProperty]
-    public double _cost;
+    private Currency _currency;
 
     [ObservableProperty]
-    public DateTime _date;
+    private double _cost;
 
     [ObservableProperty]
-    public Group _group;
+    private DateTimeOffset _date;
 
-    public ExpenseViewModel(Models.Expense expense)
+    [ObservableProperty]
+    private Group _group;
+
+    public bool ArePercentagesAddUp => Shares?.Sum(share => share.Percentage) == 100;
+
+    partial void OnSharesChanged(ObservableCollection<ShareViewModel> oldValue, ObservableCollection<ShareViewModel> newValue)
     {
-      foreach (var (user, percentage) in expense.With)
+      if (oldValue != null)
       {
-        With.Add((new User() { Email = user }, percentage));
-      }
-      Category = new Category()
-      {
-        Name = expense.Category!.MainCategory,
-        Subcategories = new Category[]
+        oldValue.CollectionChanged -= Shares_CollectionChanged;
+        foreach (var share in Shares)
         {
-          new Category()
-          {
-            Name = expense.Category.SubCategory
-          }
+          share.PropertyChanged -= Share_PropertyChanged;
         }
-      };
-      Description = expense.Description!;
-      CurrencyCode = expense.CurrencyCode!.Value;
-      Cost = expense.Cost!.Value;
-      Date = expense.Date!.Value;
-      Group = new Group()
+      }
+      if (newValue != null)
       {
-        Name = expense.Group
+        newValue.CollectionChanged += Shares_CollectionChanged;
+        foreach (var share in Shares)
+        {
+          share.PropertyChanged += Share_PropertyChanged;
+        }
+      }
+      OnPropertyChanged(nameof(ArePercentagesAddUp));
+    }
+
+    private void Shares_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+      switch (e.Action)
+      {
+        case NotifyCollectionChangedAction.Add:
+        case NotifyCollectionChangedAction.Remove:
+        case NotifyCollectionChangedAction.Replace:
+          foreach (ShareViewModel share in e.OldItems.OrEmpty())
+          {
+            share.PropertyChanged -= Share_PropertyChanged;
+          }
+          foreach (ShareViewModel share in e.NewItems.OrEmpty())
+          {
+            share.PropertyChanged += Share_PropertyChanged;
+          }
+          OnPropertyChanged(nameof(ArePercentagesAddUp));
+          break;
+      }
+    }
+
+    private void Share_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(ShareViewModel.Percentage))
+      {
+        OnPropertyChanged(nameof(ArePercentagesAddUp));
+      }
+    }
+
+    public static ExpenseViewModel FromModel(Expense model)
+    {
+      return new ExpenseViewModel()
+      {
+        Id = model.Id,
+        Shares = new ObservableCollection<ShareViewModel>(
+          model.With.Select(with => new ShareViewModel
+          {
+            User = new User()
+            {
+              Email = with.User
+            },
+            Percentage = with.Percentage
+          })),
+        Category = model.Category,
+        Description = model.Description,
+        Currency = model.Currency,
+        Cost = model.Cost,
+        Date = model.Date,
+        Group = new Group() { Name = model.Group }
       };
     }
 
-    public static Expense ToModel(ExpenseViewModel vm)
+    public ExpenseViewModel Clone()
     {
-      var users = vm.With.Select(x => new Share()
-      {
-        UserId = x.User.Id
-      }).ToArray();
-
-      for (int i = 0; i < users.Length; ++i)
-      {
-        if (i == 0)
-        {
-          users[i].PaidShare = vm.Cost.ToString("0.00");
-        }
-        else
-        {
-          users[i].PaidShare = "0";
-        }
-        if (i < users.Length - 1)
-        {
-          users[i].OwedShare = (vm.Cost * vm.With[i].Percentage / 100).ToString("0.00");
-        }
-        else
-        {
-          var total = Convert.ToDouble(vm.Cost.ToString("0.00"));
-          var sofar = users.SkipLast(1).Sum(user => Convert.ToDouble(user.OwedShare));
-          var rest = total - sofar;
-          users[i].OwedShare = rest.ToString("0.00");
-        }
-      }
-
-      return new Expense()
-      {
-        Cost = vm.Cost.ToString("0.00"),
-        Description = vm.Description,
-        Date = vm.Date,
-        CurrencyCode = vm.CurrencyCode,
-        CategoryId = vm.Category.Id,
-        GroupId = vm.Group.Id,
-        Users = users
-      };
+      return JsonSerializer.Deserialize<ExpenseViewModel>(JsonSerializer.Serialize(this));
     }
 
     [RelayCommand]
     private void SwitchCategory(Category category)
     {
       Category = category;
+    }
+
+    [RelayCommand]
+    private void AddUser(User user)
+    {
+      Shares.Add(new ShareViewModel()
+      {
+        User = new User()
+        {
+          Picture = user.Picture,
+          FirstName = user.FirstName,
+          LastName = user.LastName,
+          Email = user.Email
+        },
+        Percentage = 0
+      });
+    }
+
+    [RelayCommand]
+    private void DeleteShare(ShareViewModel share)
+    {
+      Shares.Remove(share);
+      if (Shares.Count == 1)
+      {
+        Shares[0].Percentage = 100;
+      }
     }
   }
 }

@@ -1,114 +1,210 @@
-﻿using Splitwise.Models;
-using System.Diagnostics;
-
-namespace ZoNo.Models
+﻿namespace ZoNo.Models
 {
   public class Expense
   {
-    public List<(string User, double Percentage)> With { get; } = new List<(string User, double Percentage)>();
-    public Category? Category { get; set; } = null;
-    public string? Description { get; set; } = null;
-    public CurrencyCode? CurrencyCode { get; set; } = null;
-    public double? Cost { get; set; } = null;
-    public DateTime? Date { get; set; } = null;
-    public string? Group { get; set; } = null;
+    public Guid Id { get; set; }
+    public List<(string User, double Percentage)> With { get; set; }
+    public Category Category { get; set; }
+    public string Description { get; set; }
+    public Currency Currency { get; set; }
+    public double Cost { get; set; }
+    public DateTimeOffset Date { get; set; }
+    public string Group { get; set; }
   }
 
-  [DebuggerDisplay("{MainCategory,nq}/{SubCategory,nq}")]
-  public abstract class Category
+  public class Category
   {
-    public string MainCategory { get; }
-    public string SubCategory { get; }
-
-    public Category(string mainCategory, string subCategory)
+    public string Picture { get; set; } = "invalid";
+    public string Name { get; set; }
+    public string ParentCategoryName { get; set; }
+    private Category[] _subCategories = Array.Empty<Category>();
+    public Category[] SubCategories
     {
-      MainCategory = mainCategory;
-      SubCategory = subCategory;
+      get
+      {
+        return _subCategories;
+      }
+      set
+      {
+        if (value != null)
+        {
+          _subCategories = value;
+          foreach (var category in _subCategories)
+          {
+            category.ParentCategoryName = Name;
+          }
+        }
+      }
     }
   }
 
-  public class Entertainment : Category
+  public static class Categories
   {
-    public static Category Games { get; } = new Entertainment("Games");
-    public static Category Movies { get; } = new Entertainment("Movies");
-    public static Category Music { get; } = new Entertainment("Music");
-    public static Category Other { get; } = new Entertainment("Other");
-    public static Category Sports { get; } = new Entertainment("Sports");
+    private static Category[] _categories = new Category[]
+    {
+      new Category()
+      {
+        Name = "Entertainment",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Games" },
+          new Category(){ Name = "Movies" },
+          new Category(){ Name = "Music" },
+          new Category(){ Name = "Other" },
+          new Category(){ Name = "Sports" }
+        }
+      },
+      new Category()
+      {
+        Name = "Food and drink",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Dining out" },
+          new Category(){ Name = "Groceries" },
+          new Category(){ Name = "Liquor" },
+          new Category(){ Name = "Other" }
+        }
+      },
+      new Category()
+      {
+        Name = "Home",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Electronics" },
+          new Category(){ Name = "Furniture" },
+          new Category(){ Name = "Household supplies" },
+          new Category(){ Name = "Maintenance" },
+          new Category(){ Name = "Mortgage" },
+          new Category(){ Name = "Other" },
+          new Category(){ Name = "Pets" },
+          new Category(){ Name = "Rent" },
+          new Category(){ Name = "Services" }
+        }
+      },
+      new Category()
+      {
+        Name = "Life",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Childcare" },
+          new Category(){ Name = "Clothing" },
+          new Category(){ Name = "Education" },
+          new Category(){ Name = "Gifts" },
+          new Category(){ Name = "Insurance" },
+          new Category(){ Name = "Medical expenses" },
+          new Category(){ Name = "Other" },
+          new Category(){ Name = "Taxes" }
+        }
+      },
+      new Category()
+      {
+        Name = "Transportation",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Bicycle" },
+          new Category(){ Name = "Bus/train" },
+          new Category(){ Name = "Car" },
+          new Category(){ Name = "Gas/fuel" },
+          new Category(){ Name = "Hotel" },
+          new Category(){ Name = "Other" },
+          new Category(){ Name = "Parking" },
+          new Category(){ Name = "Plane" },
+          new Category(){ Name = "Taxi" }
+        }
+      },
+      new Category()
+      {
+        Name = "Uncategorized",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "General" }
+        }
+      },
+      new Category()
+      {
+        Name = "Utilities",
+        SubCategories = new Category[]
+        {
+          new Category(){ Name = "Cleaning" },
+          new Category(){ Name = "Electricity" },
+          new Category(){ Name = "Heat/gas" },
+          new Category(){ Name = "Other" },
+          new Category(){ Name = "Trash" },
+          new Category(){ Name = "TV/Phone/Internet" },
+          new Category(){ Name = "Water" }
+        }
+      }
+    };
 
-    private Entertainment(string subCategory) : base("Entertainment", subCategory) { }
-  }
+    public static class Entertainment
+    {
+      public static Category Games => _categories[0].SubCategories[0];
+      public static Category Movies => _categories[0].SubCategories[1];
+      public static Category Music => _categories[0].SubCategories[2];
+      public static Category Other => _categories[0].SubCategories[3];
+      public static Category Sports => _categories[0].SubCategories[4];
+    }
 
-  public class FoodAndDrink : Category
-  {
-    public static Category DiningOut { get; } = new FoodAndDrink("Dining out");
-    public static Category Groceries { get; } = new FoodAndDrink("Groceries");
-    public static Category Liquor { get; } = new FoodAndDrink("Liquor");
-    public static Category Other { get; } = new FoodAndDrink("Other");
+    public class FoodAndDrink : Category
+    {
+      public static Category DiningOut => _categories[1].SubCategories[0];
+      public static Category Groceries => _categories[1].SubCategories[1];
+      public static Category Liquor => _categories[1].SubCategories[2];
+      public static Category Other => _categories[1].SubCategories[3];
+    }
 
-    private FoodAndDrink(string subCategory) : base("Food and drink", subCategory) { }
-  }
+    public class Home : Category
+    {
+      public static Category Electronics => _categories[2].SubCategories[0];
+      public static Category Furniture => _categories[2].SubCategories[1];
+      public static Category HouseholdSupplies => _categories[2].SubCategories[2];
+      public static Category Maintenance => _categories[2].SubCategories[3];
+      public static Category Mortgage => _categories[2].SubCategories[4];
+      public static Category Other => _categories[2].SubCategories[5];
+      public static Category Pets => _categories[2].SubCategories[6];
+      public static Category Rent => _categories[2].SubCategories[7];
+      public static Category Services => _categories[2].SubCategories[7];
+    }
 
-  public class Home : Category
-  {
-    public static Category Electronics { get; } = new Home("Electronics");
-    public static Category Furniture { get; } = new Home("Furniture");
-    public static Category HouseholdSupplies { get; } = new Home("Household supplies");
-    public static Category Maintenance { get; } = new Home("Maintenance");
-    public static Category Mortgage { get; } = new Home("Mortgage");
-    public static Category Other { get; } = new Home("Other");
-    public static Category Pets { get; } = new Home("Pets");
-    public static Category Rent { get; } = new Home("Rent");
-    public static Category Services { get; } = new Home("Services");
+    public class Life : Category
+    {
+      public static Category Childcare => _categories[3].SubCategories[0];
+      public static Category Clothing => _categories[3].SubCategories[1];
+      public static Category Education => _categories[3].SubCategories[2];
+      public static Category Gifts => _categories[3].SubCategories[3];
+      public static Category Insurance => _categories[3].SubCategories[4];
+      public static Category MedicalExpenses => _categories[3].SubCategories[5];
+      public static Category Other => _categories[3].SubCategories[6];
+      public static Category Taxes => _categories[3].SubCategories[7];
+    }
 
-    private Home(string subCategory) : base("Home", subCategory) { }
-  }
+    public class Transportation : Category
+    {
+      public static Category Bicycle => _categories[4].SubCategories[0];
+      public static Category BusTrain => _categories[4].SubCategories[1];
+      public static Category Car => _categories[4].SubCategories[2];
+      public static Category GasFuels => _categories[4].SubCategories[3];
+      public static Category Hotel => _categories[4].SubCategories[4];
+      public static Category Other => _categories[4].SubCategories[5];
+      public static Category Parking => _categories[4].SubCategories[6];
+      public static Category Plane => _categories[4].SubCategories[7];
+      public static Category Taxi => _categories[4].SubCategories[8];
+    }
 
-  public class Life : Category
-  {
-    public static Category Childcare { get; } = new Life("Childcare");
-    public static Category Clothing { get; } = new Life("Clothing");
-    public static Category Education { get; } = new Life("Education");
-    public static Category Gifts { get; } = new Life("Gifts");
-    public static Category Insurance { get; } = new Life("Insurance");
-    public static Category MedicalExpenses { get; } = new Life("Medical expenses");
-    public static Category Other { get; } = new Life("Other");
-    public static Category Taxes { get; } = new Life("Taxes");
+    public class Uncategorized : Category
+    {
+      public static Category General => _categories[5].SubCategories[0];
+    }
 
-    private Life(string subCategory) : base("Life", subCategory) { }
-  }
-
-  public class Transportation : Category
-  {
-    public static Category Bicycle { get; } = new Transportation("Bicycle");
-    public static Category BusTrain { get; } = new Transportation("Bus/train");
-    public static Category Car { get; } = new Transportation("Car");
-    public static Category GasFuels { get; } = new Transportation("Gas/fuel");
-    public static Category Hotel { get; } = new Transportation("Hotel");
-    public static Category Other { get; } = new Transportation("Other");
-    public static Category Parking { get; } = new Transportation("Parking");
-    public static Category Plane { get; } = new Transportation("Plane");
-    public static Category Taxi { get; } = new Transportation("Taxi");
-
-    private Transportation(string subCategory) : base("Transportation", subCategory) { }
-  }
-
-  public class Uncategorized : Category
-  {
-    public static Category General { get; } = new Uncategorized("General");
-
-    private Uncategorized(string subCategory) : base("Uncategorized", subCategory) { }
-  }
-
-  public class Utilities : Category
-  {
-    public static Category Cleaning { get; } = new Utilities("Cleaning");
-    public static Category Electricity { get; } = new Utilities("Electricity");
-    public static Category HeatGas { get; } = new Utilities("Heat/gas");
-    public static Category Other { get; } = new Utilities("Other");
-    public static Category Trash { get; } = new Utilities("Trash");
-    public static Category TVPhoneInternet { get; } = new Utilities("TV/Phone/Internet");
-    public static Category Water { get; } = new Utilities("Water");
-
-    private Utilities(string subCategory) : base("Utilities", subCategory) { }
+    public class Utilities : Category
+    {
+      public static Category Cleaning => _categories[6].SubCategories[0];
+      public static Category Electricity => _categories[6].SubCategories[1];
+      public static Category HeatGas => _categories[6].SubCategories[2];
+      public static Category Other => _categories[6].SubCategories[3];
+      public static Category Trash => _categories[6].SubCategories[4];
+      public static Category TVPhoneInternet => _categories[6].SubCategories[5];
+      public static Category Water => _categories[6].SubCategories[6];
+    }
   }
 }

@@ -10,9 +10,9 @@ namespace ZoNo.Controls
 {
   public class ValidationTextBox : TextBox
   {
-    private object? _defaultTextControlBorderBrushDisabled = null;
-    private object? _defaultTextControlBorderBrushPointerOver = null;
-    private object? _defaultTextControlBorderBrushFocused = null;
+    private object _defaultTextControlBorderBrushDisabled = null;
+    private object _defaultTextControlBorderBrushPointerOver = null;
+    private object _defaultTextControlBorderBrushFocused = null;
 
     public static readonly DependencyProperty IsValidProperty = DependencyProperty.Register(nameof(IsValid), typeof(bool), typeof(ValidationTextBox), new PropertyMetadata(false, OnIsValidChanged));
     public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register(nameof(ErrorMessage), typeof(string), typeof(ValidationTextBox), new PropertyMetadata(string.Empty, OnErrorMessageChanged));

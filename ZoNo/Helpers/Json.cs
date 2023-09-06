@@ -4,7 +4,7 @@ namespace ZoNo.Helpers
 {
   public static class Json
   {
-    public static async Task<T?> ToObjectAsync<T>(string value)
+    public static async Task<T> ToObjectAsync<T>(string value)
     {
       return await Task.Run(() =>
       {

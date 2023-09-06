@@ -9,8 +9,8 @@ namespace ZoNo.Behaviors
 {
   public class NavigationViewHeaderBehavior : Behavior<NavigationView>
   {
-    private static NavigationViewHeaderBehavior? _current;
-    private Page? _currentPage;
+    private static NavigationViewHeaderBehavior _current;
+    private Page _currentPage;
     private readonly INavigationService _navigationService = App.GetService<INavigationService>();
 
     public static readonly DependencyProperty DefaultHeaderProperty =
@@ -22,7 +22,7 @@ namespace ZoNo.Behaviors
     public static readonly DependencyProperty HeaderTemplateProperty =
         DependencyProperty.RegisterAttached("HeaderTemplate", typeof(DataTemplate), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current!.UpdateHeaderTemplate()));
 
-    public DataTemplate? DefaultHeaderTemplate { get; set; }
+    public DataTemplate DefaultHeaderTemplate { get; set; }
 
     public object DefaultHeader
     {

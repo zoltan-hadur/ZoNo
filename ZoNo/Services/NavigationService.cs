@@ -12,12 +12,12 @@ namespace ZoNo.Services
   public class NavigationService : INavigationService, ITopLevelNavigationService
   {
     private readonly IPageService _pageService;
-    private object? _lastParameterUsed;
-    private Frame? _frame;
+    private object _lastParameterUsed;
+    private Frame _frame;
 
-    public event NavigatedEventHandler? Navigated;
+    public event NavigatedEventHandler Navigated;
 
-    public Frame? Frame
+    public Frame Frame
     {
       get
       {
@@ -53,7 +53,7 @@ namespace ZoNo.Services
       }
     }
 
-    public bool NavigateTo(string pageKey, object? parameter = null, NavigationTransitionInfo? infoOverride = null)
+    public bool NavigateTo(string pageKey, object parameter = null, NavigationTransitionInfo infoOverride = null)
     {
       var pageType = _pageService.GetPageType(pageKey);
 
