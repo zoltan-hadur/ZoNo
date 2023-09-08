@@ -44,6 +44,13 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.1.0 / 2023-09-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Support auto update."/>
+        <TextBlock Text="Rework release notes."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.0.0 / 2023-09-06" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Add Delete context menu to transactions."/>
