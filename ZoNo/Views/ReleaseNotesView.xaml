@@ -7,56 +7,99 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
   <ScrollViewer>
+    <ScrollViewer.Resources>
+      <Style TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+      </Style>
+      <Style TargetType="ListView">
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="ItemContainerTransitions">
+          <Setter.Value>
+            <TransitionCollection/>
+          </Setter.Value>
+        </Setter>
+        <Setter Property="ItemContainerStyle">
+          <Setter.Value>
+            <Style TargetType="ListViewItem">
+              <Setter Property="MinHeight" Value="0"/>
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListViewItem">
+                    <Grid ColumnSpacing="6" Padding="6,0,0,0">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Grid.Column="0" Text="•"/>
+                      <ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}"/>
+                    </Grid>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ScrollViewer.Resources>
     <StackPanel Spacing="12">
-      <StackPanel>
-        <TextBlock Text="1.2.0.0" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="• Add Delete context menu to transactions."/>
-        <TextBlock Text="• Change Categories so e.g. Uncategorized.Other becomes Categories.Uncategorized.Other (breaking change, rules must be adapted)."/>
-        <TextBlock Text="• Use corner radious of 3 for expense category images."/>
-        <TextBlock Text="• Add Edit and Delete context menu to expenses."/>
-        <TextBlock Text="• Animate opacity of expense category images."/>
-        <TextBlock Text="• Extend tooltip of category buttons to include parent category's name."/>
-        <TextBlock Text="• Allow text selection of groups and users on account page but nowhere else."/>
-        <TextBlock Text="• Rearrange layout for who paid and how much for the expense."/>
-        <TextBlock Text="• Add thousands separator to cost of expense."/>
-        <TextBlock Text="• Automatic width for users name email etc in account page and expense editor."/>
-        <TextBlock Text="• Secondary sort of transactions by transaction time."/>
-        <TextBlock Text="• Add release notes to settings page."/>
-      </StackPanel>
-      <StackPanel>
-        <TextBlock Text="1.1.1.0" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="• Expense month and day aligned are center aligned."/>
-        <TextBlock Text="• Fix expense categories flyout initial size when images are still loading."/>
-        <TextBlock Text="• Disable spellcheck for e-mail on login screen."/>
-        <TextBlock Text="• Fix expense date and payment info misalignment."/>
-        <TextBlock Text="• Fix slow navigation to import page."/>
-        <TextBlock Text="• Delay removed when adding/removing transactions/expenses."/>
-        <TextBlock Text="• Fix some unnecessary refresh of the transactions and expenses during sorting."/>
-        <TextBlock Text="• Remove animation of expenses list when refreshing."/>
-        <TextBlock Text="• Defer refresh of transactions and expenses when more than 30 are added/removed."/>
-        <TextBlock Text="• Fix that theme of transactions data grid and rule editor text boxes were not reloading properly."/>
-        <TextBlock Text="• Fix animation of already loaded transactions data grid rows when navigating back to import page. "/>
-        <TextBlock Text="• Add text indicating transactions and expenses count to the bottom of the import page."/>
-        <TextBlock Text="• Animate transactions data grid only when scrolling via mouse wheel."/>
-      </StackPanel>
-      <StackPanel>
-        <TextBlock Text="1.1.0.0" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="• Support for EUR and CAD currencies when importing Excel document."/>
-        <TextBlock Text="• Handle when AccountingDate column is empty in imported Excel document."/>
-        <TextBlock Text="• Fix &quot;The size of the state manager setting value has exceeded the limit&quot; exception (breaking change, rules export then reimport is required)."/>
-        <TextBlock Text="• Handle Excel document import when there are no rules:"/>
-        <TextBlock Text="    • Category is Uncategorized.General by default."/>
-        <TextBlock Text="    • Description is transaction's PartnerName by default."/>
-        <TextBlock Text="    • CurrencyCode is transaction's Currency by default."/>
-        <TextBlock Text="    • Group is &quot;Non-group expenses&quot; by default."/>
-        <TextBlock Text="    • Cost is minus one times transaction's Amount by default."/>
-        <TextBlock Text="    • Date is transaction's TransactionTime by default."/>
-        <TextBlock Text="    • Paid by the currently logged in user when group is &quot;Non-group expenses&quot;."/>
-      </StackPanel>
-      <StackPanel>
-        <TextBlock Text="1.0.0.0" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="• Initial release."/>
-      </StackPanel>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.2.0.0 / 2023-09-06" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Add Delete context menu to transactions."/>
+        <TextBlock Text="Change Categories so e.g. Uncategorized.Other becomes Categories.Uncategorized.Other (breaking change, rules must be adapted)."/>
+        <TextBlock Text="Rounded corners for expense category images."/>
+        <TextBlock Text="Add Edit and Delete context menu to expenses."/>
+        <TextBlock Text="Animate opacity of expense category images."/>
+        <TextBlock Text="Extend tooltip of category buttons to include parent category's name."/>
+        <TextBlock Text="Allow text selection of groups and users on account page but nowhere else."/>
+        <TextBlock Text="Rearrange layout for who paid and how much for the expense."/>
+        <TextBlock Text="Add thousands separator to cost of expense."/>
+        <TextBlock Text="Automatic width for users name, email, etc in account page and expense editor."/>
+        <TextBlock Text="Secondary sort of transactions by transaction time."/>
+        <TextBlock Text="Add release notes to settings page."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.1.1.0 / 2023-08-24" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Expense month and day aligned are center aligned."/>
+        <TextBlock Text="Fix expense categories flyout initial size when images are still loading."/>
+        <TextBlock Text="Disable spellcheck for e-mail on login screen."/>
+        <TextBlock Text="Fix expense date and payment info misalignment."/>
+        <TextBlock Text="Fix slow navigation to import page."/>
+        <TextBlock Text="Delay removed when adding/removing transactions/expenses."/>
+        <TextBlock Text="Fix some unnecessary refresh of the transactions and expenses during sorting."/>
+        <TextBlock Text="Remove animation of expenses list when refreshing."/>
+        <TextBlock Text="Defer refresh of transactions and expenses when more than 30 are added/removed."/>
+        <TextBlock Text="Fix that theme of transactions data grid and rule editor text boxes were not reloading properly."/>
+        <TextBlock Text="Fix animation of already loaded transactions data grid rows when navigating back to import page. "/>
+        <TextBlock Text="Add text indicating transactions and expenses count to the bottom of the import page."/>
+        <TextBlock Text="Animate transactions data grid only when scrolling via mouse wheel."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.1.0.0 / 2023-08-18" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Support for EUR and CAD currencies when importing Excel document."/>
+        <TextBlock Text="Handle when AccountingDate column is empty in imported Excel document."/>
+        <TextBlock Text="Fix &quot;The size of the state manager setting value has exceeded the limit&quot; exception (breaking change, rules export then reimport is required)."/>
+        <ListView Header="Handle Excel document import when there are no rules:">
+          <TextBlock Text="Category is Uncategorized.General by default."/>
+          <TextBlock Text="Description is transaction's PartnerName by default."/>
+          <TextBlock Text="CurrencyCode is transaction's Currency by default."/>
+          <TextBlock Text="Group is &quot;Non-group expenses&quot; by default."/>
+          <TextBlock Text="Cost is minus one times transaction's Amount by default."/>
+          <TextBlock Text="Date is transaction's TransactionTime by default."/>
+          <TextBlock Text="Paid by the currently logged in user when group is &quot;Non-group expenses&quot;."/>
+        </ListView>
+      </ListView>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.0.0.0 / 2023-08-15" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Initial release."/>
+      </ListView>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
