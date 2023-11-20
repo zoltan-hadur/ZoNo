@@ -44,6 +44,15 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.2.0 / 2023-11-20" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Fix login issue."/>
+        <TextBlock Text="Fix that sometimes the expense category selectory is empty."/>
+        <TextBlock Text="Increase login screen width."/>
+        <TextBlock Text="Increase space between login button and remember me checkbox."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.1.0 / 2023-09-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Support auto update."/>
