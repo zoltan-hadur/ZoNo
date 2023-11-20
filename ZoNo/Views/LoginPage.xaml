@@ -15,10 +15,10 @@
     <InfoBar Grid.Row="0" Title="Wrong Credentials" Message="Incorrect e-mail or password!" HorizontalAlignment="Center" VerticalAlignment="Bottom"
              Width="350" Severity="Error" IsOpen="{x:Bind ViewModel.IsWrongCredentials, Mode=OneWay}" Margin="0,0,0,15"/>
     <controls:LoaderContentControl Grid.Row="1" IsLoading="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}" HorizontalAlignment="Center">
-      <StackPanel Width="200">
+      <StackPanel Width="230">
         <TextBox Name="Email" Header="E-mail" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Text="{x:Bind ViewModel.Email, Mode=TwoWay}" IsSpellCheckEnabled="False"/>
         <PasswordBox Header="Password" Margin="0,0,0,15" KeyDown="TextBox_KeyDown" Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
-        <CheckBox Content="Remember me!" IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
+        <CheckBox Content="Remember me!" Margin="0,0,0,6" IsChecked="{x:Bind ViewModel.IsRememberMe, Mode=TwoWay}"/>
         <Button Name="Login" Content="Login" HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.LoginCommand}"/>
       </StackPanel>
     </controls:LoaderContentControl>
