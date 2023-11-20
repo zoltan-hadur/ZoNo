@@ -41,20 +41,20 @@
             <ItemsRepeater.ItemTemplate>
               <DataTemplate x:DataType="models:Category">
                 <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="{x:Bind sys:String.Format('{0}:', Name), Mode=OneTime}" Width="110" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  <ItemsRepeater ItemsSource="{x:Bind SubCategories, Mode=OneTime}" UseLayoutRounding="True">
+                  <TextBlock Text="{x:Bind sys:String.Format('{0}:', Name), Mode=OneWay}" Width="110" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <ItemsRepeater ItemsSource="{x:Bind SubCategories, Mode=OneWay}" UseLayoutRounding="True">
                     <ItemsRepeater.Layout>
                       <StackLayout Orientation="Horizontal" Spacing="6"/>
                     </ItemsRepeater.Layout>
                     <ItemsRepeater.ItemTemplate>
                       <DataTemplate x:DataType="models:Category">
                         <Button Padding="3"
-                                ToolTipService.ToolTip="{x:Bind Name, Mode=OneTime}"
+                                ToolTipService.ToolTip="{x:Bind Name, Mode=OneWay}"
                                 Click="SubCategoryButton_Click"
-                                Command="{Binding SwitchCategoryCommand, Mode=OneTime}"
-                                CommandParameter="{x:Bind (models:Category), Mode=OneTime}">
+                                Command="{Binding SwitchCategoryCommand, Mode=OneWay}"
+                                CommandParameter="{x:Bind (models:Category), Mode=OneWay}">
                           <Border CornerRadius="3">
-                            <Image Width="36" Height="36" Source="{x:Bind Picture}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
+                            <Image Width="36" Height="36" Source="{x:Bind Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
                               <Image.OpacityTransition>
                                 <ScalarTransition Duration="0:0:0.2"/>
                               </Image.OpacityTransition>
