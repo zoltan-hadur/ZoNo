@@ -165,18 +165,19 @@ namespace ZoNo.ViewModels
               await sender.ExecuteScriptAsync($"document.querySelector('#credentials_identity').value = '{Email}'");
               await sender.ExecuteScriptAsync($"document.querySelector('#credentials_password').value = '{Password}'");
 
-              var isCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync("document.querySelector('body>main iframe[title=\\'reCAPTCHA\\']') != null"));
+              var captchaPath = "body>main iframe[title=\\'reCAPTCHA\\']";
+              var isCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync($"document.querySelector('{captchaPath}') != null"));
               if (isCaptchaExists)
               {
                 // Hide scrollbars and display only the captcha
                 await sender.ExecuteScriptAsync("document.querySelector('body').style.overflow='hidden'");
-                await sender.ExecuteScriptAsync("document.querySelector('body>main iframe[title=\\'reCAPTCHA\\']').scrollIntoView()");
+                await sender.ExecuteScriptAsync($"document.querySelector('{captchaPath}').scrollIntoView()");
 
                 // Some additional styling when needed
                 if (Theme == ApplicationTheme.Dark)
                 {
                   await sender.ExecuteScriptAsync("document.body.style.backgroundColor = 'black'");
-                  await sender.ExecuteScriptAsync("document.querySelector('body>main iframe[title=\\'reCAPTCHA\\']').parentElement.parentElement.parentElement.parentElement.parentElement.style.backgroundColor = 'black'");
+                  await sender.ExecuteScriptAsync($"document.querySelector('{captchaPath}').parentElement.parentElement.parentElement.parentElement.parentElement.style.backgroundColor = 'black'");
                 }
 
                 // Make captcha visible
@@ -202,7 +203,8 @@ namespace ZoNo.ViewModels
                     solved = color == Color.FromArgb(255, 0, 158, 85);
                   }
 
-                  var isHarderCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync("document.querySelector('body>div[style*=\\'visibility: visible\\'] iframe[title=\\'recaptcha challenge expires in two minutes\\']') != null"));
+                  var harderCaptchaPath = "body>div[style*=\\'visibility: visible\\'] iframe[title=\\'recaptcha challenge expires in two minutes\\']";
+                  var isHarderCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}') != null"));
                   if (isHarderCaptchaExists)
                   {
                     var originalWidth = sender.Width;
@@ -218,14 +220,19 @@ namespace ZoNo.ViewModels
                     sender.SetValue(Grid.RowSpanProperty, 3);
                     sender.VerticalAlignment = VerticalAlignment.Center;
 
+                    // Hide scrollbars
+                    await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}').parentNode.style.overflow = 'hidden'");
+
                     // Display only the captcha
-                    await sender.ExecuteScriptAsync("document.querySelector('body>div[style*=\\'visibility: visible\\'] iframe[title=\\'recaptcha challenge expires in two minutes\\']').scrollIntoView()");
+                    await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}').parentNode.style.width = '300px'");
+                    await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}').parentNode.style.height = '480px'");
+                    await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}').scrollIntoView()");
                     await sender.ExecuteScriptAsync("window.scrollBy(1, 0)");
 
                     // Captcha is solved when it disappears
                     while (isHarderCaptchaExists)
                     {
-                      isHarderCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync("document.querySelector('body>div[style*=\\'visibility: visible\\'] iframe[title=\\'recaptcha challenge expires in two minutes\\']') != null"));
+                      isHarderCaptchaExists = Convert.ToBoolean(await sender.ExecuteScriptAsync($"document.querySelector('{harderCaptchaPath}') != null"));
                       await Task.Delay(10);
                     }
                     solved = true;
