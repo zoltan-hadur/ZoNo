@@ -8,12 +8,6 @@ using System.Threading.Tasks;
 
 namespace ZoNo.Models
 {
-  public enum RuleType
-  {
-    Import,
-    Splitwise
-  }
-
   public class Rule
   {
     public Guid Id { get; init; } = Guid.NewGuid();

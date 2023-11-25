@@ -2,20 +2,6 @@
 
 namespace ZoNo.Models
 {
-  public enum IncomeOutcome
-  {
-    Income,
-    Outcome
-  }
-
-  public enum Currency
-  {
-    HUF,
-    EUR,
-    CAD,
-    USD
-  }
-
   public class Transaction
   {
     public Guid Id { get; set; }
