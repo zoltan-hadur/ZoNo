@@ -12,11 +12,4 @@ namespace Splitwise.Models
     public int? GroupId { get; set; }
     public Share[] Users { get; set; }
   }
-
-  public class Share
-  {
-    public int UserId { get; set; }
-    public string PaidShare { get; set; }
-    public string OwedShare { get; set; }
-  }
 }

@@ -5,9 +5,4 @@
     public string AccessToken { get; set; }
     public TokenType TokenType { get; set; }
   };
-
-  public enum TokenType
-  {
-    Bearer
-  }
 }
