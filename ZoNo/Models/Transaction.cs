@@ -12,7 +12,8 @@ namespace ZoNo.Models
   {
     HUF,
     EUR,
-    CAD
+    CAD,
+    USD
   }
 
   public class Transaction
