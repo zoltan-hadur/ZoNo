@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using ZoNo.Contracts.Services;
-using ZoNo.Helpers;
 
 namespace ZoNo.Services
 {

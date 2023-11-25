@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using Windows.Globalization.NumberFormatting;
-using ZoNo.Models;
-using static System.Net.Mime.MediaTypeNames;
+﻿using Windows.Globalization.NumberFormatting;
 
 namespace ZoNo.Converters
 {

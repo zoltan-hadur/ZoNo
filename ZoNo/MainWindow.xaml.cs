@@ -1,6 +1,4 @@
-﻿using ZoNo.Helpers;
-
-namespace ZoNo
+﻿namespace ZoNo
 {
   public sealed partial class MainWindow : WindowEx
   {

@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using ZoNo.Models;
 using ZoNo.ViewModels;
 
 namespace ZoNo.Views

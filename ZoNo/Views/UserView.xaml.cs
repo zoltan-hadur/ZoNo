@@ -1,7 +1,6 @@
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using ZoNo.Views;
 
 namespace ZoNo.Views
 {
