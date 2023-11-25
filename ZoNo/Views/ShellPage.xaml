@@ -17,8 +17,8 @@
                     ExpandedModeThresholdWidth="1280"
                     Header="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}">
       <NavigationView.MenuItems>
-        <NavigationViewItem Content="Import" Icon="Import" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Import.ImportPageViewModel"/>
-        <NavigationViewItem Content="Rules" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.Rules.RulesPageViewModel">
+        <NavigationViewItem Content="Import" Icon="Import" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.ImportPageViewModel"/>
+        <NavigationViewItem Content="Rules" helpers:NavigationHelper.NavigateTo="ZoNo.ViewModels.RulesPageViewModel">
           <NavigationViewItem.Icon>
             <!-- Handwriting -->
             <FontIcon Glyph="&#xe929;"/>

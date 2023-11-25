@@ -1,4 +1,4 @@
-﻿using ZoNo.ViewModels.Import;
+﻿using ZoNo.ViewModels;
 
 namespace ZoNo.Models
 {

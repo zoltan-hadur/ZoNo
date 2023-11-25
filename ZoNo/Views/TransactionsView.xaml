@@ -1,0 +1,268 @@
+<UserControl x:Class="ZoNo.Views.TransactionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+             xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
+             xmlns:models="using:ZoNo.Models"
+             mc:Ignorable="d"
+             Loaded="UserControl_Loaded">
+  <Grid Background="Transparent" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
+    <Border x:Name="DropHereBorder">
+      <TextBlock x:Name="DropHereText" Text="Drop Excel document here" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <interactivity:Interaction.Behaviors>
+        <core:DataTriggerBehavior Binding="{x:Bind DataGrid.IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="True">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Opacity" Value="1"/>
+        </core:DataTriggerBehavior>
+        <core:DataTriggerBehavior Binding="{x:Bind DataGrid.IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="False">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Opacity" Value="0.3" />
+        </core:DataTriggerBehavior>
+      </interactivity:Interaction.Behaviors>
+      </TextBlock>
+      <animations:Implicit.ShowAnimations>
+        <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1"/>
+      </animations:Implicit.ShowAnimations>
+      <animations:Implicit.HideAnimations>
+        <animations:OpacityAnimation Duration="0:0:0.3" From="1" To="0"/>
+      </animations:Implicit.HideAnimations>
+      <interactivity:Interaction.Behaviors>
+        <core:DataTriggerBehavior Binding="{x:Bind Transactions.Count, Mode=OneWay}" ComparisonCondition="Equal" Value="0">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereBorder}" PropertyName="Visibility" Value="Visible"/>
+        </core:DataTriggerBehavior>
+        <core:DataTriggerBehavior Binding="{x:Bind Transactions.Count, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="0">
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereBorder}" PropertyName="Visibility" Value="Collapsed" />
+        </core:DataTriggerBehavior>
+      </interactivity:Interaction.Behaviors>
+    </Border>
+    <controls:DataGrid x:Name="DataGrid"
+                       ItemsSource="{x:Bind Transactions, Mode=OneWay}"
+                       SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+                       GridLinesVisibility="All"
+                       AutoGenerateColumns="False"
+                       Sorting="DataGrid_Sorting"
+                       KeyDown="DataGrid_KeyDown"
+                       IsEnabledChanged="DataGrid_IsEnabledChanged">
+      <controls:DataGrid.Resources>
+        <ResourceDictionary>
+          <x:Double x:Key="DataGridTextOpacity">1</x:Double>
+          <!-- So that it kinda looks like the default DataGridTextColumn -->
+          <Style TargetType="TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="Padding" Value="12,0,12,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Opacity" Value="{ThemeResource DataGridTextOpacity}"/>
+          </Style>
+          <ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary x:Key="Light">
+              <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+              <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+              <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="Dark">
+              <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+              <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+              <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+            </ResourceDictionary>
+          </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+      </controls:DataGrid.Resources>
+      <controls:DataGrid.RowStyle>
+        <Style TargetType="controls:DataGridRow">
+          <Setter Property="ContextFlyout">
+            <Setter.Value>
+              <MenuFlyout>
+                <MenuFlyoutItem Text="Delete" Icon="Delete" Click="MenuFlyoutItem_Delete_Click"/>
+              </MenuFlyout>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </controls:DataGrid.RowStyle>
+      <controls:DataGrid.ColumnHeaderStyle>
+        <Style TargetType="controlsprimitives:DataGridColumnHeader">
+          <Setter Property="FontSize" Value="16"/>
+          <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
+          <Setter Property="Padding" Value="12,0,-20,0"/>
+          <!-- To have tooltip when column width is so small, the text is trimming -->
+          <Setter Property="ContentTemplate">
+            <Setter.Value>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" ToolTipService.ToolTip="{Binding}" TextTrimming="CharacterEllipsis" Opacity="{ThemeResource DataGridTextOpacity}"/>
+              </DataTemplate>
+            </Setter.Value>
+          </Setter>
+          <Setter Property="ContextFlyout">
+            <Setter.Value>
+              <MenuFlyout>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['TransactionTime'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['TransactionTime'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['AccountingDate'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['AccountingDate'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['Type'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['Type'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['Type'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['IncomeOutcome'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['IncomeOutcome'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['PartnerName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['PartnerName'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['PartnerAccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['PartnerAccountId'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['SpendingCategory'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['SpendingCategory'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['Description'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['Description'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['Description'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['AccountName'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['AccountName'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['AccountName'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['AccountId'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['AccountId'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['AccountId'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['Amount'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['Amount'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['Amount'].IsEnabled, Mode=OneWay}"/>
+                <ToggleMenuFlyoutItem Text="{x:Bind Columns['Currency'].ColumnHeader, Mode=OneWay}"
+                                      IsChecked="{x:Bind Columns['Currency'].IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{x:Bind Columns['Currency'].IsEnabled, Mode=OneWay}"/>
+              </MenuFlyout>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </controls:DataGrid.ColumnHeaderStyle>
+      <controls:DataGrid.Columns>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['TransactionTime'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['TransactionTime'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind TransactionTime}" ToolTipService.ToolTip="{x:Bind TransactionTime}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['AccountingDate'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['AccountingDate'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind AccountingDate}" ToolTipService.ToolTip="{x:Bind AccountingDate}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['Type'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['Type'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['Type'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind Type}" ToolTipService.ToolTip="{x:Bind Type}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['IncomeOutcome'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['IncomeOutcome'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind IncomeOutcome}" ToolTipService.ToolTip="{x:Bind IncomeOutcome}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['PartnerName'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['PartnerName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind PartnerName}" ToolTipService.ToolTip="{x:Bind PartnerName}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['PartnerAccountId'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['PartnerAccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind PartnerAccountId}" ToolTipService.ToolTip="{x:Bind PartnerAccountId}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['SpendingCategory'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['SpendingCategory'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind SpendingCategory}" ToolTipService.ToolTip="{x:Bind SpendingCategory}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['Description'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['Description'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['Description'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind Description}" ToolTipService.ToolTip="{x:Bind Description}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['AccountName'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['AccountName'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['AccountName'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind AccountName}" ToolTipService.ToolTip="{x:Bind AccountName}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['AccountId'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['AccountId'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['AccountId'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind AccountId}" ToolTipService.ToolTip="{x:Bind AccountId}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['Amount'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['Amount'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['Amount'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock HorizontalAlignment="Right"
+                         Text="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"
+                         ToolTipService.ToolTip="{x:Bind Amount, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+        <controls:DataGridTemplateColumn Tag="{x:Bind Columns['Currency'].ColumnHeader, Mode=OneWay}"
+                                         Header="{x:Bind Columns['Currency'].ColumnHeader, Mode=OneWay}"
+                                         Visibility="{x:Bind Columns['Currency'].IsVisible, Mode=OneWay, FallbackValue=Collapsed}"
+                                         IsReadOnly="True">
+          <controls:DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Transaction">
+              <TextBlock Text="{x:Bind Currency}" ToolTipService.ToolTip="{x:Bind Currency}"/>
+            </DataTemplate>
+          </controls:DataGridTemplateColumn.CellTemplate>
+        </controls:DataGridTemplateColumn>
+      </controls:DataGrid.Columns>
+    </controls:DataGrid>
+  </Grid>
+</UserControl>

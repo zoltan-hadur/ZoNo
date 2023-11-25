@@ -11,12 +11,7 @@ using ZoNo.Messages;
 using ZoNo.Models;
 using ZoNo.Services;
 using ZoNo.ViewModels;
-using ZoNo.ViewModels.Import;
-using ZoNo.ViewModels.Rules;
 using ZoNo.Views;
-using ZoNo.Views.Account;
-using ZoNo.Views.Import;
-using ZoNo.Views.Rules;
 
 namespace ZoNo
 {
