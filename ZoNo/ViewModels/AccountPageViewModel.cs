@@ -67,7 +67,7 @@ namespace ZoNo.ViewModels
     private void Logout()
     {
       Messenger.Send(new UserLoggedOutMessage());
-      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
     }
   }
 }

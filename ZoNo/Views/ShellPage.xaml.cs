@@ -18,7 +18,7 @@ namespace ZoNo.Views
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-      ViewModel.NavigationService.NavigateTo(typeof(ImportPageViewModel).FullName!);
+      ViewModel.NavigationService.NavigateTo(typeof(ImportPageViewModel).FullName);
     }
   }
 }

@@ -52,7 +52,7 @@ namespace ZoNo.Services
     {
       lock (_pages)
       {
-        var key = typeof(VM).FullName!;
+        var key = typeof(VM).FullName;
         if (_pages.ContainsKey(key))
         {
           throw new ArgumentException($"The key {key} is already configured in PageService");

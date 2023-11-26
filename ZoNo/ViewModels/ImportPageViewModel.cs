@@ -98,7 +98,7 @@ namespace ZoNo.ViewModels
         Date = transaction.TransactionTime,
         Group = "Non-group expenses"
       };
-      var result = await _ruleEvaluatorService!.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
+      var result = await _ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
       var expense = ExpenseViewModel.FromModel(evaluatedExpense);
       if (index.HasValue)
       {

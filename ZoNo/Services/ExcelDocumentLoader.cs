@@ -75,18 +75,18 @@ namespace ZoNo.Services
       return new Transaction
       {
         Id = Guid.NewGuid(),
-        TransactionTime = DateTimeOffset.Parse(row.Field<string>(0)!),
-        AccountingDate = string.IsNullOrEmpty(row.Field<string>(1)) ? null : DateOnly.Parse(row.Field<string>(1)!),
-        Type = row.Field<string>(2)!,
-        IncomeOutcome = row.Field<string>(3)! == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,
-        PartnerName = row.Field<string>(4)!,
-        PartnerAccountId = row.Field<string>(5)!,
-        SpendingCategory = row.Field<string>(6)!,
-        Description = row.Field<string>(7)!,
-        AccountName = row.Field<string>(8)!,
-        AccountId = row.Field<string>(9)!,
-        Amount = row.Field<double>(10)!,
-        Currency = Enum.Parse<Currency>(row.Field<string>(11)!)
+        TransactionTime = DateTimeOffset.Parse(row.Field<string>(0)),
+        AccountingDate = string.IsNullOrEmpty(row.Field<string>(1)) ? null : DateOnly.Parse(row.Field<string>(1)),
+        Type = row.Field<string>(2),
+        IncomeOutcome = row.Field<string>(3) == "Kimenő" ? IncomeOutcome.Outcome : IncomeOutcome.Income,
+        PartnerName = row.Field<string>(4),
+        PartnerAccountId = row.Field<string>(5),
+        SpendingCategory = row.Field<string>(6),
+        Description = row.Field<string>(7),
+        AccountName = row.Field<string>(8),
+        AccountId = row.Field<string>(9),
+        Amount = row.Field<double>(10),
+        Currency = Enum.Parse<Currency>(row.Field<string>(11))
       };
     }
 

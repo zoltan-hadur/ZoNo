@@ -105,7 +105,7 @@ namespace ZoNo.Views
         var rowToBeDeleted = _rows.FirstOrDefault(row => row.DataContext == transaction);
         if (rowToBeDeleted != null)
         {
-          if (_scrollBar!.Value > _scrollBar.Maximum - rowToBeDeleted.ActualHeight && _scrollBar.Maximum != 0)
+          if (_scrollBar.Value > _scrollBar.Maximum - rowToBeDeleted.ActualHeight && _scrollBar.Maximum != 0)
           {
             foreach (var row in _rows.Where(x => x.ActualOffset.Y <= rowToBeDeleted.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
             {
@@ -152,7 +152,7 @@ namespace ZoNo.Views
           addedRow.LayoutUpdated += handler;
           await semaphore.WaitAsync();
           addedRow.LayoutUpdated -= handler;
-          if (_scrollBar!.Value > _scrollBar.Maximum - addedRow.ActualHeight && _scrollBar.Maximum != 0)
+          if (_scrollBar.Value > _scrollBar.Maximum - addedRow.ActualHeight && _scrollBar.Maximum != 0)
           {
             foreach (var row in _rows.Where(x => x.ActualOffset.Y < addedRow.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
             {
@@ -252,9 +252,9 @@ namespace ZoNo.Views
 
       DataGrid.LoadingRow += DataGrid_LoadingRow;
       _scrollBar = DataGrid.FindDescendant("VerticalScrollBar") as ScrollBar;
-      _scrollBar!.ValueChanged += ScrollBar_ValueChanged;
+      _scrollBar.ValueChanged += ScrollBar_ValueChanged;
       var grid = DataGrid.FindDescendant("Root") as Grid;
-      grid!.PointerWheelChanged += Grid_PointerWheelChanged;
+      grid.PointerWheelChanged += Grid_PointerWheelChanged;
 
       // Default sort by transaction time
       Transactions.SortDescriptions.Clear();
@@ -274,7 +274,7 @@ namespace ZoNo.Views
 
     private void Grid_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
-      if (_scrollBar!.Minimum < _scrollBar.Value && _scrollBar.Value < _scrollBar.Maximum)
+      if (_scrollBar.Minimum < _scrollBar.Value && _scrollBar.Value < _scrollBar.Maximum)
       {
         _isPointerWheelScrolled = true;
       }

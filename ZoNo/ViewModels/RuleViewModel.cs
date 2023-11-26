@@ -88,7 +88,7 @@ namespace ZoNo.ViewModels
       {
         case nameof(OutputExpressionViewModel.OutputExpression):
           {
-            OutputExpressionChanged?.Invoke(sender, (sender as OutputExpressionViewModel)!.OutputExpression);
+            OutputExpressionChanged?.Invoke(sender, (sender as OutputExpressionViewModel).OutputExpression);
           }
           break;
         case nameof(OutputExpressionViewModel.IsSyntaxValid):

@@ -40,7 +40,7 @@ namespace ZoNo.ViewModels
     /// <summary>
     /// The current url during logging in / authorizing scenario.
     /// </summary>
-    private string CurrentURL => WebView!.Source.ToString();
+    private string CurrentURL => WebView.Source.ToString();
 
     private bool _isLoading = false;
     private State _state = State.LoggingIn;
@@ -92,7 +92,7 @@ namespace ZoNo.ViewModels
         Password = "0123456789";
       }
 
-      await WebView!.EnsureCoreWebView2Async();
+      await WebView.EnsureCoreWebView2Async();
       WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
       WebView.NavigationCompleted += WebView_NavigationCompleted;
 
@@ -131,12 +131,12 @@ namespace ZoNo.ViewModels
 
       if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
       {
-        _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+        _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
       }
       else
       {
         IsLoggingIn = true;
-        WebView!.Source = new Uri(_authorizationService.LoginURL);
+        WebView.Source = new Uri(_authorizationService.LoginURL);
       }
     }
 
@@ -308,7 +308,7 @@ namespace ZoNo.ViewModels
               {
                 await _tokenService.SaveTokenAsync();
               }
-              _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+              _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
             }
             else
             {

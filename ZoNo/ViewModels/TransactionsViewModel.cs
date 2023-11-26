@@ -138,8 +138,8 @@ namespace ZoNo.ViewModels
     {
       if (sender is ColumnViewModel senderColumn && e.PropertyName == nameof(ColumnViewModel.IsVisible))
       {
-        var visibleColumnCount = Columns!.Count(column => column.Value.IsVisible);
-        foreach (var (_, column) in Columns!)
+        var visibleColumnCount = Columns.Count(column => column.Value.IsVisible);
+        foreach (var (_, column) in Columns)
         {
           column.IsEnabled = !(column.IsVisible && visibleColumnCount == 1);
         }

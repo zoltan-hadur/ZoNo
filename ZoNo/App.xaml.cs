@@ -56,12 +56,12 @@ namespace ZoNo
       services.AddSingleton<ISplitwiseAuthorizationService>(provider =>
       {
         return new SplitwiseAuthorizationService(
-          httpClientFactory: provider.GetService<IHttpClientFactory>()!,
+          httpClientFactory: provider.GetService<IHttpClientFactory>(),
           consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
           consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
         );
       });
-      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>()!, provider.GetService<ITokenService>()!.GetTokenAsync().Result));
+      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>(), provider.GetService<ITokenService>().GetTokenAsync().Result));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();
@@ -88,7 +88,7 @@ namespace ZoNo
       });
       services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
       {
-        return new NavigationService(provider.GetService<ITopLevelPageService>()!)
+        return new NavigationService(provider.GetService<ITopLevelPageService>())
         {
           Frame = MainWindow.Content as Frame
         };
@@ -109,14 +109,14 @@ namespace ZoNo
       services.AddScoped<ExpensesViewModel>();
       services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
         new RulesViewModel(
-          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
-          provider.GetService<IDialogService>()!,
-          provider.GetService<IRulesService>()!,
+          provider.GetService<IRuleExpressionSyntaxCheckerService>(),
+          provider.GetService<IDialogService>(),
+          provider.GetService<IRulesService>(),
           RuleType.Import),
         new RulesViewModel(
-          provider.GetService<IRuleExpressionSyntaxCheckerService>()!,
-          provider.GetService<IDialogService>()!,
-          provider.GetService<IRulesService>()!,
+          provider.GetService<IRuleExpressionSyntaxCheckerService>(),
+          provider.GetService<IDialogService>(),
+          provider.GetService<IRulesService>(),
           RuleType.Splitwise))
       );
       services.AddScoped<QueryPageViewModel>();
@@ -131,7 +131,7 @@ namespace ZoNo
 
       UnhandledException += App_UnhandledException;
 
-      ServiceScope.ServiceProvider.GetService<IMessenger>()!.Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
+      ServiceScope.ServiceProvider.GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

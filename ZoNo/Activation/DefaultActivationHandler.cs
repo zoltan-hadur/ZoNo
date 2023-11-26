@@ -15,7 +15,7 @@ namespace ZoNo.Activation
 
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {
-      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
 
       await Task.CompletedTask;
     }

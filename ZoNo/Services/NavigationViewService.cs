@@ -44,7 +44,7 @@ namespace ZoNo.Services
     {
       if (args.IsSettingsInvoked)
       {
-        _navigationService.NavigateTo(typeof(SettingsPageViewModel).FullName!, infoOverride: new EntranceNavigationTransitionInfo());
+        _navigationService.NavigateTo(typeof(SettingsPageViewModel).FullName, infoOverride: new EntranceNavigationTransitionInfo());
       }
       else
       {

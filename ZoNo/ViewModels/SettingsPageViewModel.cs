@@ -53,7 +53,7 @@ namespace ZoNo.ViewModels
       }
       else
       {
-        version = Assembly.GetExecutingAssembly().GetName().Version!;
+        version = Assembly.GetExecutingAssembly().GetName().Version;
       }
 
       return $"ZoNo - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";

@@ -15,12 +15,12 @@
 
     public bool CanHandle(object args)
     {
-      return args is T && CanHandleInternal((args as T)!);
+      return args is T && CanHandleInternal(args as T);
     }
 
     public async Task HandleAsync(object args)
     {
-      await HandleInternalAsync((args as T)!);
+      await HandleInternalAsync(args as T);
     }
   }
 }

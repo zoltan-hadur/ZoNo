@@ -76,10 +76,10 @@ namespace ZoNo.Services
         foreach (var rule in _rules)
         {
           var scriptInput = new InputType<Input>() { RuleId = rule.Id.ToString(), Input = input };
-          if (await _inputEvaluator!(scriptInput))
+          if (await _inputEvaluator(scriptInput))
           {
             var scriptOutput = new OutputType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output };
-            await _outputEvaluator!(scriptOutput);
+            await _outputEvaluator(scriptOutput);
             if (scriptOutput.RemoveThisElementFromList)
             {
               return new EvaluationResult() { RemoveThisElementFromList = true };

@@ -119,7 +119,7 @@ namespace ZoNo.Controls
       {
         case NotifyCollectionChangedAction.Add:
           {
-            foreach (UIElement item in e.NewItems!)
+            foreach (UIElement item in e.NewItems)
             {
               OnItemAdded(item);
             }
