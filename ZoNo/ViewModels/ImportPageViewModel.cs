@@ -64,7 +64,7 @@ namespace ZoNo.ViewModels
     private async void TransactionsViewModel_LoadExcelDocumentsStarted(object sender, EventArgs e)
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
-      var rules = await _rulesService.GetRulesAsync(RuleType.Expense);
+      var rules = _rulesService.GetRules(RuleType.Expense);
       _ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(rules);
     }
 

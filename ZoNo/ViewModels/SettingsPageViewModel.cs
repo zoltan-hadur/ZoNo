@@ -132,10 +132,10 @@ namespace ZoNo.ViewModels
 
       if (await savePicker.PickSaveFileAsync() is var file && file != null)
       {
-        var rules = new Dictionary<RuleType, IList<Rule>>();
+        var rules = new Dictionary<RuleType, IReadOnlyCollection<Rule>>();
         foreach (var ruleType in Enum.GetValues<RuleType>())
         {
-          rules[ruleType] = await _rulesService.GetRulesAsync(ruleType);
+          rules[ruleType] = _rulesService.GetRules(ruleType);
         }
         var json = await Json.StringifyAsync(rules);
         await FileIO.WriteTextAsync(file, json);

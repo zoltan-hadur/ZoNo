@@ -8,16 +8,9 @@ namespace ZoNo.Services
   public class RulesService : IRulesService
   {
     private readonly Dictionary<RuleType, Rule[]> _rules = [];
-    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public RulesService()
+    public async Task InitializeAsync()
     {
-
-    }
-
-    public async Task LoadRulesAsync()
-    {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       foreach (var type in Enum.GetValues<RuleType>())
       {
         _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? [];
@@ -34,15 +27,13 @@ namespace ZoNo.Services
       }
     }
 
-    public async Task<IList<Rule>> GetRulesAsync(RuleType type)
+    public IReadOnlyCollection<Rule> GetRules(RuleType type)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
-      return _rules[type].Select(rule => rule.Clone()).ToArray();
+      return _rules[type].AsReadOnly();
     }
 
-    public async Task SaveRulesAsync(RuleType type, IList<Rule> rules)
+    public async Task SaveRulesAsync(RuleType type, IEnumerable<Rule> rules)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
       _rules[type] = rules.Select(rule => rule.Clone()).ToArray();
       await ApplicationData.Current.LocalFolder.SaveAsync($"Rules_{type}", _rules[type]);
     }

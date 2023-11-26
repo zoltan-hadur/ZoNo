@@ -4,9 +4,8 @@ namespace ZoNo.Contracts.Services
 {
   public interface ITokenService
   {
-    Task<Token> GetTokenAsync();
-    Task SetTokenAsync(Token token);
-    Task SaveTokenAsync();
-    Task<bool> DeleteSavedTokenAsync();
+    Token Token { get; set; }
+    Task InitializeAsync();
+    Task SaveAsync();
   }
 }

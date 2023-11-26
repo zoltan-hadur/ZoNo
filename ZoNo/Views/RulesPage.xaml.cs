@@ -13,10 +13,10 @@ namespace ZoNo.Views
       InitializeComponent();
     }
 
-    private async void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
+    private void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
     {
-      await ViewModel.TransactionRulesViewModel.Load();
-      await ViewModel.ExpenseRulesViewModel.Load();
+      ViewModel.TransactionRulesViewModel.Load();
+      ViewModel.ExpenseRulesViewModel.Load();
     }
   }
 }

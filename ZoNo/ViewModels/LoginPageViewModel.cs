@@ -86,7 +86,7 @@ namespace ZoNo.ViewModels
       _isLoading = true;
 
       IsRememberMe = await _localSettingsService.ReadSettingAsync<bool>(SettingRememberMe);
-      if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
+      if (IsRememberMe && _tokenService.Token != null)
       {
         Email = await _localSettingsService.ReadSettingAsync<string>(SettingEmail) ?? string.Empty;
         Password = "0123456789";
@@ -119,17 +119,18 @@ namespace ZoNo.ViewModels
         case nameof(Email):
         case nameof(Password):
         case nameof(IsRememberMe):
-          await _tokenService.DeleteSavedTokenAsync();
+          _tokenService.Token = null;
+          await _tokenService.SaveAsync();
           break;
       }
     }
 
     [RelayCommand]
-    private async Task Login()
+    private void Login()
     {
       IsWrongCredentials = false;
 
-      if (IsRememberMe && await _tokenService.GetTokenAsync() != null)
+      if (IsRememberMe && _tokenService.Token != null)
       {
         _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
       }
@@ -303,10 +304,10 @@ namespace ZoNo.ViewModels
             if (_authorizationService.ExtractAuthorizationCode(CurrentURL, out var wAuthorizationCode))
             {
               var token = await _authorizationService.GetTokenAsync(wAuthorizationCode);
-              await _tokenService.SetTokenAsync(token);
+              _tokenService.Token = token;
               if (IsRememberMe)
               {
-                await _tokenService.SaveTokenAsync();
+                await _tokenService.SaveAsync();
               }
               _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
             }

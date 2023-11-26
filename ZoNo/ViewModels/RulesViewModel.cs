@@ -18,11 +18,11 @@ namespace ZoNo.ViewModels
   {
     public ObservableCollection<RuleViewModel> Rules { get; } = [];
 
-    public async Task Load()
+    public void Load()
     {
       Rules.CollectionChanged -= Rules_CollectionChanged;
       Rules.Clear();
-      var rules = await _rulesService.GetRulesAsync(_ruleType);
+      var rules = _rulesService.GetRules(_ruleType);
       foreach (var rule in rules.Select(RuleViewModel.FromModel))
       {
         Rules.Add(rule);

@@ -26,7 +26,7 @@ namespace ZoNo.Services
       public required bool RemoveThisElementFromList { get; set; }
     }
 
-    private class RuleEvaluatorService<Input, Output>(IList<Rule> rules) : IRuleEvaluatorService<Input, Output>
+    private class RuleEvaluatorService<Input, Output>(IEnumerable<Rule> rules) : IRuleEvaluatorService<Input, Output>
     {
       private readonly IList<Rule> _rules = rules.Select(rule => rule.Clone()).ToArray();
       private ScriptRunner<bool> _inputEvaluator;
@@ -90,7 +90,12 @@ namespace ZoNo.Services
       }
     }
 
-    public async Task<IRuleEvaluatorService<Input, Output>> BuildAsync<Input, Output>(IList<Rule> rules)
+    public async Task InitializeAsync()
+    {
+      await BuildAsync<object, object>([]);
+    }
+
+    public async Task<IRuleEvaluatorService<Input, Output>> BuildAsync<Input, Output>(IEnumerable<Rule> rules)
     {
       var ruleEvaluator = new RuleEvaluatorService<Input, Output>(rules);
       await ruleEvaluator.InitializeAsync();

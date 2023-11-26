@@ -61,7 +61,7 @@ namespace ZoNo
           consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
         );
       });
-      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>(), provider.GetService<ITokenService>().GetTokenAsync().Result));
+      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>(), provider.GetService<ITokenService>().Token));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();
@@ -145,10 +145,9 @@ namespace ZoNo
       Exit();
     }
 
-    private async void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
+    private void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
     {
       ReplaceServiceScope();
-      await App.GetService<ITokenService>().SetTokenAsync(null);
     }
 
     private void ReplaceServiceScope()

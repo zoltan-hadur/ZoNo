@@ -8,6 +8,7 @@ namespace ZoNo.Services
   public class ActivationService(
     ActivationHandler<LaunchActivatedEventArgs> _defaultHandler,
     IEnumerable<IActivationHandler> _activationHandlers,
+    ITokenService _tokenService,
     IThemeSelectorService _themeSelectorService,
     IRulesService _rulesService,
     IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : IActivationService
@@ -44,16 +45,21 @@ namespace ZoNo.Services
 
     private async Task InitializeAsync()
     {
-      await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
-      _ = _rulesService.LoadRulesAsync();
-      _ = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(Array.Empty<Rule>());
-      await Task.CompletedTask;
+      await Task.WhenAll(
+      [
+        _tokenService.InitializeAsync(),
+        _themeSelectorService.InitializeAsync()
+      ]);
     }
 
     private async Task StartupAsync()
     {
-      await _themeSelectorService.SetRequestedThemeAsync();
-      await Task.CompletedTask;
+      await Task.WhenAll(
+      [
+        _themeSelectorService.SetRequestedThemeAsync(),
+        _rulesService.InitializeAsync(),
+        _ruleEvaluatorServiceBuilder.InitializeAsync()
+      ]);
     }
   }
 }
