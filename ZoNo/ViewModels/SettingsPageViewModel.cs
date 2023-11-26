@@ -2,7 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
+using System.IO;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -80,18 +83,37 @@ namespace ZoNo.ViewModels
 
       if (await openPicker.PickSingleFileAsync() is var file && file != null)
       {
-        if (await FileIO.ReadTextAsync(file) is var json &&
-            json != null &&
-            await Json.ToObjectAsync<Dictionary<RuleType, IList<Rule>>>(json) is var rules &&
-            rules != null)
+        var success = false;
+        if (await file.OpenStreamForReadAsync() is var stream &&
+            await JsonNode.ParseAsync(stream) is var jsonNode &&
+            jsonNode.AsObject() is var jsonObject)
         {
-          foreach (var rule in rules)
+          // Handle previous type of jsons (Import and Splitwise)
+          if (jsonObject.ContainsKey("Import"))
           {
-            await _rulesService.SaveRulesAsync(rule.Key, rule.Value);
+            var transactionRules = jsonObject["Import"];
+            jsonObject.Remove("Import");
+            jsonObject[RuleType.Transaction.ToString()] = transactionRules;
           }
-          await ShowMessage($"Import from {file.Path} was successful!");
+          if (jsonObject.ContainsKey("Splitwise"))
+          {
+            var expenseRules = jsonObject["Splitwise"];
+            jsonObject.Remove("Splitwise");
+            jsonObject[RuleType.Expense.ToString()] = expenseRules;
+          }
+          if (await Json.StringifyAsync(jsonObject) is var json &&
+              await Json.ToObjectAsync<Dictionary<RuleType, IList<Rule>>>(json) is var rules &&
+              rules != null)
+          {
+            foreach (var rule in rules)
+            {
+              await _rulesService.SaveRulesAsync(rule.Key, rule.Value);
+            }
+            await ShowMessage($"Import from {file.Path} was successful!");
+            success = true;
+          }
         }
-        else
+        if (!success)
         {
           await ShowMessage($"Import from {file.Path} was not successful!");
         }

@@ -22,6 +22,16 @@ namespace ZoNo.Services
       {
         _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? [];
       }
+
+      // Handle previous versions of rules
+      if (_rules[RuleType.Transaction].Length == 0)
+      {
+        _rules[RuleType.Transaction] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>("Rules_Import") ?? [];
+      }
+      if (_rules[RuleType.Expense].Length == 0)
+      {
+        _rules[RuleType.Expense] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>("Rules_Splitwise") ?? [];
+      }
     }
 
     public async Task<IList<Rule>> GetRulesAsync(RuleType type)
