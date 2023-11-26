@@ -71,7 +71,8 @@
                       DataContext="{x:Bind ViewModel.ExpensesViewModel}"
                       ItemsSource="{x:Bind ViewModel.ExpensesViewModel.Expenses}"
                       SelectedItem="{x:Bind ViewModel.SelectedExpense, Mode=TwoWay}"
-                      SelectionChanged="Expenses_SelectionChanged">
+                      SelectionChanged="Expenses_SelectionChanged"
+                      DoubleTapped="Expenses_DoubleTapped">
               <ListView.ItemContainerTransitions>
                 <TransitionCollection>
                   <AddDeleteThemeTransition />
