@@ -2,7 +2,7 @@
 {
   public enum RuleType
   {
-    Import,
-    Splitwise
+    Transaction,
+    Expense
   }
 }

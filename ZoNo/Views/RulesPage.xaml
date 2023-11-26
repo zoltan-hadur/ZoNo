@@ -15,17 +15,17 @@
         <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
       </Style>
     </controls:AutomaticStackPanel.Resources>
-    <views:RuleManager Header="Import"
-                       Rules="{x:Bind ViewModel.ImportRulesViewModel.Rules}"
-                       NewRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.NewRuleCommand}"
-                       EditRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.EditRuleCommand}"
-                       DuplicateRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.DuplicateRuleCommand}"
-                       DeleteRuleCommand="{x:Bind ViewModel.ImportRulesViewModel.DeleteRuleCommand}"/>
-    <views:RuleManager Header="Splitwise"
-                       Rules="{x:Bind ViewModel.SplitwiseRulesViewModel.Rules}"
-                       NewRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.NewRuleCommand}"
-                       EditRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.EditRuleCommand}"
-                       DuplicateRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.DuplicateRuleCommand}"
-                       DeleteRuleCommand="{x:Bind ViewModel.SplitwiseRulesViewModel.DeleteRuleCommand}"/>
+    <views:RuleManager Header="Transaction"
+                       Rules="{x:Bind ViewModel.TransactionRulesViewModel.Rules}"
+                       NewRuleCommand="{x:Bind ViewModel.TransactionRulesViewModel.NewRuleCommand}"
+                       EditRuleCommand="{x:Bind ViewModel.TransactionRulesViewModel.EditRuleCommand}"
+                       DuplicateRuleCommand="{x:Bind ViewModel.TransactionRulesViewModel.DuplicateRuleCommand}"
+                       DeleteRuleCommand="{x:Bind ViewModel.TransactionRulesViewModel.DeleteRuleCommand}"/>
+    <views:RuleManager Header="Expense"
+                       Rules="{x:Bind ViewModel.ExpenseRulesViewModel.Rules}"
+                       NewRuleCommand="{x:Bind ViewModel.ExpenseRulesViewModel.NewRuleCommand}"
+                       EditRuleCommand="{x:Bind ViewModel.ExpenseRulesViewModel.EditRuleCommand}"
+                       DuplicateRuleCommand="{x:Bind ViewModel.ExpenseRulesViewModel.DuplicateRuleCommand}"
+                       DeleteRuleCommand="{x:Bind ViewModel.ExpenseRulesViewModel.DeleteRuleCommand}"/>
   </controls:AutomaticStackPanel>
 </Page>

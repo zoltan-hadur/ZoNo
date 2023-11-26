@@ -77,7 +77,7 @@ namespace ZoNo.ViewModels
     {
       LoadExcelDocumentsStarted?.Invoke(this, EventArgs.Empty);
 
-      var rules = await _rulesService.GetRulesAsync(RuleType.Import);
+      var rules = await _rulesService.GetRulesAsync(RuleType.Transaction);
       var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
       var transactions = new List<Transaction>();
       foreach (var path in paths)

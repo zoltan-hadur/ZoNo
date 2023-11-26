@@ -2,9 +2,9 @@
 
 namespace ZoNo.ViewModels
 {
-  public class RulesPageViewModel(RulesViewModel importRulesViewModel, RulesViewModel splitwiseRulesViewModel) : ObservableObject
+  public class RulesPageViewModel(RulesViewModel transactionRulesViewModel, RulesViewModel expenseRulesViewModel) : ObservableObject
   {
-    public RulesViewModel ImportRulesViewModel { get; } = importRulesViewModel;
-    public RulesViewModel SplitwiseRulesViewModel { get; } = splitwiseRulesViewModel;
+    public RulesViewModel TransactionRulesViewModel { get; } = transactionRulesViewModel;
+    public RulesViewModel ExpenseRulesViewModel { get; } = expenseRulesViewModel;
   }
 }

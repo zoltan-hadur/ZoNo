@@ -112,12 +112,12 @@ namespace ZoNo
           provider.GetService<IRuleExpressionSyntaxCheckerService>(),
           provider.GetService<IDialogService>(),
           provider.GetService<IRulesService>(),
-          RuleType.Import),
+          RuleType.Transaction),
         new RulesViewModel(
           provider.GetService<IRuleExpressionSyntaxCheckerService>(),
           provider.GetService<IDialogService>(),
           provider.GetService<IRulesService>(),
-          RuleType.Splitwise))
+          RuleType.Expense))
       );
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();

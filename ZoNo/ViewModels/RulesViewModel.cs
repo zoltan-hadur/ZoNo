@@ -46,8 +46,8 @@ namespace ZoNo.ViewModels
       {
         switch (_ruleType)
         {
-          case RuleType.Import:
-          case RuleType.Splitwise:
+          case RuleType.Transaction:
+          case RuleType.Expense:
             (rule.IsInputSyntaxValid, rule.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction>(e);
             break;
         }
@@ -60,10 +60,10 @@ namespace ZoNo.ViewModels
       {
         switch (_ruleType)
         {
-          case RuleType.Import:
+          case RuleType.Transaction:
             (outputExpression.IsSyntaxValid, outputExpression.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction, Transaction>(e);
             break;
-          case RuleType.Splitwise:
+          case RuleType.Expense:
             (outputExpression.IsSyntaxValid, outputExpression.ErrorMessage) = await _ruleExpressionSyntaxCheckerService.TryCheckSyntaxAsync<Transaction, Expense>(e);
             break;
         }

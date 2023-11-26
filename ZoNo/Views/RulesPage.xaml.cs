@@ -15,8 +15,8 @@ namespace ZoNo.Views
 
     private async void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
     {
-      await ViewModel.ImportRulesViewModel.Load();
-      await ViewModel.SplitwiseRulesViewModel.Load();
+      await ViewModel.TransactionRulesViewModel.Load();
+      await ViewModel.ExpenseRulesViewModel.Load();
     }
   }
 }
