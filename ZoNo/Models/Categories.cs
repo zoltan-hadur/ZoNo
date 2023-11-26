@@ -107,7 +107,7 @@
       public static Category Sports => _categories[0].SubCategories[4];
     }
 
-    public class FoodAndDrink : Category
+    public static class FoodAndDrink
     {
       public static Category DiningOut => _categories[1].SubCategories[0];
       public static Category Groceries => _categories[1].SubCategories[1];
@@ -115,7 +115,7 @@
       public static Category Other => _categories[1].SubCategories[3];
     }
 
-    public class Home : Category
+    public static class Home
     {
       public static Category Electronics => _categories[2].SubCategories[0];
       public static Category Furniture => _categories[2].SubCategories[1];
@@ -128,7 +128,7 @@
       public static Category Services => _categories[2].SubCategories[7];
     }
 
-    public class Life : Category
+    public static class Life
     {
       public static Category Childcare => _categories[3].SubCategories[0];
       public static Category Clothing => _categories[3].SubCategories[1];
@@ -140,7 +140,7 @@
       public static Category Taxes => _categories[3].SubCategories[7];
     }
 
-    public class Transportation : Category
+    public static class Transportation
     {
       public static Category Bicycle => _categories[4].SubCategories[0];
       public static Category BusTrain => _categories[4].SubCategories[1];
@@ -153,12 +153,12 @@
       public static Category Taxi => _categories[4].SubCategories[8];
     }
 
-    public class Uncategorized : Category
+    public static class Uncategorized
     {
       public static Category General => _categories[5].SubCategories[0];
     }
 
-    public class Utilities : Category
+    public static class Utilities
     {
       public static Category Cleaning => _categories[6].SubCategories[0];
       public static Category Electricity => _categories[6].SubCategories[1];
