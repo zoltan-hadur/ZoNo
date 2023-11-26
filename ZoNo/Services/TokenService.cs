@@ -3,20 +3,14 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class TokenService : ITokenService
+  public class TokenService(ILocalSettingsService _localSettingsService) : ITokenService
   {
     private const string SettingToken = "Protected_Token";
-    private readonly ILocalSettingsService _localSettingsService;
     private Token _token = null;
-
-    public TokenService(ILocalSettingsService localSettingsService)
-    {
-      _localSettingsService = localSettingsService;
-    }
 
     public async Task<Token> GetTokenAsync()
     {
-      return _token ?? (_token = await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken));
+      return _token ??= await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken);
     }
 
     public async Task SetTokenAsync(Token token)

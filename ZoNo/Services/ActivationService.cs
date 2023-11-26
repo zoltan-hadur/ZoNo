@@ -5,28 +5,13 @@ using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class ActivationService : IActivationService
+  public class ActivationService(
+    ActivationHandler<LaunchActivatedEventArgs> _defaultHandler,
+    IEnumerable<IActivationHandler> _activationHandlers,
+    IThemeSelectorService _themeSelectorService,
+    IRulesService _rulesService,
+    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : IActivationService
   {
-    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
-    private readonly IEnumerable<IActivationHandler> _activationHandlers;
-    private readonly IThemeSelectorService _themeSelectorService;
-    private readonly IRulesService _rulesService;
-    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-
-    public ActivationService(
-      ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
-      IEnumerable<IActivationHandler> activationHandlers,
-      IThemeSelectorService themeSelectorService,
-      IRulesService rulesService,
-      IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder)
-    {
-      _defaultHandler = defaultHandler;
-      _activationHandlers = activationHandlers;
-      _themeSelectorService = themeSelectorService;
-      _rulesService = rulesService;
-      _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
-    }
-
     public async Task ActivateAsync(object activationArgs)
     {
       // Execute tasks before activation.

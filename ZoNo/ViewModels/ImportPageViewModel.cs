@@ -13,9 +13,9 @@ namespace ZoNo.ViewModels
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
     private IRuleEvaluatorService<Transaction, Expense> _ruleEvaluatorService;
-    private BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = new BlockingCollection<(int Index, Transaction Transaction)>();
-    private BlockingCollection<Transaction> _transactionsToRemove = new BlockingCollection<Transaction>();
-    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+    private readonly BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = [];
+    private readonly BlockingCollection<Transaction> _transactionsToRemove = [];
+    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
     public TransactionsViewModel TransactionsViewModel { get; }
     public ExpensesViewModel ExpensesViewModel { get; }
@@ -90,7 +90,7 @@ namespace ZoNo.ViewModels
       var evaluatedExpense = new Expense()
       {
         Id = transaction.Id,
-        With = new List<(string User, double Percentage)>(),
+        With = [],
         Category = Categories.Uncategorized.General,
         Description = transaction.PartnerName,
         Currency = transaction.Currency,

@@ -189,11 +189,7 @@ namespace ZoNo.ViewModels
                 {
                   await Task.Delay(10);
                   var json = await sender.CoreWebView2.CallDevToolsProtocolMethodAsync("Page.captureScreenshot", "{}");
-                  var dataStr = JsonNode.Parse(json)?["data"]?.GetValue<string>();
-                  if (dataStr == null)
-                  {
-                    throw new Exception($"Following json does not have 'data' key: {json}");
-                  }
+                  var dataStr = (JsonNode.Parse(json)?["data"]?.GetValue<string>()) ?? throw new Exception($"Following json does not have 'data' key: {json}");
                   byte[] data = Convert.FromBase64String(dataStr);
                   using (var ms = new MemoryStream(data))
                   using (var bm = new Bitmap(ms))

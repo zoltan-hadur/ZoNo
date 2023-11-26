@@ -54,11 +54,11 @@ namespace ZoNo.Views
           frameworkElement.FindAscendants().FirstOrDefault(ascendant => ascendant.GetValue(Helpers.Grid.IsSharedSizeScopeProperty) is true) is DependencyObject ancestor &&
           ancestor.GetValue(Helpers.Grid.SharedSizeScopeProperty) is Dictionary<int, double> sharedSizeScope)
       {
-        var maxWidth = sharedSizeScope.ContainsKey(column) ? sharedSizeScope[column] : 0;
+        var maxWidth = sharedSizeScope.TryGetValue(column, out double value) ? value : 0;
         if (frameworkElement.DesiredSize.Width > maxWidth)
         {
           sharedSizeScope[column] = maxWidth = frameworkElement.DesiredSize.Width;
-          foreach (UserView user in ancestor.FindDescendants().Where(descendant => descendant is UserView))
+          foreach (var user in ancestor.FindDescendants().Where(descendant => descendant is UserView).Cast<UserView>())
           {
             user.Grid.ColumnDefinitions[column].Width = new GridLength(maxWidth, GridUnitType.Pixel);
           }

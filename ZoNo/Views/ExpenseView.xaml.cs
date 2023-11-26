@@ -99,11 +99,11 @@ namespace ZoNo.Views
           stackPanel.FindAscendants().FirstOrDefault(ascendant => ascendant.GetValue(Helpers.Grid.IsSharedSizeScopeProperty) is true) is DependencyObject element &&
           element.GetValue(Helpers.Grid.SharedSizeScopeProperty) is Dictionary<int, double> sharedSizeScope)
       {
-        var maxWidth = sharedSizeScope.ContainsKey(column) ? sharedSizeScope[column] : 0;
+        var maxWidth = sharedSizeScope.TryGetValue(column, out double value) ? value : 0;
         if (stackPanel.ActualWidth > maxWidth)
         {
           sharedSizeScope[column] = maxWidth = stackPanel.ActualWidth;
-          foreach (ExpenseView expense in element.FindDescendants().Where(descendant => descendant is ExpenseView))
+          foreach (var expense in element.FindDescendants().Where(descendant => descendant is ExpenseView).Cast<ExpenseView>())
           {
             expense.Grid.ColumnDefinitions[column].Width = new GridLength(maxWidth, GridUnitType.Pixel);
           }

@@ -24,8 +24,8 @@ namespace ZoNo.Views
 {
   public sealed partial class TransactionsView : UserControl
   {
-    private Dictionary<Transaction, DateTimeOffset> _loadTimes = new Dictionary<Transaction, DateTimeOffset>();
-    private HashSet<DataGridRow> _rows = new HashSet<DataGridRow>();
+    private readonly Dictionary<Transaction, DateTimeOffset> _loadTimes = [];
+    private readonly HashSet<DataGridRow> _rows = [];
     private ScrollBar _scrollBar;
     private bool _isLoaded = false;
     private bool _isSorting = false;
@@ -145,10 +145,10 @@ namespace ZoNo.Views
         if (addedRow != null)
         {
           using var semaphore = new SemaphoreSlim(0, 1);
-          EventHandler<object> handler = (s, e) =>
+          void handler(object s, object e)
           {
             semaphore.Release();
-          };
+          }
           addedRow.LayoutUpdated += handler;
           await semaphore.WaitAsync();
           addedRow.LayoutUpdated -= handler;
@@ -236,7 +236,7 @@ namespace ZoNo.Views
       if (_isLoaded)
       {
         DataGrid.ReloadThemeResources();
-        foreach (DataGridRow dataGridRow in DataGrid.FindDescendants().Where(descendant => descendant is DataGridRow))
+        foreach (var dataGridRow in DataGrid.FindDescendants().Where(descendant => descendant is DataGridRow).Cast<DataGridRow>())
         {
           _rows.Add(dataGridRow);
         }
@@ -244,11 +244,7 @@ namespace ZoNo.Views
       }
 
       // To set the disabled state border to collapsed as text opacity is used to determine if the data grid is enabled or not
-      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement");
-      if (border == null)
-      {
-        throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
-      }
+      var border = DataGrid.FindDescendant<Border>(border => border.Name == "DisabledVisualElement") ?? throw new Exception($"Border with name \"DisabledVisualElement\" does not exist");
       border.Visibility = Visibility.Collapsed;
 
       // Set default DataGridTextOpacity
@@ -309,24 +305,12 @@ namespace ZoNo.Views
       }
     }
 
-    private DataGridColumnHeader GetHeader(DataGridColumn column)
+    private static DataGridColumnHeader GetHeader(DataGridColumn column)
     {
-      var propertyInfo = typeof(DataGridColumn).GetProperty("HeaderCell", BindingFlags.NonPublic | BindingFlags.Instance);
-      if (propertyInfo == null)
-      {
-        throw new Exception($"HeaderCell is not a property of {typeof(DataGridColumn)}!");
-      }
-      var value = propertyInfo.GetValue(column);
-      if (value == null)
-      {
-        throw new Exception($"Property 'HeaderCell' is null!");
-      }
+      var propertyInfo = typeof(DataGridColumn).GetProperty("HeaderCell", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new Exception($"HeaderCell is not a property of {typeof(DataGridColumn)}!");
+      var value = propertyInfo.GetValue(column) ?? throw new Exception($"Property 'HeaderCell' is null!");
       var header = value as DataGridColumnHeader;
-      if (header == null)
-      {
-        throw new Exception($"Property values type is '{value.GetType()} instead of {typeof(DataGridColumnHeader)}!");
-      }
-      return header;
+      return header ?? throw new Exception($"Property values type is '{value.GetType()} instead of {typeof(DataGridColumnHeader)}!");
     }
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
@@ -392,11 +376,7 @@ namespace ZoNo.Views
 
     private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-      var opacity = DataGrid.Resources["DataGridTextOpacity"] as double?;
-      if (opacity == null)
-      {
-        throw new Exception("Double with key \"DataGridTextOpacity\" does not exist");
-      }
+      _ = DataGrid.Resources["DataGridTextOpacity"] as double? ?? throw new Exception("Double with key \"DataGridTextOpacity\" does not exist");
       DataGrid.Resources["DataGridTextOpacity"] = DataGrid.IsEnabled ? 1 : 0.3;
 
       DataGrid.ReloadThemeResources();

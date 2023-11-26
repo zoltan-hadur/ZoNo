@@ -10,7 +10,8 @@ namespace ZoNo.Services
   {
     private const int _expectedWorksheetCount = 1;
     private const string _expectedWorksheetName = "Tranzakciók";
-    private readonly ImmutableArray<string> _expectedHeaders = ImmutableArray.Create(
+    private readonly ImmutableArray<string> _expectedHeaders =
+    [
       "Tranzakció dátuma",
       "Könyvelés dátuma",
       "Típus",
@@ -23,9 +24,9 @@ namespace ZoNo.Services
       "Számla szám",
       "Összeg",
       "Pénznem"
-    );
+    ];
 
-    private DataSet GetDataSet(string path)
+    private static DataSet GetDataSet(string path)
     {
       using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
       using var reader = ExcelReaderFactory.CreateReader(stream);

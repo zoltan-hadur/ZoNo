@@ -15,9 +15,9 @@ namespace ZoNo.ViewModels
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
 
-    private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
+    private readonly ObservableCollection<Transaction> _transactions = [];
 
-    public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView();
+    public AdvancedCollectionView TransactionsView { get; } = [];
 
     public Dictionary<string, ColumnViewModel> Columns { get; private set; } = null;
 
@@ -132,7 +132,7 @@ namespace ZoNo.ViewModels
       }
     }
 
-    private string SettingColumnIsVisible(ColumnHeader columnHeader) => $"Import_Columns_{columnHeader}_IsVisible";
+    private static string SettingColumnIsVisible(ColumnHeader columnHeader) => $"Import_Columns_{columnHeader}_IsVisible";
 
     private async void Column_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

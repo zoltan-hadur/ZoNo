@@ -6,15 +6,8 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class DialogService : IDialogService
+  public class DialogService(IThemeSelectorService _themeSelectorService) : IDialogService
   {
-    private readonly IThemeSelectorService _themeSelectorService;
-
-    public DialogService(IThemeSelectorService themeSelectorService)
-    {
-      _themeSelectorService = themeSelectorService;
-    }
-
     public async Task<DialogResult> ShowDialogAsync<T>(DialogType type, string title, T content, Binding isPrimaryButtonEnabled = null)
     {
       var margin = 12;

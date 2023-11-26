@@ -24,13 +24,13 @@ namespace ZoNo.Controls
       set => SetValue(IsLoadingProperty, value);
     }
 
-    private ContentControl _contentControl = new ContentControl()
+    private readonly ContentControl _contentControl = new()
     {
       HorizontalContentAlignment = HorizontalAlignment.Stretch,
       VerticalContentAlignment = VerticalAlignment.Stretch,
     };
 
-    private ProgressRing _progressRing = new ProgressRing()
+    private readonly ProgressRing _progressRing = new()
     {
       Width = 100,
       Height = 100,

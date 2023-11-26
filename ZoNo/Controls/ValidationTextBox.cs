@@ -99,7 +99,7 @@ namespace ZoNo.Controls
       }
     }
 
-    private object GetBorderBrushFromVisualState(VisualState visualState)
+    private static object GetBorderBrushFromVisualState(VisualState visualState)
     {
       return ((ObjectAnimationUsingKeyFrames)visualState.Storyboard.Children.First(child =>
         child is ObjectAnimationUsingKeyFrames animation &&

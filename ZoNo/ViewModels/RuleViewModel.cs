@@ -32,7 +32,7 @@ namespace ZoNo.ViewModels
     public bool IsSyntaxValid => IsInputSyntaxValid && IsOutputExpressionsSyntaxValid;
 
     [ObservableProperty]
-    private ObservableCollection<OutputExpressionViewModel> _outputExpressions = new ObservableCollection<OutputExpressionViewModel>();
+    private ObservableCollection<OutputExpressionViewModel> _outputExpressions = [];
 
     public event EventHandler<string> InputExpressionChanged;
     public event EventHandler<string> OutputExpressionChanged;

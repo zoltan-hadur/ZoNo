@@ -2,7 +2,7 @@
 {
   public sealed class LockGuard : IDisposable
   {
-    private SemaphoreSlim _semaphore;
+    private readonly SemaphoreSlim _semaphore;
 
     private LockGuard(SemaphoreSlim semaphore)
     {

@@ -49,14 +49,14 @@ namespace ZoNo.Controls
       set => SetValue(SpacingProperty, value);
     }
 
-    private Grid _grid = new Grid();
-    private Canvas _canvas = new Canvas();
+    private readonly Grid _grid = new();
+    private readonly Canvas _canvas = new();
 
     public AutomaticStackPanel()
     {
       VerticalContentAlignment = VerticalAlignment.Stretch;
       HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      Children = new ObservableCollection<object>();
+      Children = [];
       Content = new Grid() { Children = { _grid, _canvas } };
       SizeChanged += AutomaticStackPanel_SizeChanged;
     }
@@ -168,7 +168,7 @@ namespace ZoNo.Controls
       }
     }
 
-    private void BindItems(FrameworkElement elementInGrid, UIElement elementInCanvas)
+    private static void BindItems(FrameworkElement elementInGrid, UIElement elementInCanvas)
     {
       elementInGrid.SizeChanged += (s, e) =>
       {

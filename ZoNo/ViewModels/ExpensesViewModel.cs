@@ -20,9 +20,9 @@ namespace ZoNo.ViewModels
     private Splitwise.Models.Group[] _groups;
     private Splitwise.Models.Category[] _categories;
     private bool _isLoaded = false;
-    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public ObservableCollection<ExpenseViewModel> Expenses { get; } = new ObservableCollection<ExpenseViewModel>();
+    public ObservableCollection<ExpenseViewModel> Expenses { get; } = [];
 
     public Category[] Categories { get; private set; }
     public Group[] Groups { get; private set; }
@@ -48,7 +48,7 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
 
       _groups = await _splitwiseService.GetGroupsAsync();
-      _categories = (await _splitwiseService.GetCategoriesAsync()).OrderBy(category => category.Name).ToArray();
+      _categories = [.. (await _splitwiseService.GetCategoriesAsync()).OrderBy(category => category.Name)];
       Categories = _categories.Select(category => new Category()
       {
         Name = category.Name,

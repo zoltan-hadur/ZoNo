@@ -3,17 +3,11 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class ThemeSelectorService : IThemeSelectorService
+  public class ThemeSelectorService(ILocalSettingsService _localSettingsService) : IThemeSelectorService
   {
     private const string SettingsKey = "AppBackgroundRequestedTheme";
-    private readonly ILocalSettingsService _localSettingsService;
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
-
-    public ThemeSelectorService(ILocalSettingsService localSettingsService)
-    {
-      _localSettingsService = localSettingsService;
-    }
 
     public async Task InitializeAsync()
     {

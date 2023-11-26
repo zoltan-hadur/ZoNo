@@ -9,10 +9,8 @@ using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public partial class AccountPageViewModel : ObservableRecipient
+  public partial class AccountPageViewModel(ITopLevelNavigationService _topLevelNavigationService, ISplitwiseService _splitwiseService, IMessenger _messenger) : ObservableRecipient(_messenger)
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService;
-    private readonly ISplitwiseService _splitwiseService;
     private bool _isLoaded = false;
 
     [ObservableProperty]
@@ -34,13 +32,7 @@ namespace ZoNo.ViewModels
     private bool _isLoading = false;
 
     [ObservableProperty]
-    private Group[] _groups = Array.Empty<Group>();
-
-    public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ISplitwiseService splitwiseService, IMessenger messenger) : base(messenger)
-    {
-      _topLevelNavigationService = topLevelNavigationService;
-      _splitwiseService = splitwiseService;
-    }
+    private Group[] _groups = [];
 
     public async Task Load()
     {

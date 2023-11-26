@@ -7,8 +7,8 @@ namespace ZoNo.Services
 {
   public class RulesService : IRulesService
   {
-    private Dictionary<RuleType, Rule[]> _rules = new Dictionary<RuleType, Rule[]>();
-    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+    private readonly Dictionary<RuleType, Rule[]> _rules = [];
+    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
     public RulesService()
     {
@@ -20,7 +20,7 @@ namespace ZoNo.Services
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       foreach (var type in Enum.GetValues<RuleType>())
       {
-        _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? Array.Empty<Rule>();
+        _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? [];
       }
     }
 

@@ -5,7 +5,7 @@
     public string Picture { get; set; } = "invalid";
     public string Name { get; set; }
     public string ParentCategoryName { get; set; }
-    private Category[] _subCategories = Array.Empty<Category>();
+    private Category[] _subCategories = [];
     public Category[] SubCategories
     {
       get

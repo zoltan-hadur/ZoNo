@@ -27,7 +27,7 @@ namespace ZoNo.Services
       }
     }
 
-    private readonly Dictionary<string, Type> _pages = new Dictionary<string, Type>();
+    private readonly Dictionary<string, Type> _pages = [];
 
     private PageService()
     {

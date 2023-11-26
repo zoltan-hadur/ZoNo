@@ -21,7 +21,7 @@ namespace ZoNo.Services
     private readonly string _applicationDataFolder;
     private readonly string _localsettingsFile;
 
-    private IDictionary<string, object> _settings;
+    private Dictionary<string, object> _settings;
 
     private bool _isInitialized;
 
@@ -33,14 +33,14 @@ namespace ZoNo.Services
       _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
       _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
 
-      _settings = new Dictionary<string, object>();
+      _settings = [];
     }
 
     private async Task InitializeAsync()
     {
       if (!_isInitialized)
       {
-        _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? new Dictionary<string, object>();
+        _settings = await Task.Run(() => _fileService.Read<Dictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? [];
 
         _isInitialized = true;
       }

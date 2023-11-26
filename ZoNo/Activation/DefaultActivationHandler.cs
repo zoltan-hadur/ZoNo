@@ -5,15 +5,8 @@ using ZoNo.ViewModels;
 
 namespace ZoNo.Activation
 {
-  public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
+  public class DefaultActivationHandler(ITopLevelNavigationService _topLevelNavigationService) : ActivationHandler<LaunchActivatedEventArgs>
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService;
-
-    public DefaultActivationHandler(ITopLevelNavigationService topLevelNavigationService)
-    {
-      _topLevelNavigationService = topLevelNavigationService;
-    }
-
     protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
     {
       // None of the ActivationHandlers has handled the activation.

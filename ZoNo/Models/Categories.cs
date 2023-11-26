@@ -2,101 +2,101 @@
 {
   public static class Categories
   {
-    private static Category[] _categories = new Category[]
-    {
-      new Category()
+    private static readonly Category[] _categories =
+    [
+      new()
       {
         Name = "Entertainment",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Games" },
-          new Category(){ Name = "Movies" },
-          new Category(){ Name = "Music" },
-          new Category(){ Name = "Other" },
-          new Category(){ Name = "Sports" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Games" },
+          new() { Name = "Movies" },
+          new() { Name = "Music" },
+          new() { Name = "Other" },
+          new() { Name = "Sports" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Food and drink",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Dining out" },
-          new Category(){ Name = "Groceries" },
-          new Category(){ Name = "Liquor" },
-          new Category(){ Name = "Other" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Dining out" },
+          new() { Name = "Groceries" },
+          new() { Name = "Liquor" },
+          new() { Name = "Other" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Home",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Electronics" },
-          new Category(){ Name = "Furniture" },
-          new Category(){ Name = "Household supplies" },
-          new Category(){ Name = "Maintenance" },
-          new Category(){ Name = "Mortgage" },
-          new Category(){ Name = "Other" },
-          new Category(){ Name = "Pets" },
-          new Category(){ Name = "Rent" },
-          new Category(){ Name = "Services" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Electronics" },
+          new() { Name = "Furniture" },
+          new() { Name = "Household supplies" },
+          new() { Name = "Maintenance" },
+          new() { Name = "Mortgage" },
+          new() { Name = "Other" },
+          new() { Name = "Pets" },
+          new() { Name = "Rent" },
+          new() { Name = "Services" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Life",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Childcare" },
-          new Category(){ Name = "Clothing" },
-          new Category(){ Name = "Education" },
-          new Category(){ Name = "Gifts" },
-          new Category(){ Name = "Insurance" },
-          new Category(){ Name = "Medical expenses" },
-          new Category(){ Name = "Other" },
-          new Category(){ Name = "Taxes" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Childcare" },
+          new() { Name = "Clothing" },
+          new() { Name = "Education" },
+          new() { Name = "Gifts" },
+          new() { Name = "Insurance" },
+          new() { Name = "Medical expenses" },
+          new() { Name = "Other" },
+          new() { Name = "Taxes" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Transportation",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Bicycle" },
-          new Category(){ Name = "Bus/train" },
-          new Category(){ Name = "Car" },
-          new Category(){ Name = "Gas/fuel" },
-          new Category(){ Name = "Hotel" },
-          new Category(){ Name = "Other" },
-          new Category(){ Name = "Parking" },
-          new Category(){ Name = "Plane" },
-          new Category(){ Name = "Taxi" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Bicycle" },
+          new() { Name = "Bus/train" },
+          new() { Name = "Car" },
+          new() { Name = "Gas/fuel" },
+          new() { Name = "Hotel" },
+          new() { Name = "Other" },
+          new() { Name = "Parking" },
+          new() { Name = "Plane" },
+          new() { Name = "Taxi" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Uncategorized",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "General" }
-        }
+        SubCategories =
+        [
+          new() { Name = "General" }
+        ]
       },
-      new Category()
+      new()
       {
         Name = "Utilities",
-        SubCategories = new Category[]
-        {
-          new Category(){ Name = "Cleaning" },
-          new Category(){ Name = "Electricity" },
-          new Category(){ Name = "Heat/gas" },
-          new Category(){ Name = "Other" },
-          new Category(){ Name = "Trash" },
-          new Category(){ Name = "TV/Phone/Internet" },
-          new Category(){ Name = "Water" }
-        }
+        SubCategories =
+        [
+          new() { Name = "Cleaning" },
+          new() { Name = "Electricity" },
+          new() { Name = "Heat/gas" },
+          new() { Name = "Other" },
+          new() { Name = "Trash" },
+          new() { Name = "TV/Phone/Internet" },
+          new() { Name = "Water" }
+        ]
       }
-    };
+    ];
 
     public static class Entertainment
     {

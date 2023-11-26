@@ -39,9 +39,9 @@
           <DataTemplate x:DataType="models:Group">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border CornerRadius="3">
-                <ImageIcon Width="20" Height="20" Source="{x:Bind Picture, Mode=OneWay}"/>
+                <ImageIcon Width="20" Height="20" Source="{x:Bind Picture}"/>
               </Border>
-              <TextBlock Text="{x:Bind Name, Mode=OneWay}"/>
+              <TextBlock Text="{x:Bind Name}"/>
             </StackPanel>
           </DataTemplate>
         </ComboBox.ItemTemplate>
@@ -84,8 +84,8 @@
               </ItemsRepeater.Layout>
               <ItemsRepeater.ItemTemplate>
                 <DataTemplate x:DataType="models:User">
-                  <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" DataContext="{x:Bind (models:User), Mode=OneWay}" Click="Button_AddUser_Click">
-                    <views:UserView Picture="{x:Bind Picture, Mode=OneWay}" FirstName="{x:Bind FirstName, Mode=OneWay}" LastName="{x:Bind LastName, Mode=OneWay}" Email="{x:Bind Email, Mode=OneWay}"/>
+                  <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" DataContext="{x:Bind (models:User)}" Click="Button_AddUser_Click">
+                    <views:UserView Picture="{x:Bind Picture}" FirstName="{x:Bind FirstName}" LastName="{x:Bind LastName}" Email="{x:Bind Email}"/>
                   </Button>
                 </DataTemplate>
               </ItemsRepeater.ItemTemplate>

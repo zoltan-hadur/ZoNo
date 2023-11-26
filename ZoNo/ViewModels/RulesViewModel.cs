@@ -10,25 +10,13 @@ using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
-  public partial class RulesViewModel : ObservableObject
+  public partial class RulesViewModel(
+    IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService,
+    IDialogService _dialogService,
+    IRulesService _rulesService,
+    RuleType _ruleType) : ObservableObject
   {
-    private readonly IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService;
-    private readonly IDialogService _dialogService;
-    private readonly IRulesService _rulesService;
-    private readonly RuleType _ruleType;
-
-    public ObservableCollection<RuleViewModel> Rules { get; } = new ObservableCollection<RuleViewModel>();
-
-    public RulesViewModel(
-      IRuleExpressionSyntaxCheckerService ruleExpressionSyntaxCheckerService,
-      IDialogService dialogService,
-      IRulesService rulesService, RuleType ruleType)
-    {
-      _ruleExpressionSyntaxCheckerService = ruleExpressionSyntaxCheckerService;
-      _dialogService = dialogService;
-      _rulesService = rulesService;
-      _ruleType = ruleType;
-    }
+    public ObservableCollection<RuleViewModel> Rules { get; } = [];
 
     public async Task Load()
     {
@@ -88,7 +76,7 @@ namespace ZoNo.ViewModels
       var rule = new RuleViewModel()
       {
         Index = Rules.Count + 1,
-        OutputExpressions = new ObservableCollection<OutputExpressionViewModel> { new OutputExpressionViewModel() { Index = 1 } }
+        OutputExpressions = [new() { Index = 1 }]
       };
       rule.InputExpressionChanged += Rule_InputExpressionChanged;
       rule.OutputExpressionChanged += Rule_OutputExpressionChanged;
