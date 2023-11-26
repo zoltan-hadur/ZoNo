@@ -7,7 +7,7 @@ namespace ZoNo.Services
 {
   public class RuleExpressionSyntaxCheckerService : IRuleExpressionSyntaxCheckerService
   {
-    public async Task<(bool IsValid, string ErrorMessage)> TryCheckSyntaxAsync<Input>(string inputExpression)
+    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input>(string inputExpression)
     {
       return await Task.Run(() =>
       {
@@ -23,7 +23,7 @@ namespace ZoNo.Services
       });
     }
 
-    public async Task<(bool IsValid, string ErrorMessage)> TryCheckSyntaxAsync<Input, Output>(string outputExpression)
+    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input, Output>(string outputExpression)
     {
       return await Task.Run(() =>
       {
