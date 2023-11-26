@@ -57,18 +57,6 @@ namespace ZoNo.Views
       InitializeComponent();
     }
 
-    private void MenuFlyout_Opening(object sender, object e)
-    {
-      if (sender is MenuFlyout menuFlyout)
-      {
-        var dataContext = menuFlyout.Target?.DataContext ?? (menuFlyout.Target as ContentControl)?.Content;
-        foreach (var item in menuFlyout.Items)
-        {
-          item.DataContext = dataContext;
-        }
-      }
-    }
-
     private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
       if (e.OriginalSource is FrameworkElement element)

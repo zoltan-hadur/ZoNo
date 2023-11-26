@@ -42,9 +42,9 @@
           <Setter Property="Padding" Value="16,0,0,0"/>
           <Setter Property="ContextFlyout">
             <Setter.Value>
-              <MenuFlyout Opening="MenuFlyout_Opening">
+              <controls:BindableMenuFlyout>
                 <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind ViewModel.DeleteOutputExpressionCommand}" CommandParameter="{Binding}"/>
-              </MenuFlyout>
+              </controls:BindableMenuFlyout>
             </Setter.Value>
           </Setter>
         </Style>

@@ -81,10 +81,10 @@
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
                   <Setter Property="ContextFlyout">
                     <Setter.Value>
-                      <MenuFlyout Opening="MenuFlyout_Opening">
+                      <controls:BindableMenuFlyout>
                         <MenuFlyoutItem Text="Edit" Icon="Edit" Command="{x:Bind ViewModel.ExpensesViewModel.EditExpenseCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                         <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind ViewModel.ExpensesViewModel.DeleteExpenseCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
-                      </MenuFlyout>
+                      </controls:BindableMenuFlyout>
                     </Setter.Value>
                   </Setter>
                 </Style>

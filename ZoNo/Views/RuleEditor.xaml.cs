@@ -12,17 +12,5 @@ namespace ZoNo.Views
       ViewModel = rule;
       InitializeComponent();
     }
-
-    private void MenuFlyout_Opening(object sender, object e)
-    {
-      if (sender is MenuFlyout menuFlyout)
-      {
-        var dataContext = menuFlyout.Target?.DataContext ?? (menuFlyout.Target as ContentControl)?.Content;
-        foreach (var item in menuFlyout.Items)
-        {
-          item.DataContext = dataContext;
-        }
-      }
-    }
   }
 }

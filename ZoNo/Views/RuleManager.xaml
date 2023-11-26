@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodels="using:ZoNo.ViewModels"
              xmlns:sys="using:System"
+             xmlns:controls="using:ZoNo.Controls"
              mc:Ignorable="d">
   <Border Background="{x:Bind Background, Mode=OneWay}"
           Padding="{x:Bind Padding, Mode=OneWay}"
@@ -27,11 +28,11 @@
           <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
             <Setter Property="ContextFlyout">
               <Setter.Value>
-                <MenuFlyout Opening="MenuFlyout_Opening">
+                <controls:BindableMenuFlyout>
                   <MenuFlyoutItem Text="Edit" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                   <MenuFlyoutItem Text="Duplicate" Icon="Copy" Command="{x:Bind DuplicateRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
                   <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
-                </MenuFlyout>
+                </controls:BindableMenuFlyout>
               </Setter.Value>
             </Setter>
           </Style>

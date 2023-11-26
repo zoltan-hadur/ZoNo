@@ -9,6 +9,7 @@
              xmlns:sys="using:System"
              xmlns:converters="using:ZoNo.Converters"
              xmlns:helpers="using:ZoNo.Helpers"
+             xmlns:controls="using:ZoNo.Controls"
              mc:Ignorable="d"
              MinWidth="600"
              MinHeight="300">
@@ -101,9 +102,9 @@
           <Setter Property="Padding" Value="16,0,0,0"/>
           <Setter Property="ContextFlyout">
             <Setter.Value>
-              <MenuFlyout Opening="MenuFlyout_Opening">
+              <controls:BindableMenuFlyout>
                 <MenuFlyoutItem Text="Delete" Icon="Delete" Click="MenuFlyoutItem_DeleteShare_Click"/>
-              </MenuFlyout>
+              </controls:BindableMenuFlyout>
             </Setter.Value>
           </Setter>
         </Style>
