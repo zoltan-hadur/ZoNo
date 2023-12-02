@@ -10,7 +10,6 @@ namespace ZoNo.Services
   {
     public async Task<DialogResult> ShowDialogAsync<T>(DialogType type, string title, T content, Binding isPrimaryButtonEnabled = null)
     {
-      var margin = 12;
       var dialog = new ContentDialog()
       {
         XamlRoot = App.MainWindow.Content.XamlRoot,
@@ -24,12 +23,12 @@ namespace ZoNo.Services
       dialog.Resources["ContentDialogMinHeight"] = 0.0;
       dialog.Resources["ContentDialogMaxWidth"] = double.PositiveInfinity;
       dialog.Resources["ContentDialogMaxHeight"] = double.PositiveInfinity;
-      dialog.Resources["ContentDialogPadding"] = new Thickness(margin);
+      dialog.Resources["ContentDialogPadding"] = new Thickness(12);
       dialog.Loaded += (s, e) =>
       {
-        if (dialog.FindDescendant("BackgroundElement") is Border border)
+        if (dialog.FindDescendant("LayoutRoot") is Grid grid)
         {
-          border.Margin = new Thickness(margin);
+          grid.Margin = new Thickness(6, 40, 6, 6);
         }
       };
       if (isPrimaryButtonEnabled != null)
