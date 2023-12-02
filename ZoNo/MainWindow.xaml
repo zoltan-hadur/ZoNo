@@ -19,7 +19,7 @@
         <RowDefinition/>
       </Grid.RowDefinitions>
       <StackPanel Grid.Row="0" x:Name="AppTitleBar" Height="32" Orientation="Horizontal">
-        <Image Width="16" Height="16" Margin="16,0,0,0" VerticalAlignment="Center" Source="ms-appx:///Assets/StoreLogo.png" />
+        <Image Width="16" Height="16" Margin="16,0,0,0" VerticalAlignment="Center" Source="ms-appx:///Assets/ZoNo.png" />
         <TextBlock x:Name="TitleBarTextBlock" Margin="16,0,0,0" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Title}" TextWrapping="NoWrap">
           <TextBlock.Resources>
             <SolidColorBrush x:Key="TitleFillColorDisabled" Color="{ThemeResource TextFillColorDisabled}"/>

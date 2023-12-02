@@ -16,7 +16,7 @@ namespace ZoNo
     {
       InitializeComponent();
 
-      AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
+      AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/ZoNo.ico"));
 
       ExtendsContentIntoTitleBar = true;
       SetTitleBar(AppTitleBar);
