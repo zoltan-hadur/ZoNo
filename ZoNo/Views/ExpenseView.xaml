@@ -74,7 +74,7 @@
     <!-- Description and group -->
     <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" Spacing="3">
       <TextBlock Text="{x:Bind Description, Mode=OneWay}" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
-      <Border Background="{StaticResource SystemAltLowColor}" HorizontalAlignment="Left" Padding="6,0,6,0" CornerRadius="4">
+      <Border Background="{ThemeResource SystemRevealListLowColor}" HorizontalAlignment="Left" Padding="6,0,6,0" CornerRadius="4">
         <TextBlock Text="{x:Bind Group, Mode=OneWay}" FontSize="12"/>
       </Border>
     </StackPanel>
