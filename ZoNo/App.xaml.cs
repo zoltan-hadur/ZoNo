@@ -20,7 +20,7 @@ namespace ZoNo
     private new static App Current => (App)Application.Current;
     private IServiceScope ServiceScope { get; set; }
 
-    public static WindowEx MainWindow { get; } = new MainWindow();
+    public static MainWindow MainWindow { get; } = new MainWindow();
 
     public static T GetService<T>() where T : class
     {
@@ -90,7 +90,7 @@ namespace ZoNo
       {
         return new NavigationService(provider.GetService<ITopLevelPageService>())
         {
-          Frame = MainWindow.Content as Frame
+          Frame = MainWindow.Frame
         };
       });
       services.AddScoped<INavigationService, NavigationService>();
