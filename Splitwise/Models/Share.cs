@@ -1,9 +1,9 @@
 ﻿namespace Splitwise.Models
 {
-  public class Share
+  public record Share
   {
-    public int UserId { get; set; }
-    public string PaidShare { get; set; }
-    public string OwedShare { get; set; }
+    public int UserId { get; init; }
+    public string PaidShare { get; init; }
+    public string OwedShare { get; init; }
   }
 }

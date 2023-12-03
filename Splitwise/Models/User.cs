@@ -1,14 +1,14 @@
 ﻿namespace Splitwise.Models
 {
-  public class User
+  public record User
   {
-    public int Id { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public Picture Picture { get; set; }
-    public bool CustomPicture { get; set; }
-    public CurrencyCode DefaultCurrency { get; set; }
-    public int DefaultGroupId { get; set; }
+    public int Id { get; init; }
+    public string FirstName { get; init; }
+    public string LastName { get; init; }
+    public string Email { get; init; }
+    public Picture Picture { get; init; }
+    public bool CustomPicture { get; init; }
+    public CurrencyCode DefaultCurrency { get; init; }
+    public int DefaultGroupId { get; init; }
   }
 }

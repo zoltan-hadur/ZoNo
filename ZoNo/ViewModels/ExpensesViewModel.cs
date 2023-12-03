@@ -119,33 +119,37 @@ namespace ZoNo.ViewModels
         var category = _categories.Single(category => category.Name == expense.Category.ParentCategoryName)
           .Subcategories.Single(subcategory => subcategory.Name == expense.Category.Name);
 
-        var users = expense.Shares.Select(with => new Splitwise.Models.Share()
+        var sofar = 0.0;
+        var users = expense.Shares.Select((with, index) =>
         {
-          UserId = group.Members.Single(user => user.Email == with.User.Email).Id
-        }).ToArray();
-
-        for (int i = 0; i < users.Length; ++i)
-        {
-          if (i == 0)
+          var paidShare = string.Empty;
+          var owedShare = string.Empty;
+          if (index == 0)
           {
-            users[i].PaidShare = expense.Cost.ToString("0.00");
+            paidShare = expense.Cost.ToString("0.00");
           }
           else
           {
-            users[i].PaidShare = "0";
+            paidShare = "0";
           }
-          if (i < users.Length - 1)
+          if (index < expense.Shares.Count - 1)
           {
-            users[i].OwedShare = (expense.Cost * expense.Shares[i].Percentage / 100).ToString("0.00");
+            owedShare = (expense.Cost * expense.Shares[index].Percentage / 100).ToString("0.00");
+            sofar = sofar + Convert.ToDouble(owedShare);
           }
           else
           {
             var total = Convert.ToDouble(expense.Cost.ToString("0.00"));
-            var sofar = users.SkipLast(1).Sum(user => Convert.ToDouble(user.OwedShare));
             var rest = total - sofar;
-            users[i].OwedShare = rest.ToString("0.00");
+            owedShare = rest.ToString("0.00");
           }
-        }
+          return new Splitwise.Models.Share()
+          {
+            UserId = group.Members.Single(user => user.Email == with.User.Email).Id,
+            PaidShare = paidShare,
+            OwedShare = owedShare
+          };
+        }).ToArray();
 
         var splitwiseExpense = new Splitwise.Models.Expense()
         {

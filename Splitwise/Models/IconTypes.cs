@@ -1,8 +1,8 @@
 ﻿namespace Splitwise.Models
 {
-  public class IconTypes
+  public record IconTypes
   {
-    public Slim Slim { get; set; }
-    public Square Square { get; set; }
+    public Slim Slim { get; init; }
+    public Square Square { get; init; }
   }
 }

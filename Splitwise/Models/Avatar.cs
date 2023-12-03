@@ -1,12 +1,12 @@
 ﻿namespace Splitwise.Models
 {
-  public class Avatar
+  public record Avatar
   {
-    public string Original { get; set; }
-    public string XXLarge { get; set; }
-    public string XLarge { get; set; }
-    public string Large { get; set; }
-    public string Medium { get; set; }
-    public string Small { get; set; }
+    public string Original { get; init; }
+    public string XXLarge { get; init; }
+    public string XLarge { get; init; }
+    public string Large { get; init; }
+    public string Medium { get; init; }
+    public string Small { get; init; }
   }
 }

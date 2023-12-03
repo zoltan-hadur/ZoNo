@@ -1,8 +1,8 @@
 ﻿namespace Splitwise.Models
 {
-  public class Slim
+  public record Slim
   {
-    public string Small { get; set; }
-    public string Large { get; set; }
+    public string Small { get; init; }
+    public string Large { get; init; }
   }
 }

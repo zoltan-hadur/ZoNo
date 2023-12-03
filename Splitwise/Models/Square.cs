@@ -1,8 +1,8 @@
 ﻿namespace Splitwise.Models
 {
-  public class Square
+  public record Square
   {
-    public string Large { get; set; }
-    public string XLarge { get; set; }
+    public string Large { get; init; }
+    public string XLarge { get; init; }
   }
 }

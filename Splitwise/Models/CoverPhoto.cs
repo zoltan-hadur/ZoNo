@@ -1,8 +1,8 @@
 ﻿namespace Splitwise.Models
 {
-  public class CoverPhoto
+  public record CoverPhoto
   {
-    public string XXLarge { get; set; }
-    public string XLarge { get; set; }
+    public string XXLarge { get; init; }
+    public string XLarge { get; init; }
   }
 }

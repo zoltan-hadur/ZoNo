@@ -1,9 +1,9 @@
 ﻿namespace Splitwise.Models
 {
-  public class Picture
+  public record Picture
   {
-    public string Small { get; set; }
-    public string Medium { get; set; }
-    public string Large { get; set; }
+    public string Small { get; init; }
+    public string Medium { get; init; }
+    public string Large { get; init; }
   }
 }
