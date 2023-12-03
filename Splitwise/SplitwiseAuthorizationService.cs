@@ -75,7 +75,7 @@ namespace Splitwise
         using var contentStream = await response.Content.ReadAsStreamAsync();
         var token = await JsonSerializer.DeserializeAsync<Token>(contentStream, new JsonSerializerOptions()
         {
-          PropertyNamingPolicy = new SnakeCasePolicy(),
+          PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
           Converters = { new JsonStringEnumConverter() }
         });
         return token;

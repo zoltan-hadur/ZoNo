@@ -107,7 +107,7 @@ namespace Splitwise
         {
           var options = new JsonSerializerOptions()
           {
-            PropertyNamingPolicy = new SnakeCasePolicy(),
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             Converters = { new JsonStringEnumConverter() }
           };
           var node = JsonNode.Parse(responseString);
