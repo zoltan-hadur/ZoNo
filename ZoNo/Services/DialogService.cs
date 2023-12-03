@@ -19,6 +19,16 @@ namespace ZoNo.Services
         CloseButtonText = type == DialogType.OkCancel ? "Cancel" : string.Empty,
         Content = content
       };
+
+      dialog.SizeChanged += (s, e) =>
+      {
+        var border = dialog.FindDescendant("Container") as Border;
+        var groups = VisualStateManager.GetVisualStateGroups(border);
+        var states = groups.Single(x => x.Name == "DialogShowingStates");
+        var transition = states.Transitions.Single(x => x.To == "DialogShowing");
+        transition.Storyboard.Begin();
+      };
+
       dialog.Resources["ContentDialogMinWidth"] = 0.0;
       dialog.Resources["ContentDialogMinHeight"] = 0.0;
       dialog.Resources["ContentDialogMaxWidth"] = double.PositiveInfinity;
