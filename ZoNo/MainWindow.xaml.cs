@@ -55,6 +55,10 @@ namespace ZoNo
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
+      CommunityToolkit.WinUI.UI.Animations.AnimationBuilder
+        .Create().Opacity(to: args.WindowActivationState == WindowActivationState.Deactivated ? 0.5 : 1)
+        .Start(TitleBarImage);
+
       var resourceKey = args.WindowActivationState == WindowActivationState.Deactivated ? "TitleFillColorDisabled" : "TitleFillColorPrimary";
       var storyboard = new Storyboard();
       var animation = new ColorAnimation()
