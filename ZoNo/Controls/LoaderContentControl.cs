@@ -44,13 +44,13 @@ namespace ZoNo.Controls
 
       ElementCompositionPreview.SetImplicitShowAnimation(_progressRing, new OpacityAnimation()
       {
-        Duration = TimeSpan.FromMilliseconds(300),
+        Duration = TimeSpan.FromMilliseconds(250),
         From = 0,
         To = 1
       }.GetAnimation(_progressRing, out _));
       ElementCompositionPreview.SetImplicitHideAnimation(_progressRing, new OpacityAnimation()
       {
-        Duration = TimeSpan.FromMilliseconds(300),
+        Duration = TimeSpan.FromMilliseconds(250),
         From = 1,
         To = 0
       }.GetAnimation(_progressRing, out _));

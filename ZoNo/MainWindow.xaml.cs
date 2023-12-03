@@ -60,7 +60,7 @@ namespace ZoNo
       var animation = new ColorAnimation()
       {
         To = ((SolidColorBrush)TitleBarTextBlock.Resources[resourceKey]).Color,
-        Duration = TimeSpan.FromMilliseconds(200)
+        Duration = TimeSpan.FromMilliseconds(250)
       };
       Storyboard.SetTarget(animation, TitleBarTextBlock);
       Storyboard.SetTargetProperty(animation, "(TextBlock.Foreground).(SolidColorBrush.Color)");
