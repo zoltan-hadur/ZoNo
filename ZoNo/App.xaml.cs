@@ -132,6 +132,13 @@ namespace ZoNo
       UnhandledException += App_UnhandledException;
 
       ServiceScope.ServiceProvider.GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
+
+      var themeSelectorService = ServiceScope.ServiceProvider.GetService<IThemeSelectorService>();
+      Task.Run(themeSelectorService.InitializeAsync).Wait();
+      if (themeSelectorService.Theme != ElementTheme.Default)
+      {
+        RequestedTheme = themeSelectorService.Theme == ElementTheme.Light ? ApplicationTheme.Light : ApplicationTheme.Dark;
+      }
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
