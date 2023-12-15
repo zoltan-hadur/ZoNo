@@ -42,6 +42,22 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.3.0 / 2023-12-15" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Support USD."/>
+        <TextBlock Text="Import rules renamed to Transaction rules."/>
+        <TextBlock Text="Splitwise rules renamed to Expense rules."/>
+        <TextBlock Text="Open expense editor upon double clicking on an expense."/>
+        <TextBlock Text="Expense group color fixed."/>
+        <TextBlock Text="Show animation for dialog."/>
+        <TextBlock Text="Apply theme at application start to prevent flickering."/>
+        <ListView Header="Windows 11 style custom title bar:">
+          <TextBlock Text="The app now has an icon."/>
+          <TextBlock Text="Icon, title and caption buttons gray out when app is inactive."/>
+        </ListView>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.2.0 / 2023-11-20" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Fix login issue."/>
