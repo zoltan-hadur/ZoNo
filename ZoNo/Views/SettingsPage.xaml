@@ -6,9 +6,6 @@
       xmlns:xaml="using:Microsoft.UI.Xaml"
       mc:Ignorable="d">
   <Grid>
-    <Border VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8" Margin="0,-33,0,0">
-      <Image Width="64" Height="64" Source="ms-appx:///Assets/ZoNo.png"/>
-    </Border>
     <StackPanel>
       <TextBlock Text="Rules" Style="{ThemeResource SubtitleTextBlockStyle}"/>
       <StackPanel Orientation="Horizontal" Margin="{StaticResource SmallTopBottomMargin}">
@@ -52,5 +49,8 @@
       </StackPanel>
       <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
     </StackPanel>
+    <Border VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8" Margin="0,-33,0,0">
+      <Image Width="64" Height="64" Source="ms-appx:///Assets/ZoNo.png" ToolTipService.ToolTip="I love you, Nora! 🥰"/>
+    </Border>
   </Grid>
 </Page>
