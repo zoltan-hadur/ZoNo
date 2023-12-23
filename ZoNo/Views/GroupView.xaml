@@ -12,22 +12,21 @@
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <ListViewHeaderItem Grid.Row="0" Padding="-16,12,0,0" Margin="0">
-      <StackPanel Orientation="Horizontal">
-        <Border CornerRadius="8">
-          <Image Width="30" Height="30" Source="{x:Bind Picture, Mode=OneWay}"/>
-        </Border>
-        <TextBlock Text="{x:Bind Name, Mode=OneWay}" IsTextSelectionEnabled="{x:Bind IsTextSelectionEnabled, Mode=OneWay}" Margin="12,0,0,0"/>
-      </StackPanel>
-    </ListViewHeaderItem>
-    <ItemsRepeater Grid.Row="1" ItemsSource="{x:Bind Members, Mode=OneWay}">
+    <!-- Group name -->
+    <StackPanel Grid.Row="0" Orientation="Horizontal">
+      <Border CornerRadius="6">
+        <Image Width="32" Height="32" Source="{x:Bind Picture, Mode=OneWay}"/>
+      </Border>
+      <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" IsTextSelectionEnabled="{x:Bind IsTextSelectionEnabled, Mode=OneWay}" Margin="12,0,0,0"/>
+    </StackPanel>
+    <!-- Group members -->
+    <ItemsRepeater Grid.Row="1" ItemsSource="{x:Bind Members, Mode=OneWay}" Margin="0,8,0,0">
       <ItemsRepeater.Layout>
-        <StackLayout Orientation="Vertical" Spacing="0"/>
+        <StackLayout Orientation="Vertical" Spacing="8"/>
       </ItemsRepeater.Layout>
       <ItemsRepeater.ItemTemplate>
         <DataTemplate x:DataType="models:User">
-          <views:UserView Margin="0,8,0,0"
-                          Picture="{x:Bind Picture}"
+          <views:UserView Picture="{x:Bind Picture}"
                           FirstName="{x:Bind FirstName}"
                           LastName="{x:Bind LastName}"
                           Email="{x:Bind Email}"
