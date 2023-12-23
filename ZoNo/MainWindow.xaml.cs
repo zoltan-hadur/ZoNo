@@ -56,10 +56,12 @@ namespace ZoNo
 
     private async void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
+      // Animate app icon
       CommunityToolkit.WinUI.UI.Animations.AnimationBuilder
         .Create().Opacity(to: args.WindowActivationState == WindowActivationState.Deactivated ? 0.5 : 1)
         .Start(TitleBarImage);
 
+      // Animate app title
       var resourceKey = args.WindowActivationState == WindowActivationState.Deactivated ? "TitleFillColorDisabled" : "TitleFillColorPrimary";
       var storyboard = new Storyboard();
       var animation = new ColorAnimation()
@@ -76,6 +78,7 @@ namespace ZoNo
       };
       storyboard.Begin();
 
+      // Animate caption buttons
       try
       {
         if (args.WindowActivationState == WindowActivationState.Deactivated)

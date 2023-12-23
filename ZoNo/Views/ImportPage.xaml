@@ -22,6 +22,7 @@
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
+      <!-- Transactions and expenses -->
       <controls:AutomaticStackPanel StartingOrientation="Vertical" Threshold="1280" Spacing="12">
         <controls:AutomaticStackPanel.Resources>
           <Style x:Key="BorderStyle" TargetType="Border">
@@ -30,6 +31,7 @@
             <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundListLowBrush}"/>
           </Style>
         </controls:AutomaticStackPanel.Resources>
+        <!-- Transactions -->
         <Border Style="{StaticResource BorderStyle}">
           <views:TransactionsView Transactions="{x:Bind ViewModel.TransactionsViewModel.TransactionsView}"
                                   SelectedItem="{x:Bind ViewModel.SelectedTransaction, Mode=TwoWay}"
@@ -38,6 +40,7 @@
                                   DeleteTransactionsCommand="{x:Bind ViewModel.TransactionsViewModel.DeleteTransactionsCommand}"/>
           
         </Border>
+        <!-- Expenses -->
         <Border Style="{StaticResource BorderStyle}">
           <Grid>
             <Border x:Name="ExpensesHereBorder">
@@ -107,6 +110,7 @@
           </Grid>
         </Border>
       </controls:AutomaticStackPanel>
+      <!-- Transaction/expense counter and upload button -->
       <Grid Grid.Row="1" Margin="{StaticResource SmallTopBottomMargin}">
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                    Text="{x:Bind sys:String.Format(x:Null, 'Transactions: {0}, Expenses: {1}', ViewModel.TransactionsViewModel.TransactionsView.Count, ViewModel.ExpensesViewModel.Expenses.Count), Mode=OneWay}"/>
