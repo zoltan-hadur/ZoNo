@@ -12,13 +12,13 @@
              mc:Ignorable="d"
              Loaded="UserControl_Loaded">
   <Grid Background="Transparent" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
-    <Border x:Name="DropHereBorder">
+    <Grid x:Name="DropHereGrid">
       <TextBlock x:Name="DropHereText" Text="Drop Excel document here" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
         <interactivity:Interaction.Behaviors>
-        <core:DataTriggerBehavior Binding="{x:Bind DataGrid.IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="True">
+        <core:DataTriggerBehavior Binding="{x:Bind IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="True">
           <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Opacity" Value="1"/>
         </core:DataTriggerBehavior>
-        <core:DataTriggerBehavior Binding="{x:Bind DataGrid.IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="False">
+        <core:DataTriggerBehavior Binding="{x:Bind IsEnabled, Mode=OneWay}" ComparisonCondition="Equal" Value="False">
           <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereText}" PropertyName="Opacity" Value="0.3" />
         </core:DataTriggerBehavior>
       </interactivity:Interaction.Behaviors>
@@ -31,16 +31,16 @@
       </animations:Implicit.HideAnimations>
       <interactivity:Interaction.Behaviors>
         <core:DataTriggerBehavior Binding="{x:Bind Transactions.Count, Mode=OneWay}" ComparisonCondition="Equal" Value="0">
-          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereBorder}" PropertyName="Visibility" Value="Visible"/>
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereGrid}" PropertyName="Visibility" Value="Visible"/>
         </core:DataTriggerBehavior>
         <core:DataTriggerBehavior Binding="{x:Bind Transactions.Count, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="0">
-          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereBorder}" PropertyName="Visibility" Value="Collapsed" />
+          <core:ChangePropertyAction TargetObject="{Binding ElementName=DropHereGrid}" PropertyName="Visibility" Value="Collapsed" />
         </core:DataTriggerBehavior>
       </interactivity:Interaction.Behaviors>
-    </Border>
+    </Grid>
     <controls:DataGrid x:Name="DataGrid"
                        ItemsSource="{x:Bind Transactions, Mode=OneWay}"
-                       SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+                       SelectedItem="{x:Bind SelectedTransaction, Mode=TwoWay}"
                        GridLinesVisibility="All"
                        AutoGenerateColumns="False"
                        Sorting="DataGrid_Sorting"

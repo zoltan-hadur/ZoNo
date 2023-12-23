@@ -35,7 +35,7 @@ namespace ZoNo.Views
     public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(Dictionary<string, ColumnViewModel>), typeof(TransactionsView), null);
     public static readonly DependencyProperty LoadExcelDocumentsCommandProperty = DependencyProperty.Register(nameof(LoadExcelDocumentsCommand), typeof(ICommand), typeof(TransactionsView), null);
     public static readonly DependencyProperty DeleteTransactionsCommandProperty = DependencyProperty.Register(nameof(DeleteTransactionsCommand), typeof(ICommand), typeof(TransactionsView), null);
-    public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(Transaction), typeof(TransactionsView), new PropertyMetadata(null, OnSelectedItemChanged));
+    public static readonly DependencyProperty SelectedTransactionProperty = DependencyProperty.Register(nameof(SelectedTransaction), typeof(Transaction), typeof(TransactionsView), new PropertyMetadata(null, OnSelectedItemChanged));
 
     public AdvancedCollectionView Transactions
     {
@@ -61,10 +61,10 @@ namespace ZoNo.Views
       set => SetValue(DeleteTransactionsCommandProperty, value);
     }
 
-    public Transaction SelectedItem
+    public Transaction SelectedTransaction
     {
-      get => (Transaction)GetValue(SelectedItemProperty);
-      set => SetValue(SelectedItemProperty, value);
+      get => (Transaction)GetValue(SelectedTransactionProperty);
+      set => SetValue(SelectedTransactionProperty, value);
     }
 
     public TransactionsView()

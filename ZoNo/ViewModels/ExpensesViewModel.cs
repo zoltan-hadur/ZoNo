@@ -17,15 +17,18 @@ namespace ZoNo.ViewModels
   {
     private readonly ISplitwiseService _splitwiseService;
     private readonly IDialogService _dialogService;
-    private Splitwise.Models.Group[] _groups;
-    private Splitwise.Models.Category[] _categories;
+    private Splitwise.Models.Group[] _splitwiseGroups;
+    private Splitwise.Models.Category[] _splitwiseCategories;
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
     public ObservableCollection<ExpenseViewModel> Expenses { get; } = [];
 
-    public Category[] Categories { get; private set; }
-    public Group[] Groups { get; private set; }
+    [ObservableProperty]
+    private Category[] _categories;
+
+    [ObservableProperty]
+    private Group[] _groups;
 
     [ObservableProperty]
     private bool _isUploadingToSplitwise = false;
@@ -47,9 +50,9 @@ namespace ZoNo.ViewModels
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       if (_isLoaded) return;
 
-      _groups = await _splitwiseService.GetGroupsAsync();
-      _categories = [.. (await _splitwiseService.GetCategoriesAsync()).OrderBy(category => category.Name)];
-      Categories = _categories.Select(category => new Category()
+      _splitwiseGroups = await _splitwiseService.GetGroupsAsync();
+      _splitwiseCategories = [.. (await _splitwiseService.GetCategoriesAsync()).OrderBy(category => category.Name)];
+      Categories = _splitwiseCategories.Select(category => new Category()
       {
         Name = category.Name,
         SubCategories = category.Subcategories.Select(subCategory => new Category()
@@ -58,7 +61,7 @@ namespace ZoNo.ViewModels
           Picture = subCategory.IconTypes.Square.Large
         }).ToArray()
       }).ToArray();
-      Groups = _groups.Select(group => new Group()
+      Groups = _splitwiseGroups.Select(group => new Group()
       {
         Picture = group.Avatar.Medium,
         Name = group.Name,
@@ -114,9 +117,9 @@ namespace ZoNo.ViewModels
 
       foreach (var expense in Expenses.ToArray())
       {
-        var group = _groups.Single(group => group.Name == expense.Group.Name);
+        var group = _splitwiseGroups.Single(group => group.Name == expense.Group.Name);
 
-        var category = _categories.Single(category => category.Name == expense.Category.ParentCategoryName)
+        var category = _splitwiseCategories.Single(category => category.Name == expense.Category.ParentCategoryName)
           .Subcategories.Single(subcategory => subcategory.Name == expense.Category.Name);
 
         var sofar = 0.0;
