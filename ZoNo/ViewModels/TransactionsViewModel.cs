@@ -8,34 +8,18 @@ using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public partial class TransactionsViewModel : ObservableObject
+  public partial class TransactionsViewModel(
+    ILocalSettingsService _localSettingsService,
+    IExcelDocumentLoaderService _excelDocumentLoaderService,
+    IRulesService _rulesService,
+    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : ObservableObject
   {
-    private readonly ILocalSettingsService _localSettingsService;
-    private readonly IExcelDocumentLoaderService _excelDocumentLoaderService;
-    private readonly IRulesService _rulesService;
-    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-
-    private readonly ObservableCollection<Transaction> _transactions = [];
-
-    public AdvancedCollectionView TransactionsView { get; } = [];
+    public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView(new ObservableCollection<Transaction>());
 
     public Dictionary<string, ColumnViewModel> Columns { get; private set; } = null;
 
     public event EventHandler LoadExcelDocumentsStarted;
     public event EventHandler LoadExcelDocumentsFinished;
-
-    public TransactionsViewModel(
-      ILocalSettingsService localSettingsService,
-      IExcelDocumentLoaderService excelDocumentLoader,
-      IRulesService rulesService,
-      IRuleEvaluatorServiceBuilder ruleEvaluatorService)
-    {
-      _localSettingsService = localSettingsService;
-      _excelDocumentLoaderService = excelDocumentLoader;
-      _rulesService = rulesService;
-      _ruleEvaluatorServiceBuilder = ruleEvaluatorService;
-      TransactionsView.Source = _transactions;
-    }
 
     public async Task Load()
     {
@@ -55,7 +39,7 @@ namespace ZoNo.ViewModels
         { nameof(ColumnHeader.Currency        ), new() { ColumnHeader = ColumnHeader.Currency        , IsVisible = false } }
       };
 
-      foreach (var (_, column) in Columns)
+      foreach (var column in Columns.Values)
       {
         var isColumnVisible = await _localSettingsService.ReadSettingAsync<bool?>(SettingColumnIsVisible(column.ColumnHeader));
         if (isColumnVisible.HasValue)
@@ -64,7 +48,7 @@ namespace ZoNo.ViewModels
         }
       }
 
-      foreach (var (_, column) in Columns)
+      foreach (var column in Columns.Values)
       {
         column.PropertyChanged += Column_PropertyChanged;
       }
@@ -138,8 +122,8 @@ namespace ZoNo.ViewModels
     {
       if (sender is ColumnViewModel senderColumn && e.PropertyName == nameof(ColumnViewModel.IsVisible))
       {
-        var visibleColumnCount = Columns.Count(column => column.Value.IsVisible);
-        foreach (var (_, column) in Columns)
+        var visibleColumnCount = Columns.Values.Count(column => column.IsVisible);
+        foreach (var column in Columns.Values)
         {
           column.IsEnabled = !(column.IsVisible && visibleColumnCount == 1);
         }
