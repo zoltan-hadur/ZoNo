@@ -6,7 +6,7 @@ using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class ExcelDocumentLoader : IExcelDocumentLoader
+  public class ExcelDocumentLoaderService : IExcelDocumentLoaderService
   {
     private const int _expectedWorksheetCount = 1;
     private const string _expectedWorksheetName = "Tranzakciók";
@@ -90,7 +90,7 @@ namespace ZoNo.Services
       };
     }
 
-    public async Task<IList<Transaction>> LoadAsync(string path)
+    public async Task<IList<Transaction>> LoadDocumentAsync(string path)
     {
       return await Task.Run(() =>
       {

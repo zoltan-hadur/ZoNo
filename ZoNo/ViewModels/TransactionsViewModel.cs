@@ -11,7 +11,7 @@ namespace ZoNo.ViewModels
   public partial class TransactionsViewModel : ObservableObject
   {
     private readonly ILocalSettingsService _localSettingsService;
-    private readonly IExcelDocumentLoader _excelDocumentLoader;
+    private readonly IExcelDocumentLoaderService _excelDocumentLoaderService;
     private readonly IRulesService _rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
 
@@ -26,12 +26,12 @@ namespace ZoNo.ViewModels
 
     public TransactionsViewModel(
       ILocalSettingsService localSettingsService,
-      IExcelDocumentLoader excelDocumentLoader,
+      IExcelDocumentLoaderService excelDocumentLoader,
       IRulesService rulesService,
       IRuleEvaluatorServiceBuilder ruleEvaluatorService)
     {
       _localSettingsService = localSettingsService;
-      _excelDocumentLoader = excelDocumentLoader;
+      _excelDocumentLoaderService = excelDocumentLoader;
       _rulesService = rulesService;
       _ruleEvaluatorServiceBuilder = ruleEvaluatorService;
       TransactionsView.Source = _transactions;
@@ -82,7 +82,7 @@ namespace ZoNo.ViewModels
       var transactions = new List<Transaction>();
       foreach (var path in paths)
       {
-        foreach (var transaction in await _excelDocumentLoader.LoadAsync(path))
+        foreach (var transaction in await _excelDocumentLoaderService.LoadDocumentAsync(path))
         {
           transactions.Add(transaction);
         }
