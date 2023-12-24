@@ -13,7 +13,6 @@ using System.Numerics;
 using System.Reflection;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation.Collections;
 using Windows.System;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -28,7 +27,6 @@ namespace ZoNo.Views
     private readonly HashSet<DataGridRow> _rows = [];
     private ScrollBar _scrollBar;
     private bool _isLoaded = false;
-    private bool _isSorting = false;
     private bool _isPointerWheelScrolled = false;
 
     public static readonly DependencyProperty TransactionsProperty = DependencyProperty.Register(nameof(Transactions), typeof(AdvancedCollectionView), typeof(TransactionsView), new PropertyMetadata(null, OnTransactionsPropertyChanged));
@@ -147,11 +145,11 @@ namespace ZoNo.Views
           using var semaphore = new SemaphoreSlim(0, 1);
           void handler(object s, object e)
           {
+            addedRow.LayoutUpdated -= handler;
             semaphore.Release();
           }
           addedRow.LayoutUpdated += handler;
           await semaphore.WaitAsync();
-          addedRow.LayoutUpdated -= handler;
           if (_scrollBar.Value > _scrollBar.Maximum - addedRow.ActualHeight && _scrollBar.Maximum != 0)
           {
             foreach (var row in _rows.Where(x => x.ActualOffset.Y < addedRow.ActualOffset.Y).OrderBy(x => x.ActualOffset.Y))
@@ -261,14 +259,6 @@ namespace ZoNo.Views
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
       Transactions.SortDescriptions.Add(new SortDescription(Transaction.GetProperty(ColumnHeader.TransactionTime), SortDirection.Ascending));
 
-      Transactions.VectorChanged += (s, e) =>
-      {
-        if (_isSorting && e.CollectionChange == CollectionChange.Reset)
-        {
-          _isSorting = false;
-        }
-      };
-
       _isLoaded = true;
     }
 
@@ -315,7 +305,15 @@ namespace ZoNo.Views
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
-      _isSorting = true;
+      var selectedTransactionBeforeScrolling = SelectedTransaction;
+      SelectedTransaction = null;
+
+      void handler(object s, object e)
+      {
+        DataGrid.LayoutUpdated -= handler;
+        SelectedTransaction = selectedTransactionBeforeScrolling;
+      }
+      DataGrid.LayoutUpdated += handler;
 
       GetHeader(e.Column).Padding = new Thickness(12, 0, 0, 0);
 
@@ -357,20 +355,11 @@ namespace ZoNo.Views
       }
     }
 
-    private static async void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-      if (sender is TransactionsView view)
+      if (sender is TransactionsView view && view.SelectedTransaction != null)
       {
-        if (view._isSorting && e.NewValue is null)
-        {
-          while (view._isSorting) await Task.Delay(10);
-          view.DataGrid.SelectedItem = e.OldValue;
-          view.DataGrid.ScrollIntoView(e.OldValue, null);
-        }
-        else
-        {
-          view.DataGrid.ScrollIntoView(e.NewValue, null);
-        }
+        view.DataGrid.ScrollIntoView(view.SelectedTransaction, null);
       }
     }
 
