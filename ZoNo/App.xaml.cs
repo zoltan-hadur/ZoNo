@@ -97,6 +97,7 @@ namespace ZoNo
 
       services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelDocumentLoaderService, ExcelDocumentLoaderService>();
+      services.AddSingleton<ITransactionProcessorService, TransactionProcessorService>();
       services.AddSingleton<IRulesService, RulesService>();
       services.AddSingleton<IRuleEvaluatorServiceBuilder, RuleEvaluatorServiceBuilder>();
       services.AddSingleton<IDialogService, DialogService>();

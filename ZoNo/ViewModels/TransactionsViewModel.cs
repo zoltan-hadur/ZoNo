@@ -4,6 +4,7 @@ using CommunityToolkit.WinUI.UI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using ZoNo.Contracts.Services;
+using ZoNo.Helpers;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels
@@ -11,18 +12,20 @@ namespace ZoNo.ViewModels
   public partial class TransactionsViewModel(
     ILocalSettingsService _localSettingsService,
     IExcelDocumentLoaderService _excelDocumentLoaderService,
-    IRulesService _rulesService,
-    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : ObservableObject
+    ITransactionProcessorService _transactionProcessorService) : ObservableObject
   {
+    private bool _isLoaded = false;
+    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
+
     public AdvancedCollectionView TransactionsView { get; } = new AdvancedCollectionView(new ObservableCollection<Transaction>());
 
     public Dictionary<string, ColumnViewModel> Columns { get; private set; } = null;
 
-    public event EventHandler LoadExcelDocumentsStarted;
-    public event EventHandler LoadExcelDocumentsFinished;
-
     public async Task Load()
     {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      if (_isLoaded) return;
+
       Columns = new Dictionary<string, ColumnViewModel>()
       {
         { nameof(ColumnHeader.TransactionTime ), new() { ColumnHeader = ColumnHeader.TransactionTime , IsVisible = true  } },
@@ -54,46 +57,31 @@ namespace ZoNo.ViewModels
       }
 
       OnPropertyChanged(nameof(Columns));
+
+      _isLoaded = true;
     }
 
     [RelayCommand]
     private async Task LoadExcelDocuments(IList<string> paths)
     {
-      LoadExcelDocumentsStarted?.Invoke(this, EventArgs.Empty);
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
 
-      var rules = _rulesService.GetRules(RuleType.Transaction);
-      var ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(rules);
-      var transactions = new List<Transaction>();
-      foreach (var path in paths)
-      {
-        foreach (var transaction in await _excelDocumentLoaderService.LoadDocumentAsync(path))
-        {
-          transactions.Add(transaction);
-        }
-      }
-      var deferRefresh = transactions.Count > 30 ? TransactionsView.DeferRefresh() : null;
-      try
-      {
-        foreach (var transaction in transactions)
-        {
-          var result = await ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
-          if (!result.RemoveThisElementFromList)
-          {
-            TransactionsView.Add(transaction);
-          }
-        }
-      }
-      finally
-      {
-        deferRefresh?.Dispose();
-      }
+      await _transactionProcessorService.InitializeAsync();
 
-      LoadExcelDocumentsFinished?.Invoke(this, EventArgs.Empty);
+      var transactions = (await Task.WhenAll(paths.Select(_excelDocumentLoaderService.LoadDocumentAsync)))
+        .SelectMany(transactions => transactions);
+
+      foreach (var transaction in transactions)
+      {
+        await _transactionProcessorService.ProcessAsync(transaction);
+      }
     }
 
     [RelayCommand]
-    private void DeleteTransactions(List<Transaction> transactions)
+    private async Task DeleteTransactionsAsync(List<Transaction> transactions)
     {
+      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+
       var deferRefresh = transactions.Count > 30 ? TransactionsView.DeferRefresh() : null;
       try
       {

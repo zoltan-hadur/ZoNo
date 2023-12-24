@@ -8,110 +8,52 @@ using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public partial class ImportPageViewModel : ObservableObject
+  public partial class ImportPageViewModel(
+    ITransactionProcessorService _transactionProcessorService,
+    TransactionsViewModel _transactionsViewModel,
+    ExpensesViewModel _expensesViewModel) : ObservableObject
   {
-    private readonly IRulesService _rulesService;
-    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-    private IRuleEvaluatorService<Transaction, Expense> _ruleEvaluatorService;
-    private readonly BlockingCollection<(int Index, Transaction Transaction)> _newTransactions = [];
-    private readonly BlockingCollection<Transaction> _transactionsToRemove = [];
+    private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public TransactionsViewModel TransactionsViewModel { get; }
-    public ExpensesViewModel ExpensesViewModel { get; }
+    public TransactionsViewModel TransactionsViewModel { get; } = _transactionsViewModel;
+    public ExpensesViewModel ExpensesViewModel { get; } = _expensesViewModel;
 
     [ObservableProperty]
     private Transaction _selectedTransaction;
+
+    [ObservableProperty]
+    private ExpenseViewModel _selectedExpense;
 
     partial void OnSelectedTransactionChanged(Transaction value)
     {
       SelectedExpense = value == null ? null : ExpensesViewModel.Expenses.Single(expense => expense.Id == value.Id);
     }
 
-    [ObservableProperty]
-    private ExpenseViewModel _selectedExpense;
-
     partial void OnSelectedExpenseChanged(ExpenseViewModel value)
     {
       SelectedTransaction = value == null ? null : TransactionsViewModel.TransactionsView.Cast<Transaction>().Single(transaction => transaction.Id == value.Id);
     }
 
-    public ImportPageViewModel(
-      IRulesService rulesService,
-      IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
-      TransactionsViewModel transactionsViewModel,
-      ExpensesViewModel expensesViewModel)
-    {
-      _rulesService = rulesService;
-      _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
-      TransactionsViewModel = transactionsViewModel;
-      ExpensesViewModel = expensesViewModel;
-
-      TransactionsViewModel.LoadExcelDocumentsStarted += TransactionsViewModel_LoadExcelDocumentsStarted;
-      TransactionsViewModel.LoadExcelDocumentsFinished += TransactionsViewModel_LoadExcelDocumentsFinished;
-      TransactionsViewModel.TransactionsView.VectorChanged += (s, e) =>
-      {
-        if (e.CollectionChange == CollectionChange.ItemInserted)
-        {
-          // To track order of insertions when less than 30 are added at once
-          _newTransactions.Add(((int)e.Index, TransactionsViewModel.TransactionsView[(int)e.Index] as Transaction));
-        }
-      };
-      TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
-      ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
-    }
-
-    private async void TransactionsViewModel_LoadExcelDocumentsStarted(object sender, EventArgs e)
+    public async Task LoadAsync()
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
-      var rules = _rulesService.GetRules(RuleType.Expense);
-      _ruleEvaluatorService = await _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(rules);
+      if (_isLoaded) return;
+
+      await Task.WhenAll([TransactionsViewModel.Load(), ExpensesViewModel.LoadAsync()]);
+
+      TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
+      ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
+      _transactionProcessorService.TransactionProcessed += TransactionProcessorService_TransactionProcessed;
+
+      _isLoaded = true;
     }
 
-    private async void TransactionsViewModel_LoadExcelDocumentsFinished(object sender, EventArgs e)
+    private void TransactionProcessorService_TransactionProcessed(object sender, (Transaction Transaction, Expense Expense) e)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
-      while (_transactionsToRemove.TryTake(out var transaction))
-      {
-        try
-        {
-          TransactionsViewModel.TransactionsView.Remove(transaction);
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-          // When deleting last item, there is an exception
-          TransactionsViewModel.TransactionsView.Refresh();
-        }
-      }
-    }
-
-    private async Task AddExpenseFromTransaction(Transaction transaction, int? index = null)
-    {
-      var evaluatedExpense = new Expense()
-      {
-        Id = transaction.Id,
-        With = [],
-        Category = Categories.Uncategorized.General,
-        Description = transaction.PartnerName,
-        Currency = transaction.Currency,
-        Cost = -transaction.Amount,
-        Date = transaction.TransactionTime,
-        Group = "Non-group expenses"
-      };
-      var result = await _ruleEvaluatorService.EvaluateRulesAsync(input: transaction, output: evaluatedExpense);
-      var expense = ExpenseViewModel.FromModel(evaluatedExpense);
-      if (index.HasValue)
-      {
-        ExpensesViewModel.Expenses.Insert(index.Value, expense);
-      }
-      else
-      {
-        ExpensesViewModel.Expenses.Add(expense);
-      }
-      if (result.RemoveThisElementFromList)
-      {
-        _transactionsToRemove.Add(transaction);
-      }
+      TransactionsViewModel.TransactionsView.Add(e.Transaction);
+      var index = TransactionsViewModel.TransactionsView.IndexOf(e.Transaction);
+      ExpensesViewModel.Expenses.Insert(index, ExpenseViewModel.FromModel(e.Expense));
     }
 
     private async void TransactionsView_VectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)
@@ -119,17 +61,6 @@ namespace ZoNo.ViewModels
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
       switch (e.CollectionChange)
       {
-        // When less than 30 items were added at once
-        case CollectionChange.ItemInserted:
-          {
-            var (index, newTransaction) = _newTransactions.Take();
-            if (newTransaction == null)
-            {
-              throw new Exception($"Transaction for index \"{index}\" is null!");
-            }
-            await AddExpenseFromTransaction(newTransaction, index);
-          }
-          break;
         // When less than 30 items were removed at once
         case CollectionChange.ItemRemoved:
           {
@@ -150,7 +81,7 @@ namespace ZoNo.ViewModels
               var newTransactions = TransactionsViewModel.TransactionsView.Cast<Transaction>().Where(transaction => !ExpensesViewModel.Expenses.Any(expense => expense.Id == transaction.Id)).ToArray();
               foreach (var newTransaction in newTransactions)
               {
-                await AddExpenseFromTransaction(newTransaction);
+                //await AddExpenseFromTransaction(newTransaction);
               }
             }
             // When 30 or more items were removed at once

@@ -81,7 +81,7 @@ namespace ZoNo.ViewModels
       PropertyChanged += LoginViewModel_PropertyChanged;
     }
 
-    public async Task Load()
+    public async Task LoadAsync()
     {
       _isLoading = true;
 

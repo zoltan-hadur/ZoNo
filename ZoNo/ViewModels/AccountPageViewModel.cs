@@ -34,7 +34,7 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private Group[] _groups = [];
 
-    public async Task Load()
+    public async Task LoadAsync()
     {
       if (_isLoaded) return;
       IsLoading = true;

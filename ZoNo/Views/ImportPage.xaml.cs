@@ -16,8 +16,7 @@ namespace ZoNo.Views
 
     private async void Page_Loading(FrameworkElement sender, object args)
     {
-      await ViewModel.TransactionsViewModel.Load();
-      await ViewModel.ExpensesViewModel.Load();
+      await ViewModel.LoadAsync();
     }
   }
 }

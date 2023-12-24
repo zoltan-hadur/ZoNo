@@ -13,14 +13,15 @@ using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
-  public partial class ExpensesViewModel : ObservableObject
+  public partial class ExpensesViewModel(
+    ISplitwiseService _splitwiseService,
+    IDialogService _dialogService) : ObservableObject
   {
-    private readonly ISplitwiseService _splitwiseService;
-    private readonly IDialogService _dialogService;
-    private Splitwise.Models.Group[] _splitwiseGroups;
-    private Splitwise.Models.Category[] _splitwiseCategories;
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
+
+    private Splitwise.Models.Group[] _splitwiseGroups;
+    private Splitwise.Models.Category[] _splitwiseCategories;
 
     public ObservableCollection<ExpenseViewModel> Expenses { get; } = [];
 
@@ -37,21 +38,18 @@ namespace ZoNo.ViewModels
     [NotifyCanExecuteChangedFor(nameof(UploadExpensesToSplitwiseCommand))]
     private bool _isExpensesNotEmpty = false;
 
-    public ExpensesViewModel(ISplitwiseService splitwiseService, IDialogService dialogService)
-    {
-      _splitwiseService = splitwiseService;
-      _dialogService = dialogService;
-
-      Expenses.CollectionChanged += Expenses_CollectionChanged;
-    }
-
-    public async Task Load()
+    public async Task LoadAsync()
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       if (_isLoaded) return;
 
-      _splitwiseGroups = await _splitwiseService.GetGroupsAsync();
-      _splitwiseCategories = [.. (await _splitwiseService.GetCategoriesAsync()).OrderBy(category => category.Name)];
+      var taskGroups = _splitwiseService.GetGroupsAsync();
+      var taskCategories = _splitwiseService.GetCategoriesAsync();
+      await Task.WhenAll([taskGroups, taskCategories]);
+
+      _splitwiseGroups = taskGroups.Result;
+      _splitwiseCategories = taskCategories.Result.OrderBy(category => category.Name).ToArray();
+
       Categories = _splitwiseCategories.Select(category => new Category()
       {
         Name = category.Name,
@@ -73,6 +71,8 @@ namespace ZoNo.ViewModels
           Email = user.Email
         }).ToArray()
       }).ToArray();
+
+      Expenses.CollectionChanged += Expenses_CollectionChanged;
 
       _isLoaded = true;
     }

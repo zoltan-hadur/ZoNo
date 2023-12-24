@@ -11,7 +11,8 @@ namespace ZoNo.Services
     ITokenService _tokenService,
     IThemeSelectorService _themeSelectorService,
     IRulesService _rulesService,
-    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : IActivationService
+    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder,
+    ITransactionProcessorService _transactionProcessorService) : IActivationService
   {
     public async Task ActivateAsync(object activationArgs)
     {
@@ -60,6 +61,7 @@ namespace ZoNo.Services
         _rulesService.InitializeAsync(),
         _ruleEvaluatorServiceBuilder.InitializeAsync()
       ]);
+      await _transactionProcessorService.InitializeAsync();
     }
   }
 }
