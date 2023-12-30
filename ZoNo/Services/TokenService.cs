@@ -11,18 +11,18 @@ namespace ZoNo.Services
 
     public async Task InitializeAsync()
     {
-      Token = await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken);
+      Token = await _localSettingsService.ReadSettingAsync<Token>(SettingToken, encrypted: true);
     }
 
     public async Task SaveAsync()
     {
       if (Token == null)
       {
-        await _localSettingsService.RemoveSettingAsync(SettingToken);
+        _localSettingsService.RemoveSetting(SettingToken);
       }
       else
       {
-        await _localSettingsService.SaveProtectedSettingAsync(SettingToken, Token);
+        await _localSettingsService.SaveSettingAsync(SettingToken, Token, encrypt: true);
       }
     }
   }

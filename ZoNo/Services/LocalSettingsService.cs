@@ -1,170 +1,48 @@
-﻿using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
-using System.Text;
-using Windows.Storage;
+﻿using Windows.Storage;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
-using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class LocalSettingsService : ILocalSettingsService
+  public class LocalSettingsService(
+    IEncryptionService _encryptionService) : ILocalSettingsService
   {
-    private const string _entropy = "Nora is the love of my life";
-    private const string _defaultApplicationDataFolder = "ZoNo/ApplicationData";
-    private const string _defaultLocalSettingsFile = "LocalSettings.json";
-
-    private readonly IFileService _fileService;
-    private readonly LocalSettingsOptions _options;
-
-    private readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    private readonly string _applicationDataFolder;
-    private readonly string _localsettingsFile;
-
-    private Dictionary<string, object> _settings;
-
-    private bool _isInitialized;
-
-    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
+    public async Task<T> ReadSettingAsync<T>(string key, bool encrypted = false)
     {
-      _fileService = fileService;
-      _options = options.Value;
+      if (ReadStringifiedSetting(key) is string setting)
+      {
+        return await Json.ToObjectAsync<T>(encrypted ? _encryptionService.Decrypt(setting) : setting);
+      }
 
-      _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
-      _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
-
-      _settings = [];
+      return default;
     }
 
-    private async Task InitializeAsync()
+    public async Task SaveSettingAsync<T>(string key, T value, bool encrypt = false)
     {
-      if (!_isInitialized)
-      {
-        _settings = await Task.Run(() => _fileService.Read<Dictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? [];
+      ArgumentNullException.ThrowIfNull(value);
 
-        _isInitialized = true;
-      }
+      var setting = await Json.StringifyAsync(value);
+      SaveStringifiedSetting(key, encrypt ? _encryptionService.Encrypt(setting) : setting);
     }
 
-    private async Task<string> ReadStringifiedSettingAsync(string key)
+    public bool RemoveSetting(string key)
     {
-      if (RuntimeHelper.IsMSIX)
-      {
-        if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
-        {
-          return (string)obj;
-        }
-      }
-      else
-      {
-        await InitializeAsync();
+      return ApplicationData.Current.LocalSettings.Values.Remove(key);
+    }
 
-        if (_settings != null && _settings.TryGetValue(key, out var obj))
-        {
-          return (string)obj;
-        }
+    private void SaveStringifiedSetting(string key, string value)
+    {
+      ApplicationData.Current.LocalSettings.Values[key] = value;
+    }
+
+    private string ReadStringifiedSetting(string key)
+    {
+      if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
+      {
+        return (string)obj;
       }
 
       return null;
-    }
-
-    public async Task SaveStringifiedSettingAsync(string key, string value)
-    {
-      ArgumentNullException.ThrowIfNull(value);
-
-      if (RuntimeHelper.IsMSIX)
-      {
-        ApplicationData.Current.LocalSettings.Values[key] = value;
-      }
-      else
-      {
-        await InitializeAsync();
-
-        _settings[key] = value;
-
-        await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
-      }
-    }
-
-    /// <summary>
-    /// Encrypts a string by using the <see cref="ProtectedData"/> class.
-    /// </summary>
-    /// <param name="stringToEncrypt">String to encrypt.</param>
-    /// <returns>Encrypted string.</returns>
-    private static string Protect(string stringToEncrypt)
-    {
-      return Convert.ToBase64String(
-        ProtectedData.Protect(
-          Encoding.UTF8.GetBytes(stringToEncrypt),
-          Encoding.UTF8.GetBytes(_entropy),
-          DataProtectionScope.CurrentUser));
-    }
-
-    /// <summary>
-    /// Decrypts a string by using the <see cref="ProtectedData"/> class.
-    /// </summary>
-    /// <param name="encryptedString">String to decrypt.</param>
-    /// <returns>Decrypted string.</returns>
-    private static string Unprotect(string encryptedString)
-    {
-      return Encoding.UTF8.GetString(
-        ProtectedData.Unprotect(
-          Convert.FromBase64String(encryptedString),
-          Encoding.UTF8.GetBytes(_entropy),
-          DataProtectionScope.CurrentUser));
-    }
-
-    public async Task<T> ReadSettingAsync<T>(string key)
-    {
-      var setting = await ReadStringifiedSettingAsync(key);
-      if (setting != null)
-      {
-        return await Json.ToObjectAsync<T>(setting);
-      }
-
-      return default;
-    }
-
-    public async Task<T> ReadProtectedSettingAsync<T>(string key)
-    {
-      var setting = await ReadStringifiedSettingAsync(key);
-      if (setting != null)
-      {
-        return await Json.ToObjectAsync<T>(Unprotect(setting));
-      }
-
-      return default;
-    }
-
-    public async Task SaveSettingAsync<T>(string key, T value)
-    {
-      ArgumentNullException.ThrowIfNull(value);
-
-      var setting = await Json.StringifyAsync(value);
-      await SaveStringifiedSettingAsync(key, setting);
-    }
-
-    public async Task SaveProtectedSettingAsync<T>(string key, T value)
-    {
-      ArgumentNullException.ThrowIfNull(value);
-
-      var setting = await Json.StringifyAsync(value);
-      await SaveStringifiedSettingAsync(key, Protect(setting));
-    }
-
-    public async Task<bool> RemoveSettingAsync(string key)
-    {
-      if (RuntimeHelper.IsMSIX)
-      {
-        return ApplicationData.Current.LocalSettings.Values.Remove(key);
-      }
-      else
-      {
-        await InitializeAsync();
-        var result = _settings.Remove(key);
-        await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
-        return result;
-      }
     }
   }
 }

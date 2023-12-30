@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -39,11 +38,6 @@ namespace ZoNo
 
       InitializeComponent();
 
-      var configuration = new ConfigurationBuilder()
-        .SetBasePath(AppContext.BaseDirectory)
-        .AddJsonFile("appsettings.json")
-        .Build();
-
       var services = new ServiceCollection();
 
       // Default Activation Handler
@@ -63,6 +57,7 @@ namespace ZoNo
       });
       services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>(), provider.GetService<ITokenService>().Token));
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
+      services.AddSingleton<IEncryptionService, EncryptionService>();
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();
       services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
@@ -95,7 +90,6 @@ namespace ZoNo
       });
       services.AddScoped<INavigationService, NavigationService>();
 
-      services.AddSingleton<IFileService, FileService>();
       services.AddSingleton<IExcelDocumentLoaderService, ExcelDocumentLoaderService>();
       services.AddSingleton<ITransactionProcessorService, TransactionProcessorService>();
       services.AddSingleton<IRulesService, RulesService>();
@@ -125,15 +119,13 @@ namespace ZoNo
       services.AddScoped<SettingsPageViewModel>();
       services.AddScoped<ShellPageViewModel>();
 
-      // Configuration
-      services.Configure<LocalSettingsOptions>(configuration.GetSection(nameof(LocalSettingsOptions)));
-
       ServiceScope = services.BuildServiceProvider().CreateScope();
 
       UnhandledException += App_UnhandledException;
 
       ServiceScope.ServiceProvider.GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
 
+      // Must set the app theme in the constructor, otherwise an exception is thrown
       var themeSelectorService = ServiceScope.ServiceProvider.GetService<IThemeSelectorService>();
       Task.Run(themeSelectorService.InitializeAsync).Wait();
       if (themeSelectorService.Theme != ElementTheme.Default)

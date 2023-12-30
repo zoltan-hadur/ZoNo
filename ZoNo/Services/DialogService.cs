@@ -6,7 +6,8 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class DialogService(IThemeSelectorService _themeSelectorService) : IDialogService
+  public class DialogService(
+    IThemeSelectorService _themeSelectorService) : IDialogService
   {
     public async Task<DialogResult> ShowDialogAsync<T>(DialogType type, string title, T content, Binding isPrimaryButtonEnabled = null)
     {

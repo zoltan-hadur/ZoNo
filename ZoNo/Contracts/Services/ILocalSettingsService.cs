@@ -2,10 +2,8 @@
 {
   public interface ILocalSettingsService
   {
-    Task<T> ReadSettingAsync<T>(string key);
-    Task<T> ReadProtectedSettingAsync<T>(string key);
-    Task SaveSettingAsync<T>(string key, T value);
-    Task SaveProtectedSettingAsync<T>(string key, T value);
-    Task<bool> RemoveSettingAsync(string key);
+    Task<T> ReadSettingAsync<T>(string key, bool encrypted = false);
+    Task SaveSettingAsync<T>(string key, T value, bool encrypt = false);
+    bool RemoveSetting(string key);
   }
 }

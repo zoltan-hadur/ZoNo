@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
-using ZoNo.Models;
 
 namespace ZoNo.Services
 {
@@ -46,11 +45,7 @@ namespace ZoNo.Services
 
     private async Task InitializeAsync()
     {
-      await Task.WhenAll(
-      [
-        _tokenService.InitializeAsync(),
-        _themeSelectorService.InitializeAsync()
-      ]);
+      await _tokenService.InitializeAsync();
     }
 
     private async Task StartupAsync()

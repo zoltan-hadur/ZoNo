@@ -26,6 +26,16 @@ namespace ZoNo.Services
       "Pénznem"
     ];
 
+    public async Task<IList<Transaction>> LoadDocumentAsync(string path)
+    {
+      return await Task.Run(() =>
+      {
+        var dataSet = GetDataSet(path);
+        Validate(dataSet);
+        return dataSet.Tables[0].Rows.Cast<DataRow>().Select(TransformDataRowToTransaction).ToArray();
+      });
+    }
+
     private static DataSet GetDataSet(string path)
     {
       using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
@@ -88,16 +98,6 @@ namespace ZoNo.Services
         Amount = row.Field<double>(10),
         Currency = Enum.Parse<Currency>(row.Field<string>(11))
       };
-    }
-
-    public async Task<IList<Transaction>> LoadDocumentAsync(string path)
-    {
-      return await Task.Run(() =>
-      {
-        var dataSet = GetDataSet(path);
-        Validate(dataSet);
-        return dataSet.Tables[0].Rows.Cast<DataRow>().Select(TransformDataRowToTransaction).ToArray();
-      });
     }
   }
 }
