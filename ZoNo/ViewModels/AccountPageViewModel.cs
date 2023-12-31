@@ -39,13 +39,18 @@ namespace ZoNo.ViewModels
       if (_isLoaded) return;
       IsLoading = true;
 
-      var user = await _splitwiseService.GetCurrentUserAsync();
+      var taskUser = _splitwiseService.GetCurrentUserAsync();
+      var taskGroups = _splitwiseService.GetGroupsAsync();
+      await Task.WhenAll([taskUser, taskGroups]);
+      var user = taskUser.Result;
+      var groups = taskGroups.Result;
+
       ProfilePicture = user.Picture.Medium;
       FirstName = user.FirstName;
       LastName = user.LastName;
       Email = user.Email;
       DefaultCurrency = Enum.Parse<Currency>(user.DefaultCurrency.ToString());
-      var groups = await _splitwiseService.GetGroupsAsync();
+
       Groups = groups.Select(group => new Group()
       {
         Picture = group.Avatar.Medium,
