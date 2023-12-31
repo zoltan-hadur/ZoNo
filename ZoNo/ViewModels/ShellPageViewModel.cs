@@ -5,25 +5,19 @@ using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
-  public class ShellPageViewModel : ObservableRecipient
+  public partial class ShellPageViewModel(
+    INavigationService navigationService,
+    INavigationViewService navigationViewService) : ObservableRecipient
   {
+    public INavigationService NavigationService { get; } = navigationService;
+    public INavigationViewService NavigationViewService { get; } = navigationViewService;
+
+    [ObservableProperty]
     private object _selected;
 
-    public INavigationService NavigationService { get; }
-
-    public INavigationViewService NavigationViewService { get; }
-
-    public object Selected
+    public void Initialize()
     {
-      get => _selected;
-      set => SetProperty(ref _selected, value);
-    }
-
-    public ShellPageViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
-    {
-      NavigationService = navigationService;
       NavigationService.Navigated += OnNavigated;
-      NavigationViewService = navigationViewService;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)

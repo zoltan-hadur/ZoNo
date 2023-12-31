@@ -14,9 +14,12 @@ using ZoNo.Views;
 namespace ZoNo.ViewModels
 {
   public partial class ExpensesViewModel(
-    ISplitwiseService _splitwiseService,
-    IDialogService _dialogService) : ObservableObject
+    ISplitwiseService splitwiseService,
+    IDialogService dialogService) : ObservableObject
   {
+    private readonly ISplitwiseService _splitwiseService = splitwiseService;
+    private readonly IDialogService _dialogService = dialogService;
+
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 

@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using Windows.Foundation.Collections;
 using ZoNo.Contracts.Services;
@@ -9,15 +8,17 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class ImportPageViewModel(
-    ITransactionProcessorService _transactionProcessorService,
-    TransactionsViewModel _transactionsViewModel,
-    ExpensesViewModel _expensesViewModel) : ObservableObject
+    ITransactionProcessorService transactionProcessorService,
+    TransactionsViewModel transactionsViewModel,
+    ExpensesViewModel expensesViewModel) : ObservableObject
   {
+    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public TransactionsViewModel TransactionsViewModel { get; } = _transactionsViewModel;
-    public ExpensesViewModel ExpensesViewModel { get; } = _expensesViewModel;
+    public TransactionsViewModel TransactionsViewModel { get; } = transactionsViewModel;
+    public ExpensesViewModel ExpensesViewModel { get; } = expensesViewModel;
 
     [ObservableProperty]
     private Transaction _selectedTransaction;

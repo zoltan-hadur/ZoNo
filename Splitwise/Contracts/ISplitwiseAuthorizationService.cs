@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Splitwise.Contracts
 {
   /// <summary>
-  /// Used for authorization and getting access token from Splitwise.
+  /// Used for authorization and getting bearer token from Splitwise.
   /// </summary>
   public interface ISplitwiseAuthorizationService
   {

@@ -9,8 +9,11 @@ namespace ZoNo.Services
 {
   // For more information on navigation between pages see
   // https://github.com/microsoft/TemplateStudio/blob/main/docs/WinUI/navigation.md
-  public class NavigationService(IPageService _pageService) : INavigationService, ITopLevelNavigationService
+  public class NavigationService(
+    IPageService pageService) : INavigationService, ITopLevelNavigationService
   {
+    private readonly IPageService _pageService = pageService;
+
     private object _lastParameterUsed;
     private Frame _frame;
 

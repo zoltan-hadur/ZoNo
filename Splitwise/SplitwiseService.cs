@@ -17,22 +17,14 @@ namespace Splitwise
   /// Class used for wrapping the Splitwise REST API. <br/>
   /// Implementation of <see cref="ISplitwiseAuthorizationService"/>.
   /// </summary>
-  public class SplitwiseService : ISplitwiseService
+  public class SplitwiseService(
+    IHttpClientFactory httpClientFactory) : ISplitwiseService
   {
-    private static readonly string _baseURL = "https://www.splitwise.com/api/v3.0";
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly Token _token;
+    private const string _baseURL = "https://www.splitwise.com/api/v3.0";
 
-    /// <summary>
-    /// Creates an object of type <see cref="SplitwiseService"/> which can be used to call the Splitwise REST API.
-    /// </summary>
-    /// <param name="token">Access token from Splitwise.</param>
-    public SplitwiseService(IHttpClientFactory httpClientFactory, Token token)
-    {
-      _httpClientFactory = httpClientFactory;
-      _token = token;
-    }
+    public Token Token { get; set; }
 
     public async Task<User> GetCurrentUserAsync()
     {
@@ -91,8 +83,13 @@ namespace Splitwise
 
     private async Task<T> SendRequest<T>(HttpMethod method, string resource, Func<JsonNode, JsonSerializerOptions, T> deserialize, string content = null)
     {
+      if (Token == null)
+      {
+        throw new InvalidOperationException($"{nameof(Token)} is null!");
+      }
+
       var client = _httpClientFactory.CreateClient();
-      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(_token.TokenType.ToString(), _token.AccessToken);
+      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Token.TokenType.ToString(), Token.AccessToken);
       var request = new HttpRequestMessage(method, $"{_baseURL}/{resource}")
       {
         Content = content != null ? new StringContent(content, Encoding.UTF8, "application/json") : null

@@ -5,9 +5,12 @@ using ZoNo.Models;
 namespace ZoNo.Services
 {
   public class TransactionProcessorService(
-    IRulesService _rulesService,
-    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder) : ITransactionProcessorService
+    IRulesService rulesService,
+    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder) : ITransactionProcessorService
   {
+    private readonly IRulesService _rulesService = rulesService;
+    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
+
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
     private string _rulesJson = null;
 

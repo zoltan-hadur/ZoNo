@@ -5,14 +5,22 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   public class ActivationService(
-    ActivationHandler<LaunchActivatedEventArgs> _defaultHandler,
-    IEnumerable<IActivationHandler> _activationHandlers,
-    ITokenService _tokenService,
-    IThemeSelectorService _themeSelectorService,
-    IRulesService _rulesService,
-    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder,
-    ITransactionProcessorService _transactionProcessorService) : IActivationService
+    ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+    IEnumerable<IActivationHandler> activationHandlers,
+    ITokenService tokenService,
+    IThemeSelectorService themeSelectorService,
+    IRulesService rulesService,
+    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
+    ITransactionProcessorService transactionProcessorService) : IActivationService
   {
+    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler = defaultHandler;
+    private readonly IEnumerable<IActivationHandler> _activationHandlers = activationHandlers;
+    private readonly ITokenService _tokenService = tokenService;
+    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
+    private readonly IRulesService _rulesService = rulesService;
+    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
+    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+
     public async Task ActivateAsync(object activationArgs)
     {
       // Execute tasks before activation.

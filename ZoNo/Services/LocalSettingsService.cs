@@ -5,8 +5,10 @@ using ZoNo.Helpers;
 namespace ZoNo.Services
 {
   public class LocalSettingsService(
-    IEncryptionService _encryptionService) : ILocalSettingsService
+    IEncryptionService encryptionService) : ILocalSettingsService
   {
+    private readonly IEncryptionService _encryptionService = encryptionService;
+
     public async Task<T> ReadSettingAsync<T>(string key, bool encrypted = false)
     {
       if (ReadStringifiedSetting(key) is string setting)

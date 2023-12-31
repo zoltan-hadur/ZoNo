@@ -9,8 +9,14 @@ using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public partial class AccountPageViewModel(ITopLevelNavigationService _topLevelNavigationService, ISplitwiseService _splitwiseService, IMessenger _messenger) : ObservableRecipient(_messenger)
+  public partial class AccountPageViewModel(
+    ITopLevelNavigationService topLevelNavigationService,
+    ISplitwiseService splitwiseService,
+    IMessenger messenger) : ObservableRecipient(messenger)
   {
+    private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
+    private readonly ISplitwiseService _splitwiseService = splitwiseService;
+
     private bool _isLoaded = false;
 
     [ObservableProperty]

@@ -47,15 +47,13 @@ namespace ZoNo
 
       // Services
       services.AddHttpClient();
-      services.AddSingleton<ISplitwiseAuthorizationService>(provider =>
+      services.AddSingleton<ISplitwiseConsumerCredentials>(new SplitwiseConsumerCredentials()
       {
-        return new SplitwiseAuthorizationService(
-          httpClientFactory: provider.GetService<IHttpClientFactory>(),
-          consumerKey: Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
-          consumerSecret: Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
-        );
+        ConsumerKey = Environment.GetEnvironmentVariable("ZoNo_ConsumerKey"),
+        ConsumerSecret = Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
       });
-      services.AddScoped<ISplitwiseService>(provider => new SplitwiseService(provider.GetService<IHttpClientFactory>(), provider.GetService<ITokenService>().Token));
+      services.AddSingleton<ISplitwiseAuthorizationService, SplitwiseAuthorizationService>();
+      services.AddScoped<ISplitwiseService, SplitwiseService>();
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<IEncryptionService, EncryptionService>();
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
@@ -123,10 +121,10 @@ namespace ZoNo
 
       UnhandledException += App_UnhandledException;
 
-      ServiceScope.ServiceProvider.GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
+      GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
 
       // Must set the app theme in the constructor, otherwise an exception is thrown
-      var themeSelectorService = ServiceScope.ServiceProvider.GetService<IThemeSelectorService>();
+      var themeSelectorService = GetService<IThemeSelectorService>();
       Task.Run(themeSelectorService.InitializeAsync).Wait();
       if (themeSelectorService.Theme != ElementTheme.Default)
       {

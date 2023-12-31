@@ -9,6 +9,11 @@ namespace Splitwise.Contracts
   public interface ISplitwiseService
   {
     /// <summary>
+    /// Bearer token.
+    /// </summary>
+    Token Token { get; set; }
+
+    /// <summary>
     /// Get information about the current user.
     /// </summary>
     /// <returns></returns>

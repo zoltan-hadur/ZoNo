@@ -12,8 +12,21 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.ViewModels
 {
-  public partial class LoginPageViewModel : ObservableRecipient
+  public partial class LoginPageViewModel(
+    ITopLevelNavigationService topLevelNavigationService,
+    ILocalSettingsService localSettingsService,
+    IThemeSelectorService themeSelectorService,
+    ISplitwiseAuthorizationService splitwiseAuthorizationService,
+    ISplitwiseService splitwiseService,
+    ITokenService tokenService) : ObservableRecipient
   {
+    private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
+    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
+    private readonly ISplitwiseAuthorizationService _splitwiseAuthorizationService = splitwiseAuthorizationService;
+    private readonly ISplitwiseService _splitwiseService = splitwiseService;
+    private readonly ITokenService _tokenService = tokenService;
+
     private enum State
     {
       LoggedOut,
@@ -26,12 +39,6 @@ namespace ZoNo.ViewModels
     private const string SettingEmail = "Login_Email";
     private const string SettingRememberMe = "Login_RememberMe";
 
-    private readonly ITopLevelNavigationService _topLevelNavigationService;
-    private readonly ILocalSettingsService _localSettingsService;
-    private readonly IThemeSelectorService _themeSelectorService;
-    private readonly ISplitwiseAuthorizationService _authorizationService;
-    private readonly ITokenService _tokenService;
-
     /// <summary>
     /// To determine the theme of the captcha.
     /// </summary>
@@ -42,7 +49,6 @@ namespace ZoNo.ViewModels
     /// </summary>
     private string CurrentURL => WebView.Source.ToString();
 
-    private bool _isLoading = false;
     private State _state = State.LoggingIn;
 
     [ObservableProperty]
@@ -65,26 +71,8 @@ namespace ZoNo.ViewModels
 
     public WebView2 WebView { get; set; }
 
-    public LoginPageViewModel(
-      ITopLevelNavigationService topLevelNavigationService,
-      ILocalSettingsService localSettingsService,
-      IThemeSelectorService themeSelectorService,
-      ISplitwiseAuthorizationService authorizationService,
-      ITokenService tokenService)
-    {
-      _topLevelNavigationService = topLevelNavigationService;
-      _localSettingsService = localSettingsService;
-      _themeSelectorService = themeSelectorService;
-      _authorizationService = authorizationService;
-      _tokenService = tokenService;
-
-      PropertyChanged += LoginViewModel_PropertyChanged;
-    }
-
     public async Task LoadAsync()
     {
-      _isLoading = true;
-
       IsRememberMe = await _localSettingsService.ReadSettingAsync<bool>(SettingRememberMe);
       if (IsRememberMe && _tokenService.Token != null)
       {
@@ -96,13 +84,11 @@ namespace ZoNo.ViewModels
       WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
       WebView.NavigationCompleted += WebView_NavigationCompleted;
 
-      _isLoading = false;
+      PropertyChanged += LoginViewModel_PropertyChanged;
     }
 
     private async void LoginViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      if (_isLoading) return;
-
       switch (e.PropertyName)
       {
         case nameof(Email):
@@ -132,12 +118,13 @@ namespace ZoNo.ViewModels
 
       if (IsRememberMe && _tokenService.Token != null)
       {
+        _splitwiseService.Token = _tokenService.Token;
         _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
       }
       else
       {
         IsLoggingIn = true;
-        WebView.Source = new Uri(_authorizationService.LoginURL);
+        WebView.Source = new Uri(_splitwiseAuthorizationService.LoginURL);
       }
     }
 
@@ -154,13 +141,13 @@ namespace ZoNo.ViewModels
       {
         case State.LoggedOut:
           {
-            sender.Source = new Uri(_authorizationService.LoginURL);
+            sender.Source = new Uri(_splitwiseAuthorizationService.LoginURL);
             _state = State.LoggingIn;
             break;
           }
         case State.LoggingIn:
           {
-            if (CurrentURL == _authorizationService.LoginURL)
+            if (CurrentURL == _splitwiseAuthorizationService.LoginURL)
             {
               // Fill login details
               await sender.ExecuteScriptAsync($"document.querySelector('#credentials_identity').value = '{Email}'");
@@ -271,7 +258,7 @@ namespace ZoNo.ViewModels
           }
         case State.LoggedIn:
           {
-            if (_authorizationService.IsWrongCredentials(CurrentURL))
+            if (_splitwiseAuthorizationService.IsWrongCredentials(CurrentURL))
             {
               IsLoggingIn = false;
               IsWrongCredentials = true;
@@ -280,14 +267,14 @@ namespace ZoNo.ViewModels
             }
             else
             {
-              sender.Source = new Uri(_authorizationService.AuthorizationURL);
+              sender.Source = new Uri(_splitwiseAuthorizationService.AuthorizationURL);
               _state = State.Authorizing;
             }
             break;
           }
         case State.Authorizing:
           {
-            if (CurrentURL == _authorizationService.AuthorizationURL)
+            if (CurrentURL == _splitwiseAuthorizationService.AuthorizationURL)
             {
               // Click on authorize button
               await sender.ExecuteScriptAsync($"document.querySelector('input[type=\\'submit\\']').click()");
@@ -301,10 +288,11 @@ namespace ZoNo.ViewModels
           }
         case State.Authorized:
           {
-            if (_authorizationService.ExtractAuthorizationCode(CurrentURL, out var wAuthorizationCode))
+            if (_splitwiseAuthorizationService.ExtractAuthorizationCode(CurrentURL, out var wAuthorizationCode))
             {
-              var token = await _authorizationService.GetTokenAsync(wAuthorizationCode);
+              var token = await _splitwiseAuthorizationService.GetTokenAsync(wAuthorizationCode);
               _tokenService.Token = token;
+              _splitwiseService.Token = token;
               if (IsRememberMe)
               {
                 await _tokenService.SaveAsync();

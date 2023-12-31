@@ -2,7 +2,7 @@
 {
   public record Token
   {
-    public string AccessToken { get; init; }
-    public TokenType TokenType { get; init; }
+    public required string AccessToken { get; init; }
+    public required TokenType TokenType { get; init; }
   };
 }

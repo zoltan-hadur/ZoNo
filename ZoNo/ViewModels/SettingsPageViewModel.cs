@@ -18,32 +18,21 @@ using ZoNo.Views;
 
 namespace ZoNo.ViewModels
 {
-  public partial class SettingsPageViewModel : ObservableRecipient
+  public partial class SettingsPageViewModel(
+    IRulesService rulesService,
+    IDialogService dialogService,
+    IThemeSelectorService themeSelectorService,
+    IMessenger messenger) : ObservableRecipient(messenger)
   {
-    private readonly IRulesService _rulesService;
-    private readonly IDialogService _dialogService;
-    private readonly IThemeSelectorService _themeSelectorService;
+    private readonly IRulesService _rulesService = rulesService;
+    private readonly IDialogService _dialogService = dialogService;
+    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
 
     [ObservableProperty]
-
-    private ElementTheme _elementTheme;
+    private ElementTheme _elementTheme = themeSelectorService.Theme;
 
     [ObservableProperty]
-    private string _versionDescription;
-
-    public SettingsPageViewModel(
-      IRulesService rulesService,
-      IDialogService dialogService,
-      IThemeSelectorService themeSelectorService,
-      IMessenger messenger) : base(messenger)
-    {
-      _rulesService = rulesService;
-      _dialogService = dialogService;
-      _themeSelectorService = themeSelectorService;
-
-      _elementTheme = _themeSelectorService.Theme;
-      _versionDescription = GetVersionDescription();
-    }
+    private string _versionDescription = GetVersionDescription();
 
     private static string GetVersionDescription()
     {

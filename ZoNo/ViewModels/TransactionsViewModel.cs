@@ -10,10 +10,14 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class TransactionsViewModel(
-    ILocalSettingsService _localSettingsService,
-    IExcelDocumentLoaderService _excelDocumentLoaderService,
-    ITransactionProcessorService _transactionProcessorService) : ObservableObject
+    ILocalSettingsService localSettingsService,
+    IExcelDocumentLoaderService excelDocumentLoaderService,
+    ITransactionProcessorService transactionProcessorService) : ObservableObject
   {
+    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly IExcelDocumentLoaderService _excelDocumentLoaderService = excelDocumentLoaderService;
+    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 

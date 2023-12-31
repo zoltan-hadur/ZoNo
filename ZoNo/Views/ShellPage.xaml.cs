@@ -10,6 +10,7 @@ namespace ZoNo.Views
     public ShellPage()
     {
       ViewModel = App.GetService<ShellPageViewModel>();
+      ViewModel.Initialize();
       InitializeComponent();
 
       ViewModel.NavigationService.Frame = NavigationFrame;

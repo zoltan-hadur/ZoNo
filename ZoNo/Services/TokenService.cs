@@ -3,8 +3,11 @@ using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class TokenService(ILocalSettingsService _localSettingsService) : ITokenService
+  public class TokenService(
+    ILocalSettingsService localSettingsService) : ITokenService
   {
+    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+
     private const string SettingToken = "Protected_Token";
 
     public Token Token { get; set; } = null;

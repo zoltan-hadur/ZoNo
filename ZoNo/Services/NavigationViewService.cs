@@ -7,8 +7,13 @@ using ZoNo.ViewModels;
 
 namespace ZoNo.Services
 {
-  public class NavigationViewService(INavigationService _navigationService, IPageService _pageService) : INavigationViewService
+  public class NavigationViewService(
+    INavigationService navigationService,
+    IPageService pageService) : INavigationViewService
   {
+    private readonly INavigationService _navigationService = navigationService;
+    private readonly IPageService _pageService = pageService;
+
     private NavigationView _navigationView;
 
     public IList<object> MenuItems => _navigationView?.MenuItems;
