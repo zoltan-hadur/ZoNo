@@ -53,27 +53,8 @@ namespace ZoNo.ViewModels
       _splitwiseGroups = taskGroups.Result;
       _splitwiseCategories = taskCategories.Result.OrderBy(category => category.Name).ToArray();
 
-      Categories = _splitwiseCategories.Select(category => new Category()
-      {
-        Name = category.Name,
-        SubCategories = category.Subcategories.Select(subCategory => new Category()
-        {
-          Name = subCategory.Name,
-          Picture = subCategory.IconTypes.Square.Large
-        }).ToArray()
-      }).ToArray();
-      Groups = _splitwiseGroups.Select(group => new Group()
-      {
-        Picture = group.Avatar.Medium,
-        Name = group.Name,
-        Members = group.Members.Select(user => new User()
-        {
-          Picture = user.Picture.Medium,
-          FirstName = user.FirstName,
-          LastName = user.LastName,
-          Email = user.Email
-        }).ToArray()
-      }).ToArray();
+      Categories = _splitwiseCategories.Select(Category.FromSplitwiseModel).ToArray();
+      Groups = _splitwiseGroups.Select(Group.FromSplitwiseModel).ToArray();
 
       Expenses.CollectionChanged += Expenses_CollectionChanged;
 
@@ -118,59 +99,13 @@ namespace ZoNo.ViewModels
     {
       IsUploadingToSplitwise = true;
 
-      foreach (var expense in Expenses.ToArray())
+      var tasks = Expenses.Select(expense =>
       {
-        var group = _splitwiseGroups.Single(group => group.Name == expense.Group.Name);
-
-        var category = _splitwiseCategories.Single(category => category.Name == expense.Category.ParentCategoryName)
-          .Subcategories.Single(subcategory => subcategory.Name == expense.Category.Name);
-
-        var sofar = 0.0;
-        var users = expense.Shares.Select((with, index) =>
-        {
-          var paidShare = string.Empty;
-          var owedShare = string.Empty;
-          if (index == 0)
-          {
-            paidShare = expense.Cost.ToString("0.00");
-          }
-          else
-          {
-            paidShare = "0";
-          }
-          if (index < expense.Shares.Count - 1)
-          {
-            owedShare = (expense.Cost * expense.Shares[index].Percentage / 100).ToString("0.00");
-            sofar = sofar + Convert.ToDouble(owedShare);
-          }
-          else
-          {
-            var total = Convert.ToDouble(expense.Cost.ToString("0.00"));
-            var rest = total - sofar;
-            owedShare = rest.ToString("0.00");
-          }
-          return new Splitwise.Models.Share()
-          {
-            UserId = group.Members.Single(user => user.Email == with.User.Email).Id,
-            PaidShare = paidShare,
-            OwedShare = owedShare
-          };
-        }).ToArray();
-
-        var splitwiseExpense = new Splitwise.Models.Expense()
-        {
-          Cost = expense.Cost.ToString("0.00"),
-          Description = expense.Description,
-          Date = expense.Date,
-          CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(expense.Currency.ToString()),
-          CategoryId = category.Id,
-          GroupId = group.Id,
-          Users = users
-        };
-
-        await _splitwiseService.CreateExpense(splitwiseExpense);
-        Expenses.Remove(expense);
-      }
+        var splitwiseExpense = ExpenseViewModel.ToSplitwiseModel(expense, _splitwiseGroups, _splitwiseCategories);
+        return _splitwiseService.CreateExpense(splitwiseExpense)
+          .ContinueWith(task => Expenses.Remove(expense), TaskContinuationOptions.ExecuteSynchronously);
+      }).ToArray();
+      await Task.WhenAll(tasks);
 
       IsUploadingToSplitwise = false;
     }

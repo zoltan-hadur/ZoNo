@@ -100,16 +100,16 @@ namespace ZoNo.ViewModels
       }
     }
 
-    public static RuleViewModel FromModel(Rule model, int index)
+    public static RuleViewModel FromModel(Rule rule, int index)
     {
       return new RuleViewModel()
       {
-        Id = model.Id,
+        Id = rule.Id,
         Index = index + 1,
-        Description = model.Description,
-        InputExpression = model.InputExpression,
+        Description = rule.Description,
+        InputExpression = rule.InputExpression,
         IsInputSyntaxValid = true,
-        OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(model.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
+        OutputExpressions = new ObservableCollection<OutputExpressionViewModel>(rule.OutputExpressions.Select(OutputExpressionViewModel.FromModel))
       };
     }
 

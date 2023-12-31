@@ -8,5 +8,10 @@ namespace ZoNo.Helpers
     {
       return enumerable ?? Enumerable.Empty<object>();
     }
+
+    public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> enumerable)
+    {
+      return enumerable ?? Enumerable.Empty<T>();
+    }
   }
 }

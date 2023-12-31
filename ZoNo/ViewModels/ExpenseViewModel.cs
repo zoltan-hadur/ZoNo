@@ -85,13 +85,13 @@ namespace ZoNo.ViewModels
       }
     }
 
-    public static ExpenseViewModel FromModel(Expense model)
+    public static ExpenseViewModel FromModel(Expense expense)
     {
       return new ExpenseViewModel()
       {
-        Id = model.Id,
+        Id = expense.Id,
         Shares = new ObservableCollection<ShareViewModel>(
-          model.With.Select(with => new ShareViewModel
+          expense.With.Select(with => new ShareViewModel
           {
             User = new User()
             {
@@ -99,12 +99,63 @@ namespace ZoNo.ViewModels
             },
             Percentage = with.Percentage
           })),
-        Category = model.Category,
-        Description = model.Description,
-        Currency = model.Currency,
-        Cost = model.Cost,
-        Date = model.Date,
-        Group = new Group() { Name = model.Group }
+        Category = expense.Category,
+        Description = expense.Description,
+        Currency = expense.Currency,
+        Cost = expense.Cost,
+        Date = expense.Date,
+        Group = new Group() { Name = expense.Group }
+      };
+    }
+
+    public static Splitwise.Models.Expense ToSplitwiseModel(ExpenseViewModel vm, Splitwise.Models.Group[] groups, Splitwise.Models.Category[] categories)
+    {
+      var group = groups.Single(group => group.Name == vm.Group.Name);
+      var category = categories.Single(category => category.Name == vm.Category.ParentCategoryName)
+        .Subcategories.Single(subcategory => subcategory.Name == vm.Category.Name);
+
+      var sofar = 0.0;
+      var users = vm.Shares.Select((with, index) =>
+      {
+        var paidShare = string.Empty;
+        var owedShare = string.Empty;
+        if (index == 0)
+        {
+          paidShare = vm.Cost.ToString("0.00");
+        }
+        else
+        {
+          paidShare = "0";
+        }
+        if (index < vm.Shares.Count - 1)
+        {
+          owedShare = (vm.Cost * vm.Shares[index].Percentage / 100).ToString("0.00");
+          sofar = sofar + Convert.ToDouble(owedShare);
+        }
+        else
+        {
+          var total = Convert.ToDouble(vm.Cost.ToString("0.00"));
+          var rest = total - sofar;
+          owedShare = rest.ToString("0.00");
+        }
+
+        return new Splitwise.Models.Share()
+        {
+          UserId = group.Members.Single(user => user.Email == with.User.Email).Id,
+          PaidShare = paidShare,
+          OwedShare = owedShare
+        };
+      }).ToArray();
+
+      return new Splitwise.Models.Expense()
+      {
+        Cost = vm.Cost.ToString("0.00"),
+        Description = vm.Description,
+        Date = vm.Date,
+        CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(vm.Currency.ToString()),
+        CategoryId = category.Id,
+        GroupId = group.Id,
+        Users = users
       };
     }
 
