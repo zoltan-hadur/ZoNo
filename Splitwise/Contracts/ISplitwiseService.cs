@@ -40,6 +40,6 @@ namespace Splitwise.Contracts
     /// </summary>
     /// <param name="expense"></param>
     /// <returns></returns>
-    Task<Expense[]> CreateExpense(Expense expense);
+    Task<Expense[]> CreateExpenseAsync(Expense expense);
   }
 }

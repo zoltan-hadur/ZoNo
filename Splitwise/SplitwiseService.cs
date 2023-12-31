@@ -50,7 +50,7 @@ namespace Splitwise
       });
     }
 
-    public async Task<Expense[]> CreateExpense(Expense expense)
+    public async Task<Expense[]> CreateExpenseAsync(Expense expense)
     {
       return await SendRequest(HttpMethod.Post, "create_expense", (node, options) =>
       {

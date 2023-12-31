@@ -102,7 +102,7 @@ namespace ZoNo.ViewModels
       var tasks = Expenses.Select(expense =>
       {
         var splitwiseExpense = ExpenseViewModel.ToSplitwiseModel(expense, _splitwiseGroups, _splitwiseCategories);
-        return _splitwiseService.CreateExpense(splitwiseExpense)
+        return _splitwiseService.CreateExpenseAsync(splitwiseExpense)
           .ContinueWith(task => Expenses.Remove(expense), TaskContinuationOptions.ExecuteSynchronously);
       }).ToArray();
       await Task.WhenAll(tasks);
