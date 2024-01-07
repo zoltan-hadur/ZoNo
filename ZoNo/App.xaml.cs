@@ -4,6 +4,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Splitwise;
 using Splitwise.Contracts;
+using Tracer;
+using Tracer.Contracts;
+using Tracer.Sinks;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
@@ -94,6 +97,14 @@ namespace ZoNo
       services.AddSingleton<IRuleEvaluatorServiceBuilder, RuleEvaluatorServiceBuilder>();
       services.AddSingleton<IDialogService, DialogService>();
       services.AddSingleton<IRuleExpressionSyntaxCheckerService, RuleExpressionSyntaxCheckerService>();
+      services.AddSingleton<ITraceDetailProcessor, TraceDetailProcessor>();
+      services.AddSingleton<ITraceFactory, TraceFactory>();
+      services.AddSingleton<ITraceDetailFactory, TraceDetailFactory>();
+      services.AddSingleton<IEnumerable<ITraceSink>>(
+        [
+          new InMemoryTraceSink(),
+          new FileTraceSink() { }
+        ]);
 
       // Views and ViewModels
       services.AddScoped<LoginPageViewModel>();
@@ -130,6 +141,10 @@ namespace ZoNo
       {
         RequestedTheme = themeSelectorService.Theme == ElementTheme.Light ? ApplicationTheme.Light : ApplicationTheme.Dark;
       }
+
+      // Must set tracing settings
+      var settingsPageViewModel = GetService<SettingsPageViewModel>();
+      Task.Run(settingsPageViewModel.LoadAsync).Wait();
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

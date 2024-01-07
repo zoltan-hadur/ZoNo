@@ -49,6 +49,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Splitwise\Splitwise.csproj" />
+    <ProjectReference Include="..\Tracer\Tracer.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

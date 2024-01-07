@@ -13,5 +13,10 @@ namespace ZoNo.Views
       ViewModel = App.GetService<SettingsPageViewModel>();
       InitializeComponent();
     }
+
+    private async void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
+    {
+      await ViewModel.LoadAsync();
+    }
   }
 }
