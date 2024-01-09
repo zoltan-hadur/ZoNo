@@ -9,6 +9,7 @@ namespace Tracer
       return new TraceDetail()
       {
         Time = TimeOnly.FromDateTime(DateTime.Now),
+        CorrelationId = TraceFactory.CorrelationId,
         ProcessId = Environment.ProcessId,
         ThreadId = Environment.CurrentManagedThreadId,
         Direction = direction,

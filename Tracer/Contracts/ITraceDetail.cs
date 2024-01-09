@@ -3,6 +3,7 @@
   public interface ITraceDetail
   {
     TimeOnly Time { get; }
+    int CorrelationId { get; }
     int ProcessId { get; }
     int ThreadId { get; }
     TraceDirection Direction { get; }
