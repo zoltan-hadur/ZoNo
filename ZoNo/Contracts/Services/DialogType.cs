@@ -3,6 +3,9 @@
   public enum DialogType
   {
     Ok,
-    OkCancel
+    Close,
+    OkCancel,
+    SaveCancel,
+    SaveClose
   }
 }

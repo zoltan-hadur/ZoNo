@@ -122,12 +122,12 @@ namespace ZoNo.ViewModels
         Mode = BindingMode.OneWay,
         Source = copiedExpense
       };
-      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit Expense", new ExpenseEditor(copiedExpense)
+      var result = await _dialogService.ShowDialogAsync(DialogType.SaveCancel, $"Edit Expense", new ExpenseEditor(copiedExpense)
       {
         Categories = Categories,
         Groups = Groups
       }, isPrimaryButtonEnabledBinding);
-      if (result == DialogResult.Ok)
+      if (result)
       {
         Expenses[index] = copiedExpense;
       }

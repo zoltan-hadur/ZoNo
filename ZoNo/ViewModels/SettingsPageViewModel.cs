@@ -267,7 +267,7 @@ namespace ZoNo.ViewModels
       };
       richEditBox.Document.SetText(TextSetOptions.None, string.Join(Environment.NewLine, InMemoryTraceSink.Traces));
       richEditBox.IsReadOnly = true;
-      await _dialogService.ShowDialogAsync(DialogType.Ok, "In Memory Trace", richEditBox);
+      await _dialogService.ShowDialogAsync(DialogType.Close, "In Memory Trace", richEditBox);
     }
 
     [RelayCommand]
@@ -298,7 +298,7 @@ namespace ZoNo.ViewModels
     private void ShowReleaseNotes()
     {
       using var trace = _traceFactory.CreateNew(_traceDomain);
-      _dialogService.ShowDialogAsync(DialogType.Ok, "Release Notes", new ReleaseNotesView());
+      _dialogService.ShowDialogAsync(DialogType.Close, "Release Notes", new ReleaseNotesView());
     }
 
     private async Task ShowMessage(string message)

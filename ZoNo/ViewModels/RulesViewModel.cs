@@ -91,8 +91,8 @@ namespace ZoNo.ViewModels
         Mode = BindingMode.OneWay,
         Source = rule
       };
-      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"New {_ruleType} Rule", new RuleEditor(rule), isPrimaryButtonEnabledBinding);
-      if (result == DialogResult.Ok)
+      var result = await _dialogService.ShowDialogAsync(DialogType.SaveCancel, $"New {_ruleType} Rule", new RuleEditor(rule), isPrimaryButtonEnabledBinding);
+      if (result)
       {
         Rules.Add(rule);
       }
@@ -113,8 +113,8 @@ namespace ZoNo.ViewModels
         Mode = BindingMode.OneWay,
         Source = copiedRule
       };
-      var result = await _dialogService.ShowDialogAsync(DialogType.OkCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule), isPrimaryButtonEnabledBinding);
-      if (result == DialogResult.Ok)
+      var result = await _dialogService.ShowDialogAsync(DialogType.SaveCancel, $"Edit {_ruleType} Rule", new RuleEditor(copiedRule), isPrimaryButtonEnabledBinding);
+      if (result)
       {
         Rules[index] = copiedRule;
       }
