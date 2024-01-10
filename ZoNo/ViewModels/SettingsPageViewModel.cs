@@ -259,15 +259,39 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew(_traceDomain);
 
+      var traces = string.Join(Environment.NewLine, InMemoryTraceSink.Traces);
       var richEditBox = new RichEditBox()
       {
         FontFamily = new FontFamily("Courier New"),
         TextWrapping = TextWrapping.NoWrap,
         Padding = new Thickness(0, 0, 12, 12)
       };
-      richEditBox.Document.SetText(TextSetOptions.None, string.Join(Environment.NewLine, InMemoryTraceSink.Traces));
+      richEditBox.Document.SetText(TextSetOptions.None, traces);
       richEditBox.IsReadOnly = true;
-      await _dialogService.ShowDialogAsync(DialogType.Close, "In Memory Trace", richEditBox);
+      var path = string.Empty;
+      var result = await _dialogService.ShowDialogAsync(DialogType.SaveClose, "In Memory Trace", richEditBox, shouldCloseDialogOnPrimaryButtonClick: async () =>
+      {
+        var shouldCloseOnOk = false;
+
+        var savePicker = new FileSavePicker();
+        var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+        InitializeWithWindow.Initialize(savePicker, hWnd);
+        savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
+        savePicker.SuggestedFileName = GetTraceFileName();
+        if (await savePicker.PickSaveFileAsync() is var file && file != null)
+        {
+          path = file.Path;
+          shouldCloseOnOk = true;
+        }
+
+        return shouldCloseOnOk;
+      });
+
+      if (result)
+      {
+        File.WriteAllText(path, traces);
+      }
     }
 
     [RelayCommand]

@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Splitwise;
 using Splitwise.Contracts;
 using Tracer;
 using Tracer.Contracts;
 using Tracer.Sinks;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
@@ -31,6 +35,15 @@ namespace ZoNo
         throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
       }
       return service;
+    }
+
+    public static IEnumerable<T> GetServices<T>() where T : class
+    {
+      if (Current.ServiceScope.ServiceProvider.GetServices<T>() is not IEnumerable<T> services)
+      {
+        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      }
+      return services;
     }
 
     public App()
@@ -100,11 +113,8 @@ namespace ZoNo
       services.AddSingleton<ITraceDetailProcessor, TraceDetailProcessor>();
       services.AddSingleton<ITraceFactory, TraceFactory>();
       services.AddSingleton<ITraceDetailFactory, TraceDetailFactory>();
-      services.AddSingleton<IEnumerable<ITraceSink>>(
-        [
-          new InMemoryTraceSink(),
-          new FileTraceSink() { }
-        ]);
+      services.AddSingleton<ITraceSink, InMemoryTraceSink>();
+      services.AddSingleton<ITraceSink, FileTraceSink>();
 
       // Views and ViewModels
       services.AddScoped<LoginPageViewModel>();
@@ -150,11 +160,49 @@ namespace ZoNo
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
       e.Handled = true;
-      await GetService<IDialogService>().ShowDialogAsync(DialogType.Ok, "Unhandled Exception", new TextBlock()
+
+      var path = string.Empty;
+      var richEditBox = new RichEditBox()
       {
-        Text = e.Exception.ToString(),
-        IsTextSelectionEnabled = true
+        FontFamily = new FontFamily("Courier New"),
+        TextWrapping = TextWrapping.NoWrap,
+        Padding = new Thickness(0, 0, 12, 12)
+      };
+      richEditBox.Document.SetText(TextSetOptions.None, e.Exception.ToString());
+      richEditBox.IsReadOnly = true;
+      var result = await GetService<IDialogService>().ShowDialogAsync(DialogType.SaveClose, "Unhandled Exception", new StackPanel()
+      {
+        Spacing = 6,
+        Children =
+        {
+          richEditBox,
+          new TextBlock() { Text = "You can save the traces to a file. The app will exit after the dialog closes." }
+        }
+      }, shouldCloseDialogOnPrimaryButtonClick: async () =>
+      {
+        var shouldCloseDialog = false;
+
+        var savePicker = new FileSavePicker();
+        var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+        InitializeWithWindow.Initialize(savePicker, hWnd);
+        savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
+        savePicker.SuggestedFileName = "ZoNo.trace";
+        if (await savePicker.PickSaveFileAsync() is var file && file != null)
+        {
+          path = file.Path;
+          shouldCloseDialog = true;
+        }
+
+        return shouldCloseDialog;
       });
+
+      if (result)
+      {
+        var inMemoryTraceSink = GetServices<ITraceSink>().Single(traceSink => traceSink is InMemoryTraceSink) as InMemoryTraceSink;
+        File.WriteAllText(path, string.Join(Environment.NewLine, inMemoryTraceSink.Traces));
+      }
+
       Exit();
     }
 
