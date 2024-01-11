@@ -1,17 +1,21 @@
 ﻿using System.Collections.Concurrent;
 using Tracer.Contracts;
+using Tracer.Sinks;
 
 namespace Tracer
 {
   public class TraceDetailProcessor : ITraceDetailProcessor
   {
+    private readonly InMemoryTraceSink _inMemoryTraceSink;
     private readonly Thread _distributorThread;
     private readonly (Thread ConsumerThread, BlockingCollection<ITraceDetail> ConsumerTraceDetails)[] _consumerThreads;
     private readonly BlockingCollection<ITraceDetail> _traceDetails = [];
 
     public TraceDetailProcessor(IEnumerable<ITraceSink> traceSinks)
     {
-      _consumerThreads = traceSinks.Select(traceSink =>
+      _inMemoryTraceSink = traceSinks.SingleOrDefault(traceSink => traceSink is InMemoryTraceSink) as InMemoryTraceSink;
+
+      _consumerThreads = traceSinks.Except([_inMemoryTraceSink]).Select(traceSink =>
       {
         var consumerTraceDetails = new BlockingCollection<ITraceDetail>();
         var consumerThread = new Thread(() => Consume(consumerTraceDetails, traceSink));
@@ -23,6 +27,7 @@ namespace Tracer
 
     public void Process(ITraceDetail traceDetail)
     {
+      _inMemoryTraceSink?.Write([traceDetail]);
       _traceDetails.Add(traceDetail);
     }
 
