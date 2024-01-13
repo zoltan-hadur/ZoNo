@@ -2,6 +2,6 @@
 {
   public interface ITraceDetailFactory
   {
-    ITraceDetail Create(TraceDirection direction, TraceLevel level, TraceDomain domain, string method, string arguments, string message);
+    ITraceDetail Create(TraceDirection direction, TraceLevel level, string method, string message);
   }
 }

@@ -7,22 +7,16 @@ namespace Tracer
   {
     private readonly ITraceDetailFactory _traceDetailFactory;
     private readonly ITraceDetailProcessor _traceDetailProcessor;
-    private readonly TraceDomain _traceDomain;
-    private readonly string _arguments;
     private readonly string _method;
     private readonly Stopwatch _stopwatch;
 
     internal Trace(
       ITraceDetailFactory traceDetailFactory,
       ITraceDetailProcessor traceDetailProcessor,
-      TraceDomain traceDomain,
-      string arguments,
       string method)
     {
       _traceDetailFactory = traceDetailFactory;
       _traceDetailProcessor = traceDetailProcessor;
-      _traceDomain = traceDomain;
-      _arguments = arguments;
       _method = method;
       _stopwatch = Stopwatch.StartNew();
 
@@ -42,7 +36,7 @@ namespace Tracer
 
     private void Log(TraceDirection direction, TraceLevel level, string message)
     {
-      _traceDetailProcessor.Process(_traceDetailFactory.Create(direction, level, _traceDomain, _method, _arguments, message));
+      _traceDetailProcessor.Process(_traceDetailFactory.Create(direction, level, _method, message));
     }
   }
 }

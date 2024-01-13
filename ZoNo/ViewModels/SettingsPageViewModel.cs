@@ -5,12 +5,12 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Nodes;
 using Tracer;
 using Tracer.Contracts;
 using Tracer.Sinks;
-using Tracer.Utilities;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -36,7 +36,6 @@ namespace ZoNo.ViewModels
     private const string SettingInMemoryTraceSink = "Settings_InMemoryTraceSink";
     private const string SettingFileTraceSink = "Settings_FileTraceSink";
 
-    private readonly static TraceDomain _traceDomain = new(typeof(SettingsPageViewModel));
     private readonly IRulesService _rulesService = rulesService;
     private readonly IDialogService _dialogService = dialogService;
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
@@ -66,7 +65,7 @@ namespace ZoNo.ViewModels
 
     public async Task LoadAsync()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
       if (_isLoaded) return;
 
       InMemoryTraceSinkSettings = await _localSettingsService.ReadSettingAsync<InMemoryTraceSinkSettings>(SettingInMemoryTraceSink) ??
@@ -84,7 +83,7 @@ namespace ZoNo.ViewModels
           Path = ApplicationData.Current.LocalFolder.Path
         };
 
-      trace.Info($"Setting trace sink properties");
+      trace.Debug("Setting trace sink properties");
       InMemoryTraceSink.IsEnabled = InMemoryTraceSinkSettings.IsEnabled;
       InMemoryTraceSink.Level = InMemoryTraceSinkSettings.Level;
       InMemoryTraceSink.Size = InMemoryTraceSinkSettings.Size;
@@ -94,7 +93,7 @@ namespace ZoNo.ViewModels
 
       if (!File.Exists(FileTraceSink.Path))
       {
-        trace.Info($"Creating {FileTraceSink.Path}");
+        trace.Debug($"Creating {FileTraceSink.Path}");
         using var stream = File.Create(FileTraceSink.Path);
       }
       foreach (var path in Directory.GetFiles(FileTraceSinkSettings.Path, "ZoNo__*.trace"))
@@ -102,65 +101,24 @@ namespace ZoNo.ViewModels
         var time = Path.GetFileNameWithoutExtension(path).Replace("ZoNo__", string.Empty);
         if ((DateTime.Now - DateTime.ParseExact(time, "yyyy-MM-dd__HH.mm.ss", null)).TotalDays > 10)
         {
-          trace.Info($"Deleting {FileTraceSink.Path}");
+          trace.Debug($"Deleting {FileTraceSink.Path}");
           File.Delete(path);
         }
       }
 
-      InMemoryTraceSinkSettings.PropertyChanged += async (s, e) =>
-      {
-        using var trace = _traceFactory.CreateNew(_traceDomain);
-        trace.Info(
-          $"{TraceUtility.Format(InMemoryTraceSink.IsEnabled)}, {TraceUtility.Format(InMemoryTraceSinkSettings.IsEnabled)}," +
-          $"{TraceUtility.Format(InMemoryTraceSink.Level)}, {TraceUtility.Format(InMemoryTraceSinkSettings.Level)}," +
-          $"{TraceUtility.Format(InMemoryTraceSink.Size)}, {TraceUtility.Format(InMemoryTraceSinkSettings.Size)}"
-        );
-        InMemoryTraceSink.IsEnabled = InMemoryTraceSinkSettings.IsEnabled;
-        InMemoryTraceSink.Level = InMemoryTraceSinkSettings.Level;
-        InMemoryTraceSink.Size = InMemoryTraceSinkSettings.Size;
-        await _localSettingsService.SaveSettingAsync(SettingInMemoryTraceSink, InMemoryTraceSinkSettings);
-      };
-      FileTraceSinkSettings.PropertyChanged += async (s, e) =>
-      {
-        using var trace = _traceFactory.CreateNew(_traceDomain);
-        trace.Info(
-          $"{TraceUtility.Format(FileTraceSink.IsEnabled)}, {TraceUtility.Format(FileTraceSinkSettings.IsEnabled)}," +
-          $"{TraceUtility.Format(FileTraceSink.Level)}, {TraceUtility.Format(FileTraceSinkSettings.Level)}," +
-          $"{TraceUtility.Format(FileTraceSink.Path)}, {TraceUtility.Format(Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName()))}"
-        );
-        FileTraceSink.IsEnabled = FileTraceSinkSettings.IsEnabled;
-        FileTraceSink.Level = FileTraceSinkSettings.Level;
-        FileTraceSink.Path = Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName());
-        await _localSettingsService.SaveSettingAsync(SettingFileTraceSink, FileTraceSinkSettings);
-      };
+      InMemoryTraceSinkSettings.PropertyChanged += InMemoryTraceSinkSettings_PropertyChanged;
+      FileTraceSinkSettings.PropertyChanged += FileTraceSinkSettings_PropertyChanged;
 
-      trace.Info($"Starting {nameof(_traceDetailProcessor)}");
+      trace.Debug($"Starting {nameof(_traceDetailProcessor)}");
       _traceDetailProcessor.Start();
 
       _isLoaded = true;
     }
 
-    private static string GetVersionDescription()
-    {
-      Version version;
-
-      if (RuntimeHelper.IsMSIX)
-      {
-        var packageVersion = Package.Current.Id.Version;
-        version = new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
-      }
-      else
-      {
-        version = Assembly.GetExecutingAssembly().GetName().Version;
-      }
-
-      return $"ZoNo - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-    }
-
     [RelayCommand]
     private async Task SwitchTheme(ElementTheme elementTheme)
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
 
       if (ElementTheme != elementTheme)
       {
@@ -172,7 +130,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task ImportRules()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
 
       var openPicker = new FileOpenPicker();
       var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
@@ -222,7 +180,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task ExportRules()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
 
       var savePicker = new FileSavePicker();
       var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
@@ -257,7 +215,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task OpenInMemoryTrace()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
 
       var traces = string.Join(Environment.NewLine, InMemoryTraceSink.Traces);
       var richEditBox = new RichEditBox()
@@ -297,7 +255,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task SelectFileTraceOutputFolder()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
 
       var folderPicker = new FolderPicker();
       var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
@@ -314,23 +272,68 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private void OpenFileTrace()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
       System.Diagnostics.Process.Start("explorer", "\"" + FileTraceSinkSettings.Path + "\"");
     }
 
     [RelayCommand]
     private void ShowReleaseNotes()
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
       _dialogService.ShowDialogAsync(DialogType.Close, "Release Notes", new ReleaseNotesView());
     }
 
     private async Task ShowMessage(string message)
     {
-      using var trace = _traceFactory.CreateNew(_traceDomain);
+      using var trace = _traceFactory.CreateNew();
       await _dialogService.ShowDialogAsync(DialogType.Ok, "Message", message);
     }
 
-    private string GetTraceFileName() => $"ZoNo__{System.Diagnostics.Process.GetCurrentProcess().StartTime:yyyy-MM-dd__HH.mm.ss}.trace";
+    private static string GetTraceFileName() => $"ZoNo__{System.Diagnostics.Process.GetCurrentProcess().StartTime:yyyy-MM-dd__HH.mm.ss}.trace";
+
+    private static string GetVersionDescription()
+    {
+      Version version;
+
+      if (RuntimeHelper.IsMSIX)
+      {
+        var packageVersion = Package.Current.Id.Version;
+        version = new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
+      }
+      else
+      {
+        version = Assembly.GetExecutingAssembly().GetName().Version;
+      }
+
+      return $"ZoNo - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+    }
+
+    private async void InMemoryTraceSinkSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(
+        $"{Format(InMemoryTraceSink.IsEnabled)}, {Format(InMemoryTraceSinkSettings.IsEnabled)}," +
+        $"{Format(InMemoryTraceSink.Level)}, {Format(InMemoryTraceSinkSettings.Level)}," +
+        $"{Format(InMemoryTraceSink.Size)}, {Format(InMemoryTraceSinkSettings.Size)}"
+      );
+      InMemoryTraceSink.IsEnabled = InMemoryTraceSinkSettings.IsEnabled;
+      InMemoryTraceSink.Level = InMemoryTraceSinkSettings.Level;
+      InMemoryTraceSink.Size = InMemoryTraceSinkSettings.Size;
+      await _localSettingsService.SaveSettingAsync(SettingInMemoryTraceSink, InMemoryTraceSinkSettings);
+    }
+
+    private async void FileTraceSinkSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(
+        $"{Format(FileTraceSink.IsEnabled)}, {Format(FileTraceSinkSettings.IsEnabled)}," +
+        $"{Format(FileTraceSink.Level)}, {Format(FileTraceSinkSettings.Level)}," +
+        $"{Format(FileTraceSink.Path)}, {Format(Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName()))}"
+      );
+      FileTraceSink.IsEnabled = FileTraceSinkSettings.IsEnabled;
+      FileTraceSink.Level = FileTraceSinkSettings.Level;
+      FileTraceSink.Path = Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName());
+      await _localSettingsService.SaveSettingAsync(SettingFileTraceSink, FileTraceSinkSettings);
+    }
   }
 }

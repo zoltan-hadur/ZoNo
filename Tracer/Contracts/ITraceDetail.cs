@@ -8,9 +8,7 @@
     int ThreadId { get; }
     TraceDirection Direction { get; }
     TraceLevel Level { get; }
-    TraceDomain Domain { get; }
     string Method { get; }
-    string Arguments { get; }
     string Message { get; }
 
     public string Compose();

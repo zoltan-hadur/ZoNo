@@ -1,5 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Tracer.Contracts;
+using Tracer.Utilities;
 
 namespace Tracer
 {
@@ -27,9 +29,11 @@ namespace Tracer
       }
     }
 
-    public ITrace CreateNew(TraceDomain traceDomain, string arguments = null, [CallerMemberName] string method = null)
+    public ITrace CreateNew([CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
-      return new Trace(_traceDetailFactory, _traceDetailProcessor, traceDomain, arguments, method);
+      var method = TraceMethodDatabase.GetMethod(filePath, lineNumber);
+      Debug.Assert(method != null, "method is null!");
+      return new Trace(_traceDetailFactory, _traceDetailProcessor, method);
     }
   }
 }

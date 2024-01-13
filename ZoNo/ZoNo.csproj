@@ -49,6 +49,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Splitwise\Splitwise.csproj" />
+    <ProjectReference Include="..\Tracer.SourceGenerator\Tracer.SourceGenerator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     <ProjectReference Include="..\Tracer\Tracer.csproj" />
   </ItemGroup>
 

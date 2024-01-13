@@ -48,6 +48,9 @@ namespace ZoNo
 
     public App()
     {
+      // Fill up tracer method database
+      TraceMethodDatabaseFiller.Fill();
+
       // By default, ExcelDataReader throws a NotSupportedException "No data is available for encoding 1252." on .NET Core.
       // This fixes that.
       System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);

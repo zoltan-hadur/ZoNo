@@ -4,6 +4,6 @@ namespace Tracer.Contracts
 {
   public interface ITraceFactory
   {
-    ITrace CreateNew(TraceDomain traceDomain, string arguments = null, [CallerMemberName] string method = null);
+    ITrace CreateNew([CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = -1);
   }
 }

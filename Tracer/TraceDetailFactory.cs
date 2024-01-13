@@ -4,7 +4,7 @@ namespace Tracer
 {
   public class TraceDetailFactory : ITraceDetailFactory
   {
-    public ITraceDetail Create(TraceDirection direction, TraceLevel level, TraceDomain domain, string method, string arguments, string message)
+    public ITraceDetail Create(TraceDirection direction, TraceLevel level, string method, string message)
     {
       return new TraceDetail()
       {
@@ -14,9 +14,7 @@ namespace Tracer
         ThreadId = Environment.CurrentManagedThreadId,
         Direction = direction,
         Level = level,
-        Domain = domain,
         Method = method,
-        Arguments = arguments,
         Message = message
       };
     }
