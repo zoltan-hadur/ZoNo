@@ -10,6 +10,7 @@ namespace Tracer
     private readonly Thread _distributorThread;
     private readonly (Thread ConsumerThread, BlockingCollection<ITraceDetail> ConsumerTraceDetails)[] _consumerThreads;
     private readonly BlockingCollection<ITraceDetail> _traceDetails = [];
+    private bool _isRunning = false;
 
     public TraceDetailProcessor(IEnumerable<ITraceSink> traceSinks)
     {
@@ -27,12 +28,24 @@ namespace Tracer
 
     public void Process(ITraceDetail traceDetail)
     {
-      _inMemoryTraceSink?.Write([traceDetail]);
+      lock (_inMemoryTraceSink)
+      {
+        if (_isRunning)
+        {
+          _inMemoryTraceSink?.Write([traceDetail]);
+        }
+      }
       _traceDetails.Add(traceDetail);
     }
 
     public void Start()
     {
+      lock (_inMemoryTraceSink)
+      {
+        _inMemoryTraceSink?.Write(_traceDetails);
+        _isRunning = true;
+      }
+
       foreach (var (consumerThread, _) in _consumerThreads)
       {
         consumerThread.Start();
