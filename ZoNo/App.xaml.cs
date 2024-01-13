@@ -162,8 +162,10 @@ namespace ZoNo
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-      e.Handled = true;
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      trace.Fatal(e.Exception.ToString());
 
+      e.Handled = true;
       var path = string.Empty;
       var richEditBox = new RichEditBox()
       {
@@ -211,11 +213,13 @@ namespace ZoNo
 
     private void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
     {
+      using var trace = GetService<ITraceFactory>().CreateNew();
       ReplaceServiceScope();
     }
 
     private void ReplaceServiceScope()
     {
+      using var trace = GetService<ITraceFactory>().CreateNew();
       var newScope = ServiceScope.ServiceProvider.CreateScope();
       ServiceScope?.Dispose();
       ServiceScope = newScope;
@@ -223,9 +227,9 @@ namespace ZoNo
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
+      using var trace = GetService<ITraceFactory>().CreateNew();
       base.OnLaunched(args);
-
-      await App.GetService<IActivationService>().ActivateAsync(args);
+      await GetService<IActivationService>().ActivateAsync(args);
     }
   }
 }
