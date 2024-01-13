@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -225,7 +226,44 @@ namespace ZoNo.ViewModels
         Padding = new Thickness(0, 0, 12, 12)
       };
       richEditBox.Document.SetText(TextSetOptions.None, traces);
-      richEditBox.IsReadOnly = true;
+      richEditBox.Loaded += (s, e) =>
+      {
+        var start = 0;
+        while (true)
+        {
+          var range = richEditBox.Document.GetRange(start, start + 1);
+          var end = start + range.Expand(TextRangeUnit.Line);
+          if (range.EndPosition == start)
+          {
+            break;
+          }
+          start = end + 1;
+
+          if (range.Text.Contains("**Debug      **"))
+          {
+            range.CharacterFormat.ForegroundColor = Colors.Gray;
+          }
+          //else if (range.Text.Contains("**Information**"))
+          //{
+          //  range.CharacterFormat.ForegroundColor = Colors.White;
+          //}
+          else if (range.Text.Contains("**Warning    **"))
+          {
+            range.CharacterFormat.ForegroundColor = Colors.Orange;
+          }
+          else if (range.Text.Contains("**Error      **"))
+          {
+            range.CharacterFormat.ForegroundColor = Colors.Crimson;
+          }
+          else if (range.Text.Contains("**Fatal      **"))
+          {
+            range.CharacterFormat.ForegroundColor = Colors.DeepPink;
+          }
+        }
+        while (richEditBox.Document.ApplyDisplayUpdates() != 0) ;
+        richEditBox.IsReadOnly = true;
+      };
+
       var path = string.Empty;
       var result = await _dialogService.ShowDialogAsync(DialogType.SaveClose, "In Memory Trace", richEditBox, shouldCloseDialogOnPrimaryButtonClick: async () =>
       {
