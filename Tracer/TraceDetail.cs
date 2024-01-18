@@ -4,6 +4,7 @@ namespace Tracer
 {
   internal record TraceDetail : ITraceDetail
   {
+    public ulong Id { get; init; }
     public TimeOnly Time { get; init; }
     public int CorrelationId { get; init; }
     public int ProcessId { get; init; }

@@ -2,6 +2,7 @@
 {
   public interface ITraceDetail
   {
+    ulong Id { get; }
     TimeOnly Time { get; }
     int CorrelationId { get; }
     int ProcessId { get; }
