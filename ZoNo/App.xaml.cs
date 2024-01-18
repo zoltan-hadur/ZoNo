@@ -138,7 +138,8 @@ namespace ZoNo
       );
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();
-      services.AddScoped<SettingsPageViewModel>();
+      services.AddSingleton<SettingsPageViewModel>();
+      services.AddTransient<TracesViewModel>();
       services.AddScoped<ShellPageViewModel>();
 
       ServiceScope = services.BuildServiceProvider().CreateScope();

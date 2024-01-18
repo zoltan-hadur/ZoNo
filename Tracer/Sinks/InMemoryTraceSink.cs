@@ -26,6 +26,11 @@ namespace Tracer.Sinks
       get { lock (_lock) { return _traceDetails.Select(traceDetail => traceDetail.Compose()).ToArray(); } }
     }
 
+    public ITraceDetail[] TraceDetails
+    {
+      get { lock (_lock) { return _traceDetails.ToArray(); } }
+    }
+
     private bool _isEnabled;
     public bool IsEnabled
     {

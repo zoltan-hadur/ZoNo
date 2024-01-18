@@ -1,0 +1,52 @@
+<UserControl x:Class="ZoNo.Views.TracesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tracer="using:Tracer"
+             xmlns:tracercontracts="using:Tracer.Contracts"
+             mc:Ignorable="d"
+             Loaded="UserControl_Loaded">
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Orientation="Horizontal">
+      <CheckBox Content="{x:Bind tracer:TraceLevel.Debug}" IsChecked="{x:Bind ViewModel.IsDebugLevelFilterEnabled, Mode=TwoWay}"/>
+      <CheckBox Content="{x:Bind tracer:TraceLevel.Information}" IsChecked="{x:Bind ViewModel.IsInformationLevelFilterEnabled, Mode=TwoWay}"/>
+      <CheckBox Content="{x:Bind tracer:TraceLevel.Warning}" IsChecked="{x:Bind ViewModel.IsWarningLevelFilterEnabled, Mode=TwoWay}"/>
+      <CheckBox Content="{x:Bind tracer:TraceLevel.Error}" IsChecked="{x:Bind ViewModel.IsErrorLevelFilterEnabled, Mode=TwoWay}"/>
+      <CheckBox Content="{x:Bind tracer:TraceLevel.Fatal}" IsChecked="{x:Bind ViewModel.IsFatalLevelFilterEnabled, Mode=TwoWay}"/>
+    </StackPanel>
+    <Border Grid.Row="1" BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}" CornerRadius="8">
+      <ListView ItemsSource="{x:Bind ViewModel.TraceDetails, Mode=OneWay}"
+                ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                SelectionMode="None" Loaded="ListView_Loaded" MinHeight="400">
+        <ListView.ItemTemplate>
+          <DataTemplate x:DataType="tracercontracts:ITraceDetail">
+            <TextBlock Text="{x:Bind (tracercontracts:ITraceDetail).Compose()}"
+                       FontFamily="Courier New"
+                       DataContextChanged="TextBlock_DataContextChanged"
+                       SizeChanged="TextBlock_SizeChanged"/>
+          </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.ItemContainerStyle>
+          <Style TargetType="ListViewItem">
+            <Setter Property="MinHeight" Value="0"/>
+          </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemsPanel>
+          <ItemsPanelTemplate>
+            <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" />
+          </ItemsPanelTemplate>
+        </ListView.ItemsPanel>
+        <ListView.ItemContainerTransitions>
+          <TransitionCollection>
+            <PopupThemeTransition/>
+          </TransitionCollection>
+        </ListView.ItemContainerTransitions>
+      </ListView>
+    </Border>
+  </Grid>
+</UserControl>
