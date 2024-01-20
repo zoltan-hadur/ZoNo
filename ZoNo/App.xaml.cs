@@ -25,6 +25,7 @@ namespace ZoNo
   {
     private new static App Current => (App)Application.Current;
     private IServiceScope ServiceScope { get; set; }
+    private ServiceProvider _serviceProvider;
 
     public static MainWindow MainWindow { get; } = new MainWindow();
 
@@ -142,7 +143,8 @@ namespace ZoNo
       services.AddTransient<TracesViewModel>();
       services.AddScoped<ShellPageViewModel>();
 
-      ServiceScope = services.BuildServiceProvider().CreateScope();
+      _serviceProvider = services.BuildServiceProvider();
+      ServiceScope = _serviceProvider.CreateScope();
 
       UnhandledException += App_UnhandledException;
 
@@ -218,6 +220,12 @@ namespace ZoNo
     {
       using var trace = GetService<ITraceFactory>().CreateNew();
       base.OnLaunched(args);
+
+      App.MainWindow.Closed += (s, e) =>
+      {
+        _serviceProvider.Dispose();
+      };
+
       await GetService<IActivationService>().ActivateAsync(args);
     }
   }
