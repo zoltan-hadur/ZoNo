@@ -49,7 +49,7 @@ namespace ZoNo.ViewModels
     public TraceLevel[] TraceLevels { get; } = Enum.GetValues<TraceLevel>();
 
     [ObservableProperty]
-    private ElementTheme _elementTheme = themeSelectorService.Theme;
+    private ElementTheme _elementTheme;
 
     [ObservableProperty]
     private InMemoryTraceSinkSettings _inMemoryTraceSinkSettings;
@@ -64,6 +64,8 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew();
       if (_isLoaded) return;
+
+      ElementTheme = _themeSelectorService.Theme;
 
       InMemoryTraceSinkSettings = await _localSettingsService.ReadSettingAsync<InMemoryTraceSinkSettings>(SettingInMemoryTraceSink) ??
         new InMemoryTraceSinkSettings()

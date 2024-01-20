@@ -147,18 +147,6 @@ namespace ZoNo
       UnhandledException += App_UnhandledException;
 
       GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
-
-      // Must set the app theme in the constructor, otherwise an exception is thrown
-      var themeSelectorService = GetService<IThemeSelectorService>();
-      Task.Run(themeSelectorService.InitializeAsync).Wait();
-      if (themeSelectorService.Theme != ElementTheme.Default)
-      {
-        RequestedTheme = themeSelectorService.Theme == ElementTheme.Light ? ApplicationTheme.Light : ApplicationTheme.Dark;
-      }
-
-      // Must set tracing settings
-      var settingsPageViewModel = GetService<SettingsPageViewModel>();
-      Task.Run(settingsPageViewModel.LoadAsync).Wait();
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

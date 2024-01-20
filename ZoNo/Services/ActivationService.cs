@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
+using ZoNo.ViewModels;
 
 namespace ZoNo.Services
 {
@@ -11,7 +12,8 @@ namespace ZoNo.Services
     IThemeSelectorService themeSelectorService,
     IRulesService rulesService,
     IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
-    ITransactionProcessorService transactionProcessorService) : IActivationService
+    ITransactionProcessorService transactionProcessorService,
+    SettingsPageViewModel settingsPageViewModel) : IActivationService
   {
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler = defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers = activationHandlers;
@@ -20,6 +22,7 @@ namespace ZoNo.Services
     private readonly IRulesService _rulesService = rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
     private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+    private readonly SettingsPageViewModel _settingsPageViewModel = settingsPageViewModel;
 
     public async Task ActivateAsync(object activationArgs)
     {
@@ -53,14 +56,19 @@ namespace ZoNo.Services
 
     private async Task InitializeAsync()
     {
-      await _tokenService.InitializeAsync();
+      await _themeSelectorService.InitializeAsync();
+      await Task.WhenAll(
+      [
+        _tokenService.InitializeAsync(),
+        _themeSelectorService.SetRequestedThemeAsync(),
+        _settingsPageViewModel.LoadAsync()
+      ]);
     }
 
     private async Task StartupAsync()
     {
       await Task.WhenAll(
       [
-        _themeSelectorService.SetRequestedThemeAsync(),
         _rulesService.InitializeAsync(),
         _ruleEvaluatorServiceBuilder.InitializeAsync()
       ]);
