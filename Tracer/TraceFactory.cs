@@ -10,15 +10,23 @@ namespace Tracer
     ITraceDetailProcessor traceDetailProcessor) : ITraceFactory
   {
     private static int _correlationId = 1;
-    private static readonly AsyncLocal<int> _asyncLocalCorrelationId = new();
+    private static readonly AsyncLocal<int> _asyncLocalCorrelationId = new() { Value = _correlationId };
     private readonly ITraceDetailFactory _traceDetailFactory = traceDetailFactory;
     private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
 
-    public static int CorrelationId => _asyncLocalCorrelationId.Value;
-
-    static TraceFactory()
+    public static int CorrelationId
     {
-      _asyncLocalCorrelationId.Value = _correlationId;
+      get
+      {
+        lock (_asyncLocalCorrelationId)
+        {
+          if (_asyncLocalCorrelationId.Value == 0)
+          {
+            IncrementCorrelationId();
+          }
+          return _asyncLocalCorrelationId.Value;
+        }
+      }
     }
 
     public static void IncrementCorrelationId()
