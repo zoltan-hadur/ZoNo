@@ -306,10 +306,14 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format(
-        InMemoryTraceSink.IsEnabled, InMemoryTraceSinkSettings.IsEnabled,
-        InMemoryTraceSink.Level, InMemoryTraceSinkSettings.Level,
-        InMemoryTraceSink.Size, InMemoryTraceSinkSettings.Size)
-      );
+      [
+        InMemoryTraceSink.IsEnabled,
+        InMemoryTraceSinkSettings.IsEnabled,
+        InMemoryTraceSink.Level,
+        InMemoryTraceSinkSettings.Level,
+        InMemoryTraceSink.Size,
+        InMemoryTraceSinkSettings.Size
+      ]));
       InMemoryTraceSink.IsEnabled = InMemoryTraceSinkSettings.IsEnabled;
       InMemoryTraceSink.Level = InMemoryTraceSinkSettings.Level;
       InMemoryTraceSink.Size = InMemoryTraceSinkSettings.Size;
@@ -320,10 +324,14 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format(
-        FileTraceSinkSettings.IsEnabled, FileTraceSinkSettings.IsEnabled,
-        FileTraceSinkSettings.Level, FileTraceSinkSettings.Level,
-        FileTraceSinkSettings.Path, Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName()))
-      );
+      [
+        FileTraceSinkSettings.IsEnabled,
+        FileTraceSinkSettings.IsEnabled,
+        FileTraceSinkSettings.Level,
+        FileTraceSinkSettings.Level,
+        FileTraceSinkSettings.Path,
+        Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName())
+      ]));
       FileTraceSink.IsEnabled = FileTraceSinkSettings.IsEnabled;
       FileTraceSink.Level = FileTraceSinkSettings.Level;
       FileTraceSink.Path = Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName());

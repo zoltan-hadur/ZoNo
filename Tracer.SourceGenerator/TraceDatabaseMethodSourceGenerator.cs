@@ -73,6 +73,7 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
     public static void Fill()
     {{
       FillTraceMethods();
+      FillTraceFormatParameters();
     }}
 
     private static void FillTraceMethods()
@@ -82,6 +83,8 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
         {string.Join(",\r\n        ", traceMethodInfos.Select(traceMethodInfo => $"(@\"{traceMethodInfo.filePath}\", {traceMethodInfo.lineNumber}, @\"{traceMethodInfo.method}\")"))}
       ]);
     }}
+
+    static partial void FillTraceFormatParameters();
   }}
 }}
 ";
