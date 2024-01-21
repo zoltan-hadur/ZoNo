@@ -5,6 +5,7 @@
     <Platforms>x64</Platforms>
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
