@@ -25,7 +25,10 @@ namespace Tracer.SourceGenerator
                 {
                   Parent: BlockSyntax
                   {
-                    Parent: MethodDeclarationSyntax or ConstructorDeclarationSyntax or LocalFunctionStatementSyntax
+                    Parent: MethodDeclarationSyntax or
+                            ConstructorDeclarationSyntax or
+                            LocalFunctionStatementSyntax or
+                            AccessorDeclarationSyntax { Parent: AccessorListSyntax { Parent: PropertyDeclarationSyntax } }
                   }
                 }
               }
@@ -35,15 +38,19 @@ namespace Tracer.SourceGenerator
         static (context, _) =>
         {
           var invocationExpressionSyntax = context.Node as InvocationExpressionSyntax;
-          if (context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax).Symbol.ToString() != "Tracer.Contracts.ITraceFactory.CreateNew(string, int)")
+
+          var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
+          var symbolString = (symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.First()).ToString();
+          if (symbolString != "Tracer.Contracts.ITraceFactory.CreateNew(string, int)")
           {
             return (null, null);
           }
+
           var syntaxNode = invocationExpressionSyntax.Parent.Parent.Parent.Parent.Parent.Parent;
           var symbol = context.SemanticModel.GetDeclaredSymbol(syntaxNode) as IMethodSymbol;
           return (invocationExpressionSyntax, symbol);
         }
-      ).Where(tuple => tuple is not { invocationExpressionSyntax: null, symbol: null });
+      ).Where(tuple => tuple is not (null, null));
 
       var compilationAndTraceCreationsAndEnclosingMethods = context.CompilationProvider.Combine(traceCreationsAndEnclosingMethods.Collect());
 
