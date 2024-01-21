@@ -7,7 +7,7 @@ using System.Linq;
 namespace Tracer.SourceGenerator
 {
   [Generator]
-  public class TraceMethodDatabaseSourceGenerator : IIncrementalGenerator
+  public class TraceDatabaseMethodSourceGenerator : IIncrementalGenerator
   {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -68,18 +68,25 @@ using Tracer.Utilities;
 
 namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 {{
-  public static class TraceMethodDatabaseFiller
+  public static partial class TraceDatabaseFiller
   {{
     public static void Fill()
     {{
-      {string.Join("\r\n      ", traceMethodInfos.Select(traceMethodInfo => $"TraceMethodDatabase.AddMethod(@\"{traceMethodInfo.filePath}\", {traceMethodInfo.lineNumber}, @\"{traceMethodInfo.method}\");"))}
-      TraceMethodDatabase.FinishAdding();
+      FillTraceMethods();
+    }}
+
+    private static void FillTraceMethods()
+    {{
+      TraceDatabase.AddTraceMethods(
+      [
+        {string.Join(",\r\n        ", traceMethodInfos.Select(traceMethodInfo => $"(@\"{traceMethodInfo.filePath}\", {traceMethodInfo.lineNumber}, @\"{traceMethodInfo.method}\")"))}
+      ]);
     }}
   }}
 }}
 ";
 
-      context.AddSource("TraceMethodDatabaseFiller.g.cs", source);
+      context.AddSource("TraceDatabaseFiller.Method.g.cs", source);
     }
   }
 }

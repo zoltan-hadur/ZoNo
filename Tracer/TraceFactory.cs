@@ -39,7 +39,7 @@ namespace Tracer
 
     public ITrace CreateNew([CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
-      var method = TraceMethodDatabase.GetMethod(filePath, lineNumber);
+      var method = TraceDatabase.GetTraceMethod(filePath, lineNumber);
       Debug.Assert(method != null, "method is null!");
       return new Trace(_traceDetailFactory, _traceDetailProcessor, method);
     }
