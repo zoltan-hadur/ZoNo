@@ -35,11 +35,15 @@ namespace Tracer.SourceGenerator
         static (context, _) =>
         {
           var invocationExpressionSyntax = context.Node as InvocationExpressionSyntax;
+          if (context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax).Symbol.ToString() != "Tracer.Contracts.ITraceFactory.CreateNew(string, int)")
+          {
+            return (null, null);
+          }
           var syntaxNode = invocationExpressionSyntax.Parent.Parent.Parent.Parent.Parent.Parent;
           var symbol = context.SemanticModel.GetDeclaredSymbol(syntaxNode) as IMethodSymbol;
           return (invocationExpressionSyntax, symbol);
         }
-      );
+      ).Where(tuple => tuple is not { invocationExpressionSyntax: null, symbol: null });
 
       var compilationAndTraceCreationsAndEnclosingMethods = context.CompilationProvider.Combine(traceCreationsAndEnclosingMethods.Collect());
 
