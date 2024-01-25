@@ -1,8 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Tracer.SourceGenerator
 {
@@ -11,51 +15,113 @@ namespace Tracer.SourceGenerator
   {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-      var traceFormatCalls = context.SyntaxProvider.CreateSyntaxProvider(
-        static (node, _) => node is InvocationExpressionSyntax
-        {
-          Expression: IdentifierNameSyntax { Identifier.Text: "Format" } or MemberAccessExpressionSyntax { Name.Identifier.Text: "Format" },
-          ArgumentList: ArgumentListSyntax
-          {
-            Arguments: SeparatedSyntaxList<ArgumentSyntax> { Count: 1 } arguments
-          }
-        } && arguments[0] is ArgumentSyntax
-        {
-          Expression: CollectionExpressionSyntax
-        },
-        static (context, _) =>
-        {
-          var invocationExpressionSyntax = context.Node as InvocationExpressionSyntax;
-          var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
-          if ((symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.First()).ToString() != "Tracer.Utilities.TraceUtility.Format(System.Collections.Generic.IEnumerable<object>, string, int)")
-          {
-            return null;
-          }
-          return invocationExpressionSyntax;
-        }
-      ).Where(invocationExpressionSyntax => invocationExpressionSyntax is not null);
+      var formatCalls = context.SyntaxProvider.CreateSyntaxProvider(
+        static (node, _) => IsPotentialFormatCall(node),
+        static (context, _) => TransformPotentialFormatCall(context)
+      ).Where(potentialFormatCall => potentialFormatCall is not null);
 
-      var compilationAndTraceFormatCalls = context.CompilationProvider.Combine(traceFormatCalls.Collect());
+      var invalidFormatCallLocations = formatCalls.Where(IsNotValidFormatCall).Select((x, _) => x.GetLocation()).Collect();
+      context.RegisterSourceOutput(invalidFormatCallLocations, ReportDiagnostics1);
 
-      context.RegisterSourceOutput(compilationAndTraceFormatCalls, static (context, source) => Execute(source.Left, source.Right, context));
+      var validFormatCalls = formatCalls.Where(IsValidFormatCall).Collect();
+      context.RegisterSourceOutput(validFormatCalls, ReportDiagnostics2);
+
+      var compilationAndFormatCalls = context.CompilationProvider.Combine(validFormatCalls);
+      context.RegisterSourceOutput(compilationAndFormatCalls, static (context, source) => GenerateCode(source.Left, source.Right, context));
     }
 
-    private static void Execute(Compilation compilation, ImmutableArray<InvocationExpressionSyntax> traceFormatCalls, SourceProductionContext context)
+    private static bool IsPotentialFormatCall(SyntaxNode node) => node is InvocationExpressionSyntax
     {
-      var traceFormatInfos = traceFormatCalls.Select(invocationExpressionSyntax =>
+      Expression: IdentifierNameSyntax { Identifier.Text: "Format" } or
+                  MemberAccessExpressionSyntax { Name.Identifier.Text: "Format" }
+    };
+
+    private static InvocationExpressionSyntax TransformPotentialFormatCall(GeneratorSyntaxContext context)
+    {
+      var formatCall = context.Node as InvocationExpressionSyntax;
+      var symbolInfo = context.SemanticModel.GetSymbolInfo(formatCall);
+      if ((symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.First()).ToDisplayString() !=
+        "Tracer.Utilities.TraceUtility.Format(System.Collections.Generic.IEnumerable<object>, string, int)")
       {
-        var lineSpan = invocationExpressionSyntax.GetLocation().GetLineSpan();
+        return null;
+      }
+      return formatCall;
+    }
+
+    private static bool IsValidFormatCall(InvocationExpressionSyntax node) => node is
+    {
+      ArgumentList: ArgumentListSyntax
+      {
+        Arguments: SeparatedSyntaxList<ArgumentSyntax> { Count: 1 } arguments
+      }
+    } && arguments[0] is ArgumentSyntax
+    {
+      Expression: CollectionExpressionSyntax
+    };
+
+    private static bool IsNotValidFormatCall(InvocationExpressionSyntax node) => !IsValidFormatCall(node);
+
+    private static void ReportDiagnostics1(SourceProductionContext context, ImmutableArray<Location> invalidFormatCallLocations)
+    {
+      foreach (var location in invalidFormatCallLocations)
+      {
+        context.ReportDiagnostic(Diagnostic.Create(
+          new DiagnosticDescriptor(
+              id: "TRACER_1",
+              title: "Wrong use of Format.",
+              messageFormat: "Format must use a single collection expression as its single parameter.",
+              category: "Design",
+              defaultSeverity: DiagnosticSeverity.Error,
+              isEnabledByDefault: true
+          ), location)
+        );
+      }
+    }
+
+    private static void ReportDiagnostics2(SourceProductionContext context, ImmutableArray<InvocationExpressionSyntax> formatCalls)
+    {
+      var lineSpans = new HashSet<(string, int)>();
+      foreach (var formatCall in formatCalls)
+      {
+        var location = formatCall.GetLocation();
+        var lineSpan = location.GetMappedLineSpan();
+        var tuple = (lineSpan.Path, lineSpan.StartLinePosition.Line);
+        if (lineSpans.Contains(tuple))
+        {
+          context.ReportDiagnostic(Diagnostic.Create(
+          new DiagnosticDescriptor(
+              id: "TRACER_2",
+              title: "Wrong use of Format.",
+              messageFormat: "Only one Format call is allowed per line.",
+              category: "Design",
+              defaultSeverity: DiagnosticSeverity.Error,
+              isEnabledByDefault: true
+          ), location)
+        );
+        }
+        else
+        {
+          lineSpans.Add(tuple);
+        }
+      }
+    }
+
+    private static void GenerateCode(Compilation compilation, ImmutableArray<InvocationExpressionSyntax> formatCalls, SourceProductionContext context)
+    {
+      var formatCallInfos = formatCalls.Select(formatCall =>
+      {
+        var lineSpan = formatCall.GetLocation().GetLineSpan();
         var filePath = lineSpan.Path;
         var lineNumber = lineSpan.StartLinePosition.Line + 1;
-        var collectionExpressionSyntax = invocationExpressionSyntax.ArgumentList.Arguments[0].Expression as CollectionExpressionSyntax;
-        var parameters = collectionExpressionSyntax.Elements.Select(x => x.ToString()).ToArray();
+        var collectionExpressionSyntax = formatCall.ArgumentList.Arguments[0].Expression as CollectionExpressionSyntax;
+        var parameters = collectionExpressionSyntax.Elements.Select(x => x.ToString());
         return (filePath, lineNumber, parameters);
       });
 
       var mainMethod = compilation.GetEntryPoint(context.CancellationToken);
 
-      var source = $@"
-using Tracer.Utilities;
+      var sourceCode =
+$@"using Tracer.Utilities;
 
 namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 {{
@@ -65,14 +131,16 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
     {{
       TraceDatabase.AddTraceFormatParameters(
       [
-        {string.Join(",\r\n        ", traceFormatInfos.Select(traceFormatInfo => $"(@\"{traceFormatInfo.filePath}\", {traceFormatInfo.lineNumber}, [{string.Join(", ", traceFormatInfo.parameters.Select(parameter => $"@\"{parameter}\""))}])"))}
+        {string.Join(",\r\n        ", formatCallInfos
+          .Select(formatCallInfo => $"(@\"{formatCallInfo.filePath}\", {formatCallInfo.lineNumber}, [{string
+            .Join(", ", formatCallInfo.parameters
+              .Select(parameter => $"@\"{parameter}\""))}])"))}
       ]);
     }}
   }}
-}}
-";
+}}";
 
-      context.AddSource("TraceDatabaseFiller.Format.g.cs", source);
+      context.AddSource("TraceDatabaseFiller.Format.g.cs", sourceCode);
     }
   }
 }
