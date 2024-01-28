@@ -7,12 +7,15 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Tracer.Contracts;
 
 namespace ZoNo.Controls
 {
   [ContentProperty(Name = nameof(Children))]
   public class AutomaticStackPanel : ContentControl
   {
+    private static readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
+
     public static readonly DependencyProperty ChildrenProperty = DependencyProperty.Register(nameof(Children), typeof(ObservableCollection<object>), typeof(AutomaticStackPanel), new PropertyMetadata(null, OnChildrenChanged));
     public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(AutomaticStackPanel), new PropertyMetadata(Orientation.Vertical, OnOrientationChanged));
     public static readonly DependencyProperty StartingOrientationProperty = DependencyProperty.Register(nameof(StartingOrientation), typeof(Orientation), typeof(AutomaticStackPanel), new PropertyMetadata(Orientation.Vertical, OnStartingOrientationChanged));
@@ -54,6 +57,7 @@ namespace ZoNo.Controls
 
     public AutomaticStackPanel()
     {
+      using var trace = _traceFactory.CreateNew();
       VerticalContentAlignment = VerticalAlignment.Stretch;
       HorizontalContentAlignment = HorizontalAlignment.Stretch;
       Children = [];
@@ -63,7 +67,9 @@ namespace ZoNo.Controls
 
     private void AutomaticStackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       var newValue = StartingOrientation == Orientation.Vertical ? e.NewSize.Width : e.NewSize.Height;
+      trace.Debug(Format([newValue, Threshold, newValue >= Threshold]));
       if (newValue >= Threshold)
       {
         Orientation = StartingOrientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical;
@@ -76,8 +82,10 @@ namespace ZoNo.Controls
 
     public static void OnChildrenChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is AutomaticStackPanel panel)
       {
+        trace.Debug(Format([e.OldValue, e.NewValue]));
         if (e.OldValue is ObservableCollection<object> oldChildren)
         {
           oldChildren.CollectionChanged -= panel.Children_CollectionChanged;
@@ -91,34 +99,42 @@ namespace ZoNo.Controls
 
     public static void OnOrientationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is AutomaticStackPanel panel)
       {
+        trace.Debug(Format([panel.Orientation]));
         panel.RearrangeChildren();
       }
     }
 
     public static void OnStartingOrientationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is AutomaticStackPanel panel && e.NewValue is Orientation orientation)
       {
+        trace.Debug(Format([orientation]));
         panel.Orientation = orientation;
       }
     }
 
     public static void OnSpacingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is AutomaticStackPanel panel)
       {
+        trace.Debug(Format([panel.Spacing]));
         panel._grid.RowSpacing = panel._grid.ColumnSpacing = panel.Spacing;
       }
     }
 
     private void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       switch (e.Action)
       {
         case NotifyCollectionChangedAction.Add:
           {
+            trace.Debug(Format([e.NewItems.Count]));
             foreach (UIElement item in e.NewItems)
             {
               OnItemAdded(item);
@@ -130,6 +146,7 @@ namespace ZoNo.Controls
 
     private void OnItemAdded(UIElement item)
     {
+      using var trace = _traceFactory.CreateNew();
       var rectangle = new Rectangle();
       _grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
       _grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
@@ -148,8 +165,11 @@ namespace ZoNo.Controls
 
     private void RearrangeChildren()
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([_grid.Children.Count]));
       for (int i = 0; i < _grid.Children.Count; ++i)
       {
+        trace.Debug(Format([i, Orientation]));
         switch (Orientation)
         {
           case Orientation.Vertical:
@@ -170,6 +190,7 @@ namespace ZoNo.Controls
 
     private static void BindItems(FrameworkElement elementInGrid, UIElement elementInCanvas)
     {
+      using var trace = _traceFactory.CreateNew();
       elementInGrid.SizeChanged += (s, e) =>
       {
         if (elementInGrid.Tag is bool isLoaded && isLoaded)

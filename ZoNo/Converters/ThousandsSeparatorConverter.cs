@@ -1,11 +1,16 @@
 ﻿using Microsoft.UI.Xaml.Data;
+using Tracer.Contracts;
 
 namespace ZoNo.Converters
 {
   public class ThousandsSeparatorConverter : IValueConverter
   {
+    private readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
+
     public object Convert(object value, Type targetType, object parameter, string language)
     {
+      using var trace = _traceFactory.CreateNew();
+
       if (value is sbyte
        || value is byte
        || value is short
@@ -18,7 +23,9 @@ namespace ZoNo.Converters
        || value is double
        || value is decimal)
       {
-        return System.Convert.ToDouble(value).ToString("N");
+        var result = System.Convert.ToDouble(value).ToString("N");
+        trace.Debug(Format([value, result]));
+        return result;
       }
       else
       {

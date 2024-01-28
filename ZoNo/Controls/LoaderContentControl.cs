@@ -3,12 +3,15 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Markup;
+using Tracer.Contracts;
 
 namespace ZoNo.Controls
 {
   [ContentProperty(Name = nameof(Content))]
   public class LoaderContentControl : ContentControl
   {
+    private static readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
+
     public static new readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(object), typeof(LoaderContentControl), new PropertyMetadata(null, OnContentChanged));
     public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register(nameof(IsLoading), typeof(bool), typeof(LoaderContentControl), new PropertyMetadata(null, OnIsLoadingChanged));
 
@@ -40,6 +43,8 @@ namespace ZoNo.Controls
 
     public LoaderContentControl()
     {
+      using var trace = _traceFactory.CreateNew();
+
       base.Content = new Grid() { Children = { _contentControl, _progressRing } };
 
       ElementCompositionPreview.SetImplicitShowAnimation(_progressRing, new OpacityAnimation()
@@ -58,16 +63,20 @@ namespace ZoNo.Controls
 
     public static void OnContentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is LoaderContentControl loaderContentControl)
       {
+        trace.Debug(Format([e.NewValue]));
         loaderContentControl._contentControl.Content = e.NewValue;
       }
     }
 
     public static void OnIsLoadingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is LoaderContentControl loaderContentControl && e.NewValue is bool isLoading)
       {
+        trace.Debug(Format([isLoading]));
         loaderContentControl._contentControl.IsEnabled = !isLoading;
         loaderContentControl._progressRing.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
       }

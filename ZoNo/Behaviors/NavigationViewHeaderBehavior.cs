@@ -2,13 +2,15 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
-
+using Tracer.Contracts;
+using Tracer.Utilities;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Behaviors
 {
   public class NavigationViewHeaderBehavior : Behavior<NavigationView>
   {
+    private readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
     private static NavigationViewHeaderBehavior _current;
     private Page _currentPage;
     private readonly INavigationService _navigationService = App.GetService<INavigationService>();
@@ -62,26 +64,26 @@ namespace ZoNo.Behaviors
 
     protected override void OnAttached()
     {
+      using var trace = _traceFactory.CreateNew();
       base.OnAttached();
-
       _navigationService.Navigated += OnNavigated;
-
       _current = this;
     }
 
     protected override void OnDetaching()
     {
+      using var trace = _traceFactory.CreateNew();
       base.OnDetaching();
-
       _navigationService.Navigated -= OnNavigated;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is Frame frame && frame.Content is Page page)
       {
+        trace.Debug(Format([page.GetType().Name]));
         _currentPage = page;
-
         UpdateHeader();
         UpdateHeaderTemplate();
       }
@@ -89,6 +91,7 @@ namespace ZoNo.Behaviors
 
     private void UpdateHeader()
     {
+      using var trace = _traceFactory.CreateNew();
       if (_currentPage != null)
       {
         var headerMode = GetHeaderMode(_currentPage);
@@ -123,6 +126,7 @@ namespace ZoNo.Behaviors
 
     private void UpdateHeaderTemplate()
     {
+      using var trace = _traceFactory.CreateNew();
       if (_currentPage != null)
       {
         var headerTemplate = GetHeaderTemplate(_currentPage);
