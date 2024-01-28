@@ -100,7 +100,7 @@ namespace ZoNo.ViewModels
         var time = Path.GetFileNameWithoutExtension(path).Replace("ZoNo__", string.Empty);
         if ((DateTime.Now - DateTime.ParseExact(time, "yyyy-MM-dd__HH.mm.ss", null)).TotalDays > 10)
         {
-          trace.Debug($"Deleting {FileTraceSink.Path}");
+          trace.Debug($"Deleting {path}");
           File.Delete(path);
         }
       }
