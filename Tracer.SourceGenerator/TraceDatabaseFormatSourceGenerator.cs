@@ -1,12 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace Tracer.SourceGenerator
 {
@@ -21,10 +18,10 @@ namespace Tracer.SourceGenerator
       ).Where(potentialFormatCall => potentialFormatCall is not null);
 
       var invalidFormatCallLocations = formatCalls.Where(IsNotValidFormatCall).Select((x, _) => x.GetLocation()).Collect();
-      context.RegisterSourceOutput(invalidFormatCallLocations, ReportDiagnostics1);
+      context.RegisterSourceOutput(invalidFormatCallLocations, ReportDiagnostics_1);
 
       var validFormatCalls = formatCalls.Where(IsValidFormatCall).Collect();
-      context.RegisterSourceOutput(validFormatCalls, ReportDiagnostics2);
+      context.RegisterSourceOutput(validFormatCalls, ReportDiagnostics_2);
 
       var compilationAndFormatCalls = context.CompilationProvider.Combine(validFormatCalls);
       context.RegisterSourceOutput(compilationAndFormatCalls, static (context, source) => GenerateCode(source.Left, source.Right, context));
@@ -61,7 +58,7 @@ namespace Tracer.SourceGenerator
 
     private static bool IsNotValidFormatCall(InvocationExpressionSyntax node) => !IsValidFormatCall(node);
 
-    private static void ReportDiagnostics1(SourceProductionContext context, ImmutableArray<Location> invalidFormatCallLocations)
+    private static void ReportDiagnostics_1(SourceProductionContext context, ImmutableArray<Location> invalidFormatCallLocations)
     {
       foreach (var location in invalidFormatCallLocations)
       {
@@ -78,15 +75,15 @@ namespace Tracer.SourceGenerator
       }
     }
 
-    private static void ReportDiagnostics2(SourceProductionContext context, ImmutableArray<InvocationExpressionSyntax> formatCalls)
+    private static void ReportDiagnostics_2(SourceProductionContext context, ImmutableArray<InvocationExpressionSyntax> formatCalls)
     {
       var lineSpans = new HashSet<(string, int)>();
       foreach (var formatCall in formatCalls)
       {
         var location = formatCall.GetLocation();
-        var lineSpan = location.GetMappedLineSpan();
-        var tuple = (lineSpan.Path, lineSpan.StartLinePosition.Line);
-        if (lineSpans.Contains(tuple))
+        var mappedLineSpan = location.GetMappedLineSpan();
+        var lineSpan = (mappedLineSpan.Path, mappedLineSpan.StartLinePosition.Line);
+        if (lineSpans.Contains(lineSpan))
         {
           context.ReportDiagnostic(Diagnostic.Create(
           new DiagnosticDescriptor(
@@ -101,7 +98,7 @@ namespace Tracer.SourceGenerator
         }
         else
         {
-          lineSpans.Add(tuple);
+          lineSpans.Add(lineSpan);
         }
       }
     }
