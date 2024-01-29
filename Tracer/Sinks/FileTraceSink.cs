@@ -32,7 +32,11 @@ namespace Tracer.Sinks
       lock (_lock)
       {
         if (!IsEnabled) return;
-        File.AppendAllLines(Path, traceDetails.Where(traceDetail => traceDetail.Level >= Level).Select(traceDetail => traceDetail.Compose()));
+        var traceMessages = traceDetails.Where(traceDetail => traceDetail.Level >= Level).Select(traceDetail => traceDetail.Compose());
+        if (traceMessages.Any())
+        {
+          File.AppendAllLines(Path, traceMessages);
+        }
       }
     }
   }
