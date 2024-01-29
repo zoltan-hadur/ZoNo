@@ -28,6 +28,7 @@ namespace ZoNo
     private ServiceProvider _serviceProvider;
 
     public static MainWindow MainWindow { get; } = new MainWindow();
+    public static bool IsClosed { get; private set; } = false;
 
     public static T GetService<T>() where T : class
     {
@@ -221,9 +222,16 @@ namespace ZoNo
       using var trace = GetService<ITraceFactory>().CreateNew();
       base.OnLaunched(args);
 
-      App.MainWindow.Closed += (s, e) =>
+      MainWindow.Closed += async (s, e) =>
       {
+        if (IsClosed) return;
+        e.Handled = true;
+        IsClosed = true;
+        MainWindow.Hide();
+        await Task.Delay(1000);
         _serviceProvider.Dispose();
+        _serviceProvider = null;
+        MainWindow.Close();
       };
 
       await GetService<IActivationService>().ActivateAsync(args);
