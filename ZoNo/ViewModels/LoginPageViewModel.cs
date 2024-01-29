@@ -80,10 +80,6 @@ namespace ZoNo.ViewModels
         Password = "0123456789";
       }
 
-      await WebView.EnsureCoreWebView2Async();
-      WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
-      WebView.NavigationCompleted += WebView_NavigationCompleted;
-
       PropertyChanged += LoginViewModel_PropertyChanged;
     }
 
@@ -112,8 +108,14 @@ namespace ZoNo.ViewModels
     }
 
     [RelayCommand]
-    private void Login()
+    private async Task LoginAsync()
     {
+      await WebView.EnsureCoreWebView2Async();
+      WebView.CoreWebView2.DOMContentLoaded -= CoreWebView2_DOMContentLoaded;
+      WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
+      WebView.NavigationCompleted -= WebView_NavigationCompleted;
+      WebView.NavigationCompleted += WebView_NavigationCompleted;
+
       IsWrongCredentials = false;
 
       if (IsRememberMe && _tokenService.Token != null)
