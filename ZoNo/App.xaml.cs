@@ -26,6 +26,7 @@ namespace ZoNo
     private new static App Current => (App)Application.Current;
     private IServiceScope ServiceScope { get; set; }
     private ServiceProvider _serviceProvider;
+    private AutoResetEvent _windowClosed = new(false);
 
     public static MainWindow MainWindow { get; } = new MainWindow();
     public static bool IsClosed { get; private set; } = false;
@@ -222,16 +223,18 @@ namespace ZoNo
       using var trace = GetService<ITraceFactory>().CreateNew();
       base.OnLaunched(args);
 
-      MainWindow.Closed += async (s, e) =>
+      new Thread(async () =>
       {
-        if (IsClosed) return;
-        e.Handled = true;
-        IsClosed = true;
-        MainWindow.Hide();
+        _windowClosed.WaitOne();
         await Task.Delay(1000);
         _serviceProvider.Dispose();
         _serviceProvider = null;
-        MainWindow.Close();
+      }).Start();
+
+      MainWindow.Closed += (s, e) =>
+      {
+        IsClosed = true;
+        _windowClosed.Set();
       };
 
       await GetService<IActivationService>().ActivateAsync(args);
