@@ -10,16 +10,25 @@
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <StackPanel Grid.Row="0" Orientation="Horizontal">
+    <Grid Grid.Row="0" ColumnSpacing="12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="Filter:" VerticalAlignment="Center"/>
+      <TextBox Grid.Column="1" Text="{x:Bind ViewModel.Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+    <StackPanel Grid.Row="1" Orientation="Horizontal">
       <CheckBox Content="{x:Bind tracer:TraceLevel.Debug}" IsChecked="{x:Bind ViewModel.IsDebugLevelFilterEnabled, Mode=TwoWay}"/>
       <CheckBox Content="{x:Bind tracer:TraceLevel.Information}" IsChecked="{x:Bind ViewModel.IsInformationLevelFilterEnabled, Mode=TwoWay}"/>
       <CheckBox Content="{x:Bind tracer:TraceLevel.Warning}" IsChecked="{x:Bind ViewModel.IsWarningLevelFilterEnabled, Mode=TwoWay}"/>
       <CheckBox Content="{x:Bind tracer:TraceLevel.Error}" IsChecked="{x:Bind ViewModel.IsErrorLevelFilterEnabled, Mode=TwoWay}"/>
       <CheckBox Content="{x:Bind tracer:TraceLevel.Fatal}" IsChecked="{x:Bind ViewModel.IsFatalLevelFilterEnabled, Mode=TwoWay}"/>
     </StackPanel>
-    <Border Grid.Row="1" BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}" CornerRadius="8">
+    <Border Grid.Row="2" BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}" CornerRadius="8">
       <ListView ItemsSource="{x:Bind ViewModel.TraceDetails, Mode=OneWay}"
                 ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 SelectionMode="None" Loaded="ListView_Loaded" MinHeight="400">

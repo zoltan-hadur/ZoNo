@@ -32,6 +32,9 @@ namespace ZoNo.ViewModels
     [ObservableProperty]
     private bool _isFatalLevelFilterEnabled;
 
+    [ObservableProperty]
+    private string _filter;
+
     public TracesViewModel(
       ILocalSettingsService localSettingsService,
       IEnumerable<ITraceSink> traceSinks)
@@ -42,7 +45,7 @@ namespace ZoNo.ViewModels
       var traceDetails = inMemoryTraceSink.TraceDetails;
       TraceDetails = new AdvancedCollectionView(traceDetails)
       {
-        Filter = TraceLevelFilter,
+        Filter = TraceFilter,
         SortDescriptions = { new SortDescription(nameof(ITraceDetail.Id), SortDirection.Ascending) }
       };
     }
@@ -65,18 +68,28 @@ namespace ZoNo.ViewModels
     private async void TracesViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       TraceDetails.RefreshFilter();
-      await _localSettingsService.SaveSettingAsync(SettingsTraceLevels, (IsDebugLevelFilterEnabled, IsWarningLevelFilterEnabled, IsInformationLevelFilterEnabled, IsErrorLevelFilterEnabled, IsFatalLevelFilterEnabled));
+      if (e.PropertyName != nameof(Filter))
+      {
+        await _localSettingsService.SaveSettingAsync(SettingsTraceLevels, (IsDebugLevelFilterEnabled, IsWarningLevelFilterEnabled, IsInformationLevelFilterEnabled, IsErrorLevelFilterEnabled, IsFatalLevelFilterEnabled));
+      }
     }
 
-    private bool TraceLevelFilter(object obj)
+    private bool TraceFilter(object obj)
     {
       if (obj is ITraceDetail traceDetail)
       {
-        return traceDetail.Level == Tracer.TraceLevel.Debug && IsDebugLevelFilterEnabled ||
-               traceDetail.Level == Tracer.TraceLevel.Information && IsInformationLevelFilterEnabled ||
-               traceDetail.Level == Tracer.TraceLevel.Warning && IsWarningLevelFilterEnabled ||
-               traceDetail.Level == Tracer.TraceLevel.Error && IsErrorLevelFilterEnabled ||
-               traceDetail.Level == Tracer.TraceLevel.Fatal && IsFatalLevelFilterEnabled;
+        var isLevelAllowed = traceDetail.Level == Tracer.TraceLevel.Debug && IsDebugLevelFilterEnabled ||
+                             traceDetail.Level == Tracer.TraceLevel.Information && IsInformationLevelFilterEnabled ||
+                             traceDetail.Level == Tracer.TraceLevel.Warning && IsWarningLevelFilterEnabled ||
+                             traceDetail.Level == Tracer.TraceLevel.Error && IsErrorLevelFilterEnabled ||
+                             traceDetail.Level == Tracer.TraceLevel.Fatal && IsFatalLevelFilterEnabled;
+
+        var isMessageAllowed = string.IsNullOrEmpty(Filter) ?
+          true :
+          (traceDetail.Method.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+          (traceDetail.Message?.Contains(Filter, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return isLevelAllowed && isMessageAllowed;
       }
       return false;
     }
