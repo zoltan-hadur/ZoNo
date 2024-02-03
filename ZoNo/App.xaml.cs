@@ -28,7 +28,10 @@ namespace ZoNo
     private ServiceProvider _serviceProvider;
     private AutoResetEvent _windowClosed = new(false);
 
-    public static MainWindow MainWindow { get; } = new MainWindow();
+    public static MainWindow MainWindow { get; } = new MainWindow(
+      GetService<INotificationService>(),
+      GetService<ITraceFactory>()
+    );
     public static bool IsClosed { get; private set; } = false;
 
     public static T GetService<T>() where T : class
@@ -121,6 +124,8 @@ namespace ZoNo
       services.AddSingleton<ITraceDetailFactory, TraceDetailFactory>();
       services.AddSingleton<ITraceSink, InMemoryTraceSink>();
       services.AddSingleton<ITraceSink, FileTraceSink>();
+      services.AddSingleton<INotificationService, NotificationService>();
+      services.AddSingleton<IUpdateService, UpdateService>();
 
       // Views and ViewModels
       services.AddScoped<LoginPageViewModel>();

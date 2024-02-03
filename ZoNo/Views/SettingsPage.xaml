@@ -98,12 +98,12 @@
       </StackPanel>
       <!-- About this application -->
       <TextBlock Text="About this application" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-      <StackPanel Margin="{StaticResource XSmallTopMargin}">
+      <StackPanel Margin="{StaticResource SmallTopBottomMargin}" Spacing="8">
         <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}"/>
-        <TextBlock Text="TODO: Replace with your app description." Margin="{StaticResource XSmallTopMargin}" Style="{ThemeResource BodyTextBlockStyle}"/>
-        <HyperlinkButton Content="Privacy Statement" NavigateUri="https://YourPrivacyUrlGoesHere/" Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"/>
+        <TextBlock Text="Little app to convert bank transactions to expenses and upload them to Splitwise." Style="{ThemeResource BodyTextBlockStyle}"/>
+        <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
+        <Button Content="Check for updates" Command="{x:Bind ViewModel.CheckForUpdatesCommand}"/>
       </StackPanel>
-      <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
     </StackPanel>
     <!-- App icon -->
     <Border VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8" Margin="0,-33,0,0">

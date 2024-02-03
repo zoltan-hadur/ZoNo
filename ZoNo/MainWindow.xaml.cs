@@ -1,36 +1,83 @@
 ﻿using Microsoft.UI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using System.Diagnostics;
+using Tracer.Contracts;
+using Windows.Foundation;
 using Windows.UI;
+using ZoNo.Contracts.Services;
+using ZoNo.ViewModels;
 
 namespace ZoNo
 {
   public sealed partial class MainWindow : WindowEx
   {
+    private readonly INotificationService _notificationService;
+    private readonly ITraceFactory _traceFactory;
+
+    private IReadOnlyCollection<NotificationViewModel> Notifications => _notificationService.Notifications;
     public Frame Frame => NavigationFrame;
 
-    public MainWindow()
+    public MainWindow(
+      INotificationService notificationService,
+      ITraceFactory traceFactory)
     {
+      using var trace = traceFactory.CreateNew();
+      _notificationService = notificationService;
+      _traceFactory = traceFactory;
+
       InitializeComponent();
 
       AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/ZoNo.ico"));
 
+      AppTitleBar.Loaded += (s, e) => SetRegionsForCustomTitleBar();
+      AppTitleBar.SizeChanged += (s, e) => SetRegionsForCustomTitleBar();
+      NotificationsButton.SizeChanged += (s, e) => SetRegionsForCustomTitleBar();
+      NotificationsButton.LayoutUpdated += (s, e) => SetRegionsForCustomTitleBar();
       ExtendsContentIntoTitleBar = true;
-      SetTitleBar(AppTitleBar);
 
       Activated += MainWindow_Activated;
       NavigationFrame.ActualThemeChanged += NavigationFrame_ActualThemeChanged;
       NavigationFrame_ActualThemeChanged(null, null);
     }
 
+    private void SetRegionsForCustomTitleBar()
+    {
+      if (App.IsClosed || !ExtendsContentIntoTitleBar) return;
+
+      var scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
+
+      RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
+      LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
+
+      var transform = NotificationsButton.TransformToVisual(null);
+      var bounds = transform.TransformBounds(new Rect(0, 0, NotificationsButton.ActualWidth, NotificationsButton.ActualHeight));
+      var rect = GetRect(bounds, scaleAdjustment);
+
+      var nonClientInputSrc = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
+      nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, [rect]);
+    }
+
+    private static Windows.Graphics.RectInt32 GetRect(Rect bounds, double scale)
+    {
+      return new Windows.Graphics.RectInt32(
+          _X: (int)Math.Round(bounds.X * scale),
+          _Y: (int)Math.Round(bounds.Y * scale),
+          _Width: (int)Math.Round(bounds.Width * scale),
+          _Height: (int)Math.Round(bounds.Height * scale)
+      );
+    }
+
     private void NavigationFrame_ActualThemeChanged(FrameworkElement sender, object args)
     {
+      using var trace = _traceFactory.CreateNew();
       if (AppWindowTitleBar.IsCustomizationSupported())
       {
+        trace.Debug(Format([NavigationFrame.ActualTheme]));
         if (NavigationFrame.ActualTheme == ElementTheme.Light)
         {
           AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
@@ -56,6 +103,9 @@ namespace ZoNo
 
     private async void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([args.WindowActivationState]));
+
       // Animate app icon
       CommunityToolkit.WinUI.UI.Animations.AnimationBuilder
         .Create().Opacity(to: args.WindowActivationState == WindowActivationState.Deactivated ? 0.5 : 1)
@@ -92,11 +142,21 @@ namespace ZoNo
             var r = Convert.ToByte(double.Lerp(from.R, to.R, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var g = Convert.ToByte(double.Lerp(from.G, to.G, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var b = Convert.ToByte(double.Lerp(from.B, to.B, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
-            AppWindow.TitleBar.ButtonInactiveForegroundColor = Color.FromArgb(255, r, g, b);
+            if (!App.IsClosed)
+            {
+              AppWindow.TitleBar.ButtonInactiveForegroundColor = Color.FromArgb(255, r, g, b);
+            }
+            else
+            {
+              break;
+            }
             await Task.Delay(1);
           }
           stopwatch.Stop();
-          AppWindow.TitleBar.ButtonInactiveForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.LightSlateGray : Colors.Gray;
+          if (!App.IsClosed)
+          {
+            AppWindow.TitleBar.ButtonInactiveForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.LightSlateGray : Colors.Gray;
+          }
         }
         else
         {
@@ -109,16 +169,37 @@ namespace ZoNo
             var r = Convert.ToByte(double.Lerp(from.R, to.R, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var g = Convert.ToByte(double.Lerp(from.G, to.G, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var b = Convert.ToByte(double.Lerp(from.B, to.B, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
-            AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(255, r, g, b);
+            if (!App.IsClosed)
+            {
+              AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(255, r, g, b);
+            }
+            else
+            {
+              break;
+            }
             await Task.Delay(1);
           }
           stopwatch.Stop();
-          AppWindow.TitleBar.ButtonForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.Black : Colors.White;
+          if (!App.IsClosed)
+          {
+            AppWindow.TitleBar.ButtonForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.Black : Colors.White;
+          }
         }
       }
       catch
       {
 
+      }
+    }
+
+    private void NotificationView_Click(object sender, RoutedEventArgs e)
+    {
+      using var trace = _traceFactory.CreateNew();
+      if (sender is Button button &&
+          button.DataContext is NotificationViewModel notificationViewModel)
+      {
+        _notificationService.RemoveNotification(notificationViewModel);
+        NotificationsFlyout.Hide();
       }
     }
   }

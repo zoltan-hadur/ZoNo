@@ -25,6 +25,7 @@ namespace ZoNo.ViewModels
     IDialogService dialogService,
     IThemeSelectorService themeSelectorService,
     ILocalSettingsService localSettingsService,
+    IUpdateService updateService,
     ITraceFactory traceFactory,
     ITraceDetailProcessor traceDetailProcessor,
     IEnumerable<ITraceSink> traceSinks,
@@ -37,6 +38,7 @@ namespace ZoNo.ViewModels
     private readonly IDialogService _dialogService = dialogService;
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly IUpdateService _updateService = updateService;
     private readonly ITraceFactory _traceFactory = traceFactory;
     private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
     private readonly IEnumerable<ITraceSink> _traceSinks = traceSinks;
@@ -275,6 +277,12 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew();
       _dialogService.ShowDialogAsync(DialogType.Close, "Release Notes", new ReleaseNotesView());
+    }
+
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+      await _updateService.CheckForUpdateAsync();
     }
 
     private async Task ShowMessage(string message)

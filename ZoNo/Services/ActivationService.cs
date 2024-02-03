@@ -13,6 +13,7 @@ namespace ZoNo.Services
     IRulesService rulesService,
     IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
     ITransactionProcessorService transactionProcessorService,
+    IUpdateService updateService,
     SettingsPageViewModel settingsPageViewModel) : IActivationService
   {
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler = defaultHandler;
@@ -22,6 +23,7 @@ namespace ZoNo.Services
     private readonly IRulesService _rulesService = rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
     private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+    private readonly IUpdateService _updateService = updateService;
     private readonly SettingsPageViewModel _settingsPageViewModel = settingsPageViewModel;
 
     public async Task ActivateAsync(object activationArgs)
@@ -70,7 +72,8 @@ namespace ZoNo.Services
       await Task.WhenAll(
       [
         _rulesService.InitializeAsync(),
-        _ruleEvaluatorServiceBuilder.InitializeAsync()
+        _ruleEvaluatorServiceBuilder.InitializeAsync(),
+        _updateService.CheckForUpdateAsync()
       ]);
       await _transactionProcessorService.InitializeAsync();
     }
