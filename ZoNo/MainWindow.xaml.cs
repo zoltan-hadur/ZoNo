@@ -19,6 +19,7 @@ namespace ZoNo
     private readonly INotificationService _notificationService;
     private readonly ITraceFactory _traceFactory;
 
+    private bool _firstActivation = true;
     private IReadOnlyCollection<NotificationViewModel> Notifications => _notificationService.Notifications;
     public Frame Frame => NavigationFrame;
 
@@ -104,7 +105,13 @@ namespace ZoNo
     private async void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([args.WindowActivationState]));
+      trace.Debug(Format([_firstActivation, args.WindowActivationState]));
+
+      if (_firstActivation)
+      {
+        _firstActivation = false;
+        return;
+      }
 
       // Animate app icon
       CommunityToolkit.WinUI.UI.Animations.AnimationBuilder
