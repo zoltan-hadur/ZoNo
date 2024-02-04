@@ -333,11 +333,11 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format(
       [
+        FileTraceSink.IsEnabled,
         FileTraceSinkSettings.IsEnabled,
-        FileTraceSinkSettings.IsEnabled,
+        FileTraceSink.Level,
         FileTraceSinkSettings.Level,
-        FileTraceSinkSettings.Level,
-        FileTraceSinkSettings.Path,
+        FileTraceSink.Path,
         Path.Combine(FileTraceSinkSettings.Path, GetTraceFileName())
       ]));
       FileTraceSink.IsEnabled = FileTraceSinkSettings.IsEnabled;
