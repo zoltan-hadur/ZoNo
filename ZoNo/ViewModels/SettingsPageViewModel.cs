@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Tracer;
 using Tracer.Contracts;
 using Tracer.Sinks;
@@ -188,7 +189,20 @@ namespace ZoNo.ViewModels
       InitializeWithWindow.Initialize(savePicker, hWnd);
       savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       savePicker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-      savePicker.SuggestedFileName = "Rules.json";
+      var lastIndex = -1;
+      try
+      {
+        lastIndex = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Rules*.json")
+          .Select(Path.GetFileNameWithoutExtension)
+          .Where(fileName => Regex.IsMatch(fileName, @"Rules(\d)+"))
+          .Select(fileName => fileName.Replace("Rules", string.Empty))
+          .Select(int.Parse).Max();
+      }
+      catch (Exception ex)
+      {
+        trace.Error(ex.ToString());
+      }
+      savePicker.SuggestedFileName = $"Rules{lastIndex + 1}.json";
 
       if (await savePicker.PickSaveFileAsync() is var file && file != null)
       {
