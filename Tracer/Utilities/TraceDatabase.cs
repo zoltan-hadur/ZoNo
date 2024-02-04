@@ -4,19 +4,19 @@ namespace Tracer.Utilities
 {
   public static class TraceDatabase
   {
-    private static FrozenDictionary<(string FilePath, int LineNumber), string> _traceMethods = null;
+    private static FrozenDictionary<(string FilePath, int LineNumber), (string Method, bool IsAsyncVoid)> _traceMethodInfos = null;
     private static FrozenDictionary<(string FilePath, int LineNumber), string[]> _traceFormatParameters = null;
 
-    public static void AddTraceMethods(IEnumerable<(string FilePath, int LineNumber, string TraceMethod)> values)
+    public static void AddTraceMethodInfos(IEnumerable<(string FilePath, int LineNumber, string TraceMethod, bool IsAsyncVoid)> values)
     {
-      if (_traceMethods != null) throw new InvalidOperationException($"{nameof(TraceDatabase)} trace methods are already added!");
-      _traceMethods = values.ToFrozenDictionary(tuple => (tuple.FilePath, tuple.LineNumber), tuple => tuple.TraceMethod);
+      if (_traceMethodInfos != null) throw new InvalidOperationException($"{nameof(TraceDatabase)} trace methods are already added!");
+      _traceMethodInfos = values.ToFrozenDictionary(tuple => (tuple.FilePath, tuple.LineNumber), tuple => (tuple.TraceMethod, tuple.IsAsyncVoid));
     }
 
-    public static string GetTraceMethod(string filePath, int lineNumber)
+    public static (string Method, bool IsAsyncVoid)? GetTraceMethodInfo(string filePath, int lineNumber)
     {
-      if (_traceMethods == null) throw new InvalidOperationException($"{nameof(TraceDatabase)} trace methods are not added yet!");
-      return _traceMethods.TryGetValue((filePath, lineNumber), out var method) ? method : null;
+      if (_traceMethodInfos == null) throw new InvalidOperationException($"{nameof(TraceDatabase)} trace methods are not added yet!");
+      return _traceMethodInfos.TryGetValue((filePath, lineNumber), out var traceMethodInfo) ? traceMethodInfo : null;
     }
 
     public static void AddTraceFormatParameters(IEnumerable<(string FilePath, int LineNumber, IEnumerable<string> TraceFormatParameters)> values)

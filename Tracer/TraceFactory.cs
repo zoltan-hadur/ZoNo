@@ -39,9 +39,20 @@ namespace Tracer
 
     public ITrace CreateNew([CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
-      var method = TraceDatabase.GetTraceMethod(filePath, lineNumber);
-      Debug.Assert(method != null, "method is null!");
-      return new Trace(_traceDetailFactory, _traceDetailProcessor, method);
+      var traceMethodInfo = TraceDatabase.GetTraceMethodInfo(filePath, lineNumber);
+      Debug.Assert(traceMethodInfo != null, "method info is null!");
+      string message = null;
+      if (traceMethodInfo.Value.IsAsyncVoid)
+      {
+        var previousCorrelationId = CorrelationId;
+        IncrementCorrelationId();
+        message = $"{previousCorrelationId} -> {CorrelationId}";
+      }
+      else if (_asyncLocalCorrelationId.Value == 0)
+      {
+        message = $"0 -> {CorrelationId}";
+      }
+      return new Trace(_traceDetailFactory, _traceDetailProcessor, traceMethodInfo.Value.Method, message);
     }
   }
 }

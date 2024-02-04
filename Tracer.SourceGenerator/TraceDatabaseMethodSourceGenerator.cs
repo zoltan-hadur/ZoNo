@@ -158,10 +158,17 @@ namespace Tracer.SourceGenerator
         var lineNumber = lineSpan.StartLinePosition.Line + 1;
 
         var syntaxNode = tuple.TraceCreation.Parent.Parent.Parent.Parent.Parent.Parent;
+
+        var isAsyncVoid = syntaxNode is MethodDeclarationSyntax
+        {
+          ReturnType: PredefinedTypeSyntax { Keyword: SyntaxToken { Text: "void" } },
+          Modifiers: SyntaxTokenList { Count: > 0 } syntaxTokenList
+        } && syntaxTokenList.Any(x => x is SyntaxToken { Value: "async" });
+
         var symbol = tuple.Context?.SemanticModel.GetDeclaredSymbol(syntaxNode) as IMethodSymbol;
         var method = $"{symbol.ContainingType} {symbol.Name}({string.Join(", ", symbol.Parameters)})";
 
-        return (filePath, lineNumber, method);
+        return (filePath, lineNumber, method, isAsyncVoid);
       });
 
       var mainMethod = compilation.GetEntryPoint(context.CancellationToken);
@@ -181,9 +188,9 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 
     private static void FillTraceMethods()
     {{
-      TraceDatabase.AddTraceMethods(
+      TraceDatabase.AddTraceMethodInfos(
       [
-        {string.Join(",\r\n        ", traceMethodInfos.Select(traceMethodInfo => $"(@\"{traceMethodInfo.filePath}\", {traceMethodInfo.lineNumber}, @\"{traceMethodInfo.method}\")"))}
+        {string.Join(",\r\n        ", traceMethodInfos.Select(traceMethodInfo => $"(@\"{traceMethodInfo.filePath}\", {traceMethodInfo.lineNumber}, @\"{traceMethodInfo.method}\", {(traceMethodInfo.isAsyncVoid ? "true" : "false")})"))}
       ]);
     }}
 

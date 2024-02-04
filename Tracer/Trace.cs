@@ -13,14 +13,15 @@ namespace Tracer
     internal Trace(
       ITraceDetailFactory traceDetailFactory,
       ITraceDetailProcessor traceDetailProcessor,
-      string method)
+      string method,
+      string message)
     {
       _traceDetailFactory = traceDetailFactory;
       _traceDetailProcessor = traceDetailProcessor;
       _method = method;
       _stopwatch = Stopwatch.StartNew();
 
-      Log(TraceDirection.Entering, TraceLevel.Information, null);
+      Log(TraceDirection.Entering, TraceLevel.Information, message);
     }
 
     public void Dispose()
