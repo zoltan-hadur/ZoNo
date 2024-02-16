@@ -2,17 +2,23 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
   public class DialogService(
-    IThemeSelectorService themeSelectorService) : IDialogService
+    IThemeSelectorService themeSelectorService,
+    ITraceFactory traceFactory) : IDialogService
   {
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     public async Task<bool> ShowDialogAsync<T>(DialogType dialogType, string title, T content, Binding isPrimaryButtonEnabled = null, Func<Task<bool>> shouldCloseDialogOnPrimaryButtonClick = null)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([dialogType, title, content, isPrimaryButtonEnabled, shouldCloseDialogOnPrimaryButtonClick]));
+
       var dialog = new ContentDialog()
       {
         XamlRoot = App.MainWindow.Content.XamlRoot,
@@ -46,10 +52,11 @@ namespace ZoNo.Services
       }
 
       // Fix for show animation
-      static void ContentDialog_SizeChanged(object sender, SizeChangedEventArgs e)
+      void ContentDialog_SizeChanged(object sender, SizeChangedEventArgs e)
       {
         if (sender is ContentDialog dialog)
         {
+          trace.Debug("Start dialog show animation");
           var border = dialog.FindDescendant("Container") as Border;
           var groups = VisualStateManager.GetVisualStateGroups(border);
           var states = groups.Single(x => x.Name == "DialogShowingStates");
@@ -84,16 +91,19 @@ namespace ZoNo.Services
         {
           if (e.Result == ContentDialogResult.Primary)
           {
+            trace.Debug("Dialog closing");
             e.Cancel = true;
             var deferral = e.GetDeferral();
             var shouldClose = await shouldCloseDialogOnPrimaryButtonClick();
             e.Cancel = !shouldClose;
             deferral.Complete();
+            trace.Debug(Format([shouldClose]));
           }
         };
       }
 
       var result = await dialog.ShowAsync();
+      trace.Debug(Format([result]));
       return result == ContentDialogResult.Primary;
     }
   }

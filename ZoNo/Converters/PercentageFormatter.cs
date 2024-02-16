@@ -1,15 +1,58 @@
-﻿using Windows.Globalization.NumberFormatting;
+﻿using Tracer.Contracts;
+using Windows.Globalization.NumberFormatting;
 
 namespace ZoNo.Converters
 {
   public class PercentageFormatter : INumberFormatter2, INumberParser
   {
-    public string FormatDouble(double value) => $"{value:0.00} %";
-    public string FormatInt(long value) => $"{value:0.00} %";
-    public string FormatUInt(ulong value) => $"{value:0.00} %";
+    private readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
 
-    public double? ParseDouble(string text) => double.Parse(text.Trim('%'));
-    public long? ParseInt(string text) => long.Parse(text.Trim('%'));
-    public ulong? ParseUInt(string text) => ulong.Parse(text.Trim('%'));
+    public string FormatDouble(double value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public string FormatInt(long value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public string FormatUInt(ulong value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public double? ParseDouble(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = double.Parse(text.Trim('%'));
+      trace.Debug(Format([text, result]));
+      return result;
+    }
+
+    public long? ParseInt(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = long.Parse(text.Trim('%'));
+      trace.Debug(Format([text, result]));
+      return result;
+    }
+
+    public ulong? ParseUInt(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = ulong.Parse(text.Trim('%'));
+      trace.Debug(Format([text, result]));
+      return result;
+    }
   }
 }

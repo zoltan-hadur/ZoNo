@@ -1,13 +1,17 @@
 ﻿using ExcelDataReader;
 using System.Collections.Immutable;
 using System.Data;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class ExcelDocumentLoaderService : IExcelDocumentLoaderService
+  public class ExcelDocumentLoaderService(
+    ITraceFactory traceFactory) : IExcelDocumentLoaderService
   {
+    private readonly ITraceFactory _traceFactory = traceFactory;
+
     private const int _expectedWorksheetCount = 1;
     private const string _expectedWorksheetName = "Tranzakciók";
     private readonly ImmutableArray<string> _expectedHeaders =
@@ -28,16 +32,21 @@ namespace ZoNo.Services
 
     public async Task<IList<Transaction>> LoadDocumentAsync(string path)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([path]));
       return await Task.Run(() =>
       {
         var dataSet = GetDataSet(path);
         Validate(dataSet);
+        trace.Info("Transform data rows to transactions");
         return dataSet.Tables[0].Rows.Cast<DataRow>().Select(TransformDataRowToTransaction).ToArray();
       });
     }
 
-    private static DataSet GetDataSet(string path)
+    private DataSet GetDataSet(string path)
     {
+      using var trace = _traceFactory.CreateNew();
+
       using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
       using var reader = ExcelReaderFactory.CreateReader(stream);
       var result = reader.AsDataSet(new ExcelDataSetConfiguration()
@@ -52,19 +61,24 @@ namespace ZoNo.Services
 
     private void Validate(DataSet dataSet)
     {
+      using var trace = _traceFactory.CreateNew();
+
       var actualWorksheetCount = dataSet.Tables.Count;
+      trace.Debug(Format([actualWorksheetCount]));
       if (actualWorksheetCount != _expectedWorksheetCount)
       {
         throw new Exception($"Worksheet count is not {_expectedWorksheetCount}, it is {actualWorksheetCount}!");
       }
 
       var actualWorksheetName = dataSet.Tables[0].TableName;
+      trace.Debug(Format([actualWorksheetName]));
       if (actualWorksheetName != _expectedWorksheetName)
       {
         throw new Exception($"Worksheet name is not {_expectedWorksheetName}, it is {actualWorksheetName}");
       }
 
       var actualHeaderCount = dataSet.Tables[0].Columns.Count;
+      trace.Debug(Format([actualHeaderCount]));
       if (actualHeaderCount != _expectedHeaders.Length)
       {
         throw new Exception($"Column count is not {_expectedHeaders.Length}, it is {actualHeaderCount}!");
@@ -73,6 +87,7 @@ namespace ZoNo.Services
       for (int i = 0; i < actualHeaderCount; ++i)
       {
         var actualHeader = dataSet.Tables[0].Columns[i].ColumnName;
+        trace.Debug(Format([i, actualHeader]));
         if (actualHeader != _expectedHeaders[i])
         {
           throw new Exception($"Header[{i}] is not '{_expectedHeaders[i]}', it is '{actualHeader}'!");

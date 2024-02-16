@@ -89,14 +89,14 @@ namespace ZoNo
       services.AddSingleton<IActivationService, ActivationService>();
       services.AddSingleton<ITopLevelPageService, PageService>(provider =>
       {
-        return new PageService.Builder()
+        return new PageService.Builder(provider.GetService<ITraceFactory>())
           .Configure<LoginPageViewModel, LoginPage>()
           .Configure<ShellPageViewModel, ShellPage>()
           .Build();
       });
       services.AddSingleton<IPageService, PageService>(provider =>
       {
-        return new PageService.Builder()
+        return new PageService.Builder(provider.GetService<ITraceFactory>())
           .Configure<ImportPageViewModel, ImportPage>()
           .Configure<RulesPageViewModel, RulesPage>()
           .Configure<QueryPageViewModel, QueryPage>()
@@ -106,7 +106,7 @@ namespace ZoNo
       });
       services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
       {
-        return new NavigationService(provider.GetService<ITopLevelPageService>())
+        return new NavigationService(provider.GetService<ITopLevelPageService>(), provider.GetService<ITraceFactory>())
         {
           Frame = MainWindow.Frame
         };
