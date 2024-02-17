@@ -30,9 +30,10 @@ namespace ZoNo.Views
 
       if (ViewModel.TraceDetails.Source.Cast<ITraceDetail>().ToArray() is var traceDetails && traceDetails.Length != 0)
       {
-        var longestTraceLength = traceDetails.Max(x => x.Compose().Length);
-        var longestTrace = traceDetails.First(x => x.Compose().Length == longestTraceLength);
-        var textBlock = new TextBlock() { FontFamily = new FontFamily("Courier New"), Text = longestTrace.Compose() };
+        var traces = traceDetails.SelectMany(x => x.Compose().Split('\r', '\n')).ToArray();
+        var longestTraceLength = traces.Max(str => str.Length);
+        var longestTrace = traces.First(str => str.Length == longestTraceLength);
+        var textBlock = new TextBlock() { FontFamily = new FontFamily("Courier New"), Text = longestTrace };
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         _width = textBlock.DesiredSize.Width;
       }
