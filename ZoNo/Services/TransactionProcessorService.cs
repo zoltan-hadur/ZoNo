@@ -48,8 +48,7 @@ namespace ZoNo.Services
         throw new InvalidOperationException($"{nameof(InitializeAsync)} should be called first!");
       }
 
-      var result = await _transactionRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction);
-      if (!result.RemoveThisElementFromList)
+      if (await _transactionRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction))
       {
         var expense = new Expense()
         {
@@ -62,8 +61,7 @@ namespace ZoNo.Services
           Date = transaction.TransactionTime,
           Group = "Non-group expenses"
         };
-        result = await _expenseRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: expense);
-        if (!result.RemoveThisElementFromList)
+        if (await _expenseRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: expense))
         {
           TransactionProcessed?.Invoke(this, (transaction, expense));
         }

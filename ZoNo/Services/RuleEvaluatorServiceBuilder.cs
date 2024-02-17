@@ -1,103 +1,106 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class RuleEvaluatorServiceBuilder : IRuleEvaluatorServiceBuilder
+  public class RuleEvaluatorServiceBuilder(
+    ITraceFactory traceFactory) : IRuleEvaluatorServiceBuilder
   {
-    public class InputType<T>
-    {
-      public required string RuleId { get; set; }
-      public required T Input { get; set; }
-    }
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
-    public class OutputType<T1, T2>
+    private class RuleEvaluatorService<Input, Output>(
+      IEnumerable<Rule> rules,
+      ITraceFactory traceFactory) : IRuleEvaluatorService<Input, Output>
     {
-      public required string RuleId { get; set; }
-      public required T1 Input { get; set; }
-      public required T2 Output { get; set; }
-      public bool RemoveThisElementFromList { get; set; } = false;
-    }
-
-    public class EvaluationResult
-    {
-      public required bool RemoveThisElementFromList { get; set; }
-    }
-
-    private class RuleEvaluatorService<Input, Output>(IEnumerable<Rule> rules) : IRuleEvaluatorService<Input, Output>
-    {
+      private readonly ITraceFactory _traceFactory = traceFactory;
       private readonly IList<Rule> _rules = rules.Select(rule => rule.Clone()).ToArray();
-      private ScriptRunner<bool> _inputEvaluator;
-      private ScriptRunner<object> _outputEvaluator;
+      private ScriptRunner<bool> _evaluator;
 
       public async Task InitializeAsync()
       {
+        using var trace = _traceFactory.CreateNew();
+
         await Task.Run(() =>
         {
-          var inputCode = $$"""
-                          switch (RuleId)
-                          {
-                            case "ForDefaultType": return false;
-                            {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"case \"{rule.Id}\": {{ {rule.InputExpression} }} break;"))}}
-                            default: throw new NotImplementedException();
-                          }
-                          """;
-          var inputScript = CSharpScript.Create<bool>(
-            inputCode,
+          var code = $$"""
+            switch (RuleId)
+            {
+              case "ForDefaultType": return false;
+            {{string.Join("\r", _rules.Select(rule => $$"""
+
+              // {{rule.Description}}
+              case "{{rule.Id}}":
+                {
+                  switch (ExecutionType)
+                  {
+                    case ExecutionType.Condition:
+                      {
+                        {{rule.InputExpression.Replace("\r", $"\r            ")}}
+                      } break;
+                    case ExecutionType.Action:
+                      {
+                        {{string.Join("\r            ", rule.OutputExpressions)}}
+                        return RemoveThisElementFromList;
+                      } break;
+                  }
+                } break;
+            """))}}
+
+              default: throw new NotImplementedException();
+            }
+            """;
+
+          trace.Debug(Format([code]));
+          var script = CSharpScript.Create<bool>(
+            code,
             options: ScriptOptions.Default
               .WithReferences("System.Core", "ZoNo")
               .WithImports("System", "System.Linq", "ZoNo.Models"),
-            globalsType: typeof(InputType<Input>)
+            globalsType: typeof(GlobalType<Input, Output>)
           );
-          _inputEvaluator = inputScript.CreateDelegate();
-
-          var outputCode = $$"""
-                           switch (RuleId)
-                           {
-                             {{string.Join($"{Environment.NewLine}  ", _rules.Select(rule => $"case \"{rule.Id}\": {{ {string.Join(" ", rule.OutputExpressions)} }} break;"))}}
-                             default: throw new NotImplementedException();
-                           }
-                           """;
-          var outputScript = CSharpScript.Create<object>(
-            outputCode,
-            options: ScriptOptions.Default
-              .WithReferences("Splitwise", "ZoNo")
-              .WithImports("System", "System.Linq", "Splitwise.Models", "ZoNo.Models"),
-            globalsType: typeof(OutputType<Input, Output>)
-          );
-          _outputEvaluator = outputScript.CreateDelegate();
+          _evaluator = script.CreateDelegate();
         });
       }
 
-      public async Task<EvaluationResult> EvaluateRulesAsync(Input input, Output output)
+      public async Task<bool> EvaluateRulesAsync(Input input, Output output)
       {
+        using var trace = _traceFactory.CreateNew();
+        trace.Debug(Format([input, output]));
         foreach (var rule in _rules)
         {
-          var scriptInput = new InputType<Input>() { RuleId = rule.Id.ToString(), Input = input };
-          if (await _inputEvaluator(scriptInput))
+          trace.Debug(Format([rule.Description]));
+          var condition = new GlobalType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = default, ExecutionType = ExecutionType.Condition };
+          var result = await _evaluator(condition);
+          trace.Debug(Format([rule.InputExpression, result]));
+          if (result)
           {
-            var scriptOutput = new OutputType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output };
-            await _outputEvaluator(scriptOutput);
-            if (scriptOutput.RemoveThisElementFromList)
+            var action = new GlobalType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output, ExecutionType = ExecutionType.Action };
+            var removeThisElementFromList = await _evaluator(action);
+            trace.Debug(Format([string.Join(Environment.NewLine, rule.OutputExpressions), removeThisElementFromList]));
+            if (removeThisElementFromList)
             {
-              return new EvaluationResult() { RemoveThisElementFromList = true };
+              return false;
             }
           }
         }
-        return new EvaluationResult() { RemoveThisElementFromList = false };
+        return true;
       }
     }
 
     public async Task InitializeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       await BuildAsync<object, object>([]);
     }
 
     public async Task<IRuleEvaluatorService<Input, Output>> BuildAsync<Input, Output>(IEnumerable<Rule> rules)
     {
-      var ruleEvaluator = new RuleEvaluatorService<Input, Output>(rules);
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([rules.Count()]));
+      var ruleEvaluator = new RuleEvaluatorService<Input, Output>(rules, _traceFactory);
       await ruleEvaluator.InitializeAsync();
       return ruleEvaluator;
     }

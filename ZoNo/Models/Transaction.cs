@@ -18,6 +18,13 @@ namespace ZoNo.Models
     public double Amount { get; set; } = 0;
     public Currency Currency { get; set; } = Currency.HUF;
 
+    public override string ToString() =>
+      $"{nameof(Id)}: {Id}, {nameof(TransactionTime)}: {TransactionTime}, {nameof(AccountingDate)}: {AccountingDate}, " +
+      $"{nameof(Type)}: {Type}, {nameof(IncomeOutcome)}: {IncomeOutcome}, {nameof(PartnerName)}: {PartnerName}, " +
+      $"{nameof(PartnerAccountId)}: {PartnerAccountId}, {nameof(SpendingCategory)}: {SpendingCategory}, " +
+      $"{nameof(Description)}: {Description}, {nameof(AccountName)}: {AccountName}, {nameof(AccountId)}: {AccountId}, " +
+      $"{nameof(Amount)}: {Amount}, {nameof(Currency)}: {Currency}";
+
     public static string GetProperty(ColumnHeader columnHeader) => columnHeader switch
     {
       ColumnHeader.TransactionTime => nameof(TransactionTime),

@@ -1,38 +1,28 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using ZoNo.Contracts.Services;
-using static ZoNo.Services.RuleEvaluatorServiceBuilder;
+using ZoNo.Models;
 
 namespace ZoNo.Services
 {
   public class RuleExpressionSyntaxCheckerService : IRuleExpressionSyntaxCheckerService
   {
-    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input>(string inputExpression)
+    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input>(string inputExpression) =>
+      await CheckSyntaxAsync<Input, Input, bool>(inputExpression);
+
+    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input, Output>(string outputExpression) =>
+      await CheckSyntaxAsync<Input, Output, object>(outputExpression);
+
+    private async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<TInput, TOutput, TScriptReturn>(string expression)
     {
       return await Task.Run(() =>
       {
-        var script = CSharpScript.Create<bool>(
-          inputExpression,
+        var script = CSharpScript.Create<TScriptReturn>(
+          expression,
           options: ScriptOptions.Default
             .WithReferences("System.Core", "ZoNo")
             .WithImports("System", "System.Linq", "ZoNo.Models"),
-          globalsType: typeof(InputType<Input>)
-        );
-        var compilationResult = script.Compile();
-        return (compilationResult.IsEmpty, string.Join(Environment.NewLine, compilationResult.Select(x => x.ToString())));
-      });
-    }
-
-    public async Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<Input, Output>(string outputExpression)
-    {
-      return await Task.Run(() =>
-      {
-        var script = CSharpScript.Create<object>(
-          outputExpression,
-          options: ScriptOptions.Default
-            .WithReferences("Splitwise", "ZoNo")
-            .WithImports("System", "System.Linq", "Splitwise.Models", "ZoNo.Models"),
-          globalsType: typeof(OutputType<Input, Output>)
+          globalsType: typeof(GlobalType<TInput, TOutput>)
         );
         var compilationResult = script.Compile();
         return (compilationResult.IsEmpty, string.Join(Environment.NewLine, compilationResult.Select(x => x.ToString())));
