@@ -41,8 +41,8 @@ namespace ZoNo.Services
     private void RegisterFrameEvents()
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_frame == null]));
-      if (_frame != null)
+      trace.Debug(Format([_frame is null]));
+      if (_frame is not null)
       {
         _frame.Navigated += OnNavigated;
       }
@@ -51,8 +51,8 @@ namespace ZoNo.Services
     private void UnregisterFrameEvents()
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_frame == null]));
-      if (_frame != null)
+      trace.Debug(Format([_frame is null]));
+      if (_frame is not null)
       {
         _frame.Navigated -= OnNavigated;
       }
@@ -64,7 +64,7 @@ namespace ZoNo.Services
       trace.Debug(Format([pageKey, parameter, infoOverride]));
       var pageType = _pageService.GetPageType(pageKey);
 
-      if (_frame != null && (_frame.Content?.GetType() != pageType || (parameter != null && !parameter.Equals(_lastParameterUsed))))
+      if (_frame is not null && (_frame.Content?.GetType() != pageType || (parameter is not null && !parameter.Equals(_lastParameterUsed))))
       {
         var vmBeforeNavigation = _frame.GetPageViewModel();
         var navigated = _frame.Navigate(pageType, parameter, infoOverride);

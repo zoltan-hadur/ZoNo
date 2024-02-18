@@ -146,7 +146,9 @@ namespace ZoNo.Services
 
       public void Dispose()
       {
-        if (_assemblyLoadContext != null)
+        using var trace = _traceFactory.CreateNew();
+        trace.Debug(Format([_assemblyLoadContext is null]));
+        if (_assemblyLoadContext is not null)
         {
           _ruleEvaluator = null;
           _assemblyLoadContext.Unload();

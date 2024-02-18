@@ -40,7 +40,7 @@ namespace Tracer
     public ITrace CreateNew([CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
       var traceMethodInfo = TraceDatabase.GetTraceMethodInfo(filePath, lineNumber);
-      Debug.Assert(traceMethodInfo != null, "method info is null!");
+      Debug.Assert(traceMethodInfo is not null, "method info is null!");
       string message = null;
       if (traceMethodInfo.Value.IsAsyncVoid)
       {

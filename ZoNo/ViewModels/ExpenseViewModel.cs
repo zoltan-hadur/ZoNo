@@ -38,7 +38,7 @@ namespace ZoNo.ViewModels
 
     partial void OnSharesChanged(ObservableCollection<ShareViewModel> oldValue, ObservableCollection<ShareViewModel> newValue)
     {
-      if (oldValue != null)
+      if (oldValue is not null)
       {
         oldValue.CollectionChanged -= Shares_CollectionChanged;
         foreach (var share in Shares)
@@ -46,7 +46,7 @@ namespace ZoNo.ViewModels
           share.PropertyChanged -= Share_PropertyChanged;
         }
       }
-      if (newValue != null)
+      if (newValue is not null)
       {
         newValue.CollectionChanged += Shares_CollectionChanged;
         foreach (var share in Shares)

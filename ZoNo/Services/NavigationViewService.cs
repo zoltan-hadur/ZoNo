@@ -34,8 +34,8 @@ namespace ZoNo.Services
     public void UnregisterEvents()
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_navigationView == null]));
-      if (_navigationView != null)
+      trace.Debug(Format([_navigationView is null]));
+      if (_navigationView is not null)
       {
         _navigationView.ItemInvoked -= OnItemInvoked;
       }
@@ -44,8 +44,8 @@ namespace ZoNo.Services
     public NavigationViewItem GetSelectedItem(Type pageType)
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_navigationView == null, GetTypeName(pageType)]));
-      if (_navigationView != null)
+      trace.Debug(Format([_navigationView is null, GetTypeName(pageType)]));
+      if (_navigationView is not null)
       {
         return GetSelectedItem(_navigationView.MenuItems, pageType) ?? GetSelectedItem(_navigationView.FooterMenuItems, pageType);
       }
@@ -83,8 +83,8 @@ namespace ZoNo.Services
         }
 
         var selectedChild = GetSelectedItem(item.MenuItems, pageType);
-        trace.Debug(Format([selectedChild == null]));
-        if (selectedChild != null)
+        trace.Debug(Format([selectedChild is null]));
+        if (selectedChild is not null)
         {
           return selectedChild;
         }

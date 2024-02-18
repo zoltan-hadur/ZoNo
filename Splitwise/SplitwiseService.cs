@@ -129,7 +129,7 @@ namespace Splitwise
 
     private async Task<T> SendRequest<T>(HttpMethod method, string resource, NameValueCollection parameters, Func<JsonNode, JsonSerializerOptions, T> deserialize, string content)
     {
-      if (Token == null)
+      if (Token is null)
       {
         throw new InvalidOperationException($"{nameof(Token)} is null!");
       }
@@ -144,7 +144,7 @@ namespace Splitwise
       client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Token.TokenType.ToString(), Token.AccessToken);
       var request = new HttpRequestMessage(method, $"{_baseURL}/{resource}?{query}")
       {
-        Content = content != null ? new StringContent(content, Encoding.UTF8, "application/json") : null
+        Content = content is not null ? new StringContent(content, Encoding.UTF8, "application/json") : null
       };
       var response = await client.SendAsync(request);
       using var contentStream = await response.Content.ReadAsStreamAsync();

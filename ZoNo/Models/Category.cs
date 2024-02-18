@@ -16,7 +16,7 @@ namespace ZoNo.Models
       }
       set
       {
-        if (value != null)
+        if (value is not null)
         {
           _subCategories = value;
           foreach (var category in _subCategories)

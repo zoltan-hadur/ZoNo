@@ -80,12 +80,12 @@ namespace ZoNo.Services
         }
       };
 
-      if (isPrimaryButtonEnabled != null)
+      if (isPrimaryButtonEnabled is not null)
       {
         dialog.SetBinding(ContentDialog.IsPrimaryButtonEnabledProperty, isPrimaryButtonEnabled);
       }
 
-      if (!string.IsNullOrEmpty(dialog.PrimaryButtonText) && !string.IsNullOrEmpty(dialog.CloseButtonText) && shouldCloseDialogOnPrimaryButtonClick != null)
+      if (!string.IsNullOrEmpty(dialog.PrimaryButtonText) && !string.IsNullOrEmpty(dialog.CloseButtonText) && shouldCloseDialogOnPrimaryButtonClick is not null)
       {
         dialog.Closing += async (s, e) =>
         {

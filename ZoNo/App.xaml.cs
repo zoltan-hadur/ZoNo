@@ -191,7 +191,7 @@ namespace ZoNo
         savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
         savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
         savePicker.SuggestedFileName = "ZoNo.trace";
-        if (await savePicker.PickSaveFileAsync() is var file && file != null)
+        if (await savePicker.PickSaveFileAsync() is var file && file is not null)
         {
           path = file.Path;
           shouldCloseDialog = true;

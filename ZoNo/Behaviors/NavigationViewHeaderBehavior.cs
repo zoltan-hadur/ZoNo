@@ -92,7 +92,7 @@ namespace ZoNo.Behaviors
     private void UpdateHeader()
     {
       using var trace = _traceFactory.CreateNew();
-      if (_currentPage != null)
+      if (_currentPage is not null)
       {
         var headerMode = GetHeaderMode(_currentPage);
         if (headerMode == NavigationViewHeaderMode.Never)
@@ -103,7 +103,7 @@ namespace ZoNo.Behaviors
         else
         {
           var headerFromPage = GetHeaderContext(_currentPage);
-          if (headerFromPage != null)
+          if (headerFromPage is not null)
           {
             AssociatedObject.Header = headerFromPage;
           }
@@ -127,7 +127,7 @@ namespace ZoNo.Behaviors
     private void UpdateHeaderTemplate()
     {
       using var trace = _traceFactory.CreateNew();
-      if (_currentPage != null)
+      if (_currentPage is not null)
       {
         var headerTemplate = GetHeaderTemplate(_currentPage);
         AssociatedObject.HeaderTemplate = headerTemplate ?? DefaultHeaderTemplate;

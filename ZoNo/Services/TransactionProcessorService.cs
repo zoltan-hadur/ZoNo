@@ -45,7 +45,7 @@ namespace ZoNo.Services
     {
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
 
-      if (_transactionRuleEvaluatorService == null || _expenseRuleEvaluatorService == null)
+      if (_transactionRuleEvaluatorService is null || _expenseRuleEvaluatorService is null)
       {
         throw new InvalidOperationException($"{nameof(InitializeAsync)} should be called first!");
       }

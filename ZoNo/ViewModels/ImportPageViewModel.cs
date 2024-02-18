@@ -28,12 +28,12 @@ namespace ZoNo.ViewModels
 
     partial void OnSelectedTransactionChanged(Transaction value)
     {
-      SelectedExpense = value == null ? null : ExpensesViewModel.Expenses.Single(expense => expense.Id == value.Id);
+      SelectedExpense = value is null ? null : ExpensesViewModel.Expenses.Single(expense => expense.Id == value.Id);
     }
 
     partial void OnSelectedExpenseChanged(ExpenseViewModel value)
     {
-      SelectedTransaction = value == null ? null : TransactionsViewModel.TransactionsView.Cast<Transaction>().Single(transaction => transaction.Id == value.Id);
+      SelectedTransaction = value is null ? null : TransactionsViewModel.TransactionsView.Cast<Transaction>().Single(transaction => transaction.Id == value.Id);
     }
 
     public async Task LoadAsync()

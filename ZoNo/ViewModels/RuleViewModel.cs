@@ -44,7 +44,7 @@ namespace ZoNo.ViewModels
 
     partial void OnOutputExpressionsChanged(ObservableCollection<OutputExpressionViewModel> oldValue, ObservableCollection<OutputExpressionViewModel> newValue)
     {
-      if (oldValue != null)
+      if (oldValue is not null)
       {
         oldValue.CollectionChanged -= OutputExpressions_CollectionChanged;
         foreach (var outputExpression in oldValue)
@@ -52,7 +52,7 @@ namespace ZoNo.ViewModels
           outputExpression.PropertyChanged -= OutputExpression_PropertyChanged;
         }
       }
-      if (newValue != null)
+      if (newValue is not null)
       {
         newValue.CollectionChanged += OutputExpressions_CollectionChanged;
         foreach (var outputExpression in newValue)

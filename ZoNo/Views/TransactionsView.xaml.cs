@@ -101,7 +101,7 @@ namespace ZoNo.Views
       {
         _loadTimes.Remove(transaction);
         var rowToBeDeleted = _rows.FirstOrDefault(row => row.DataContext == transaction);
-        if (rowToBeDeleted != null)
+        if (rowToBeDeleted is not null)
         {
           if (_scrollBar.Value > _scrollBar.Maximum - rowToBeDeleted.ActualHeight && _scrollBar.Maximum != 0)
           {
@@ -140,7 +140,7 @@ namespace ZoNo.Views
       foreach (Transaction transaction in e.NewItems.OrEmpty())
       {
         var addedRow = _rows.FirstOrDefault(row => row.DataContext == transaction);
-        if (addedRow != null)
+        if (addedRow is not null)
         {
           using var semaphore = new SemaphoreSlim(0, 1);
           void handler(object s, object e)
@@ -357,7 +357,7 @@ namespace ZoNo.Views
 
     private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-      if (sender is TransactionsView view && view.SelectedTransaction != null)
+      if (sender is TransactionsView view && view.SelectedTransaction is not null)
       {
         view.DataGrid.ScrollIntoView(view.SelectedTransaction, null);
       }

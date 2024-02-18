@@ -17,7 +17,7 @@ namespace ZoNo.Activation
     {
       using var trace = _traceFactory.CreateNew();
       // None of the ActivationHandlers has handled the activation.
-      return _topLevelNavigationService.Frame?.Content == null;
+      return _topLevelNavigationService.Frame?.Content is null;
     }
 
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)

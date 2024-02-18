@@ -19,7 +19,7 @@ namespace ZoNo.Services
 
     public async Task SaveAsync()
     {
-      if (Token == null)
+      if (Token is null)
       {
         _localSettingsService.RemoveSetting(SettingToken);
       }

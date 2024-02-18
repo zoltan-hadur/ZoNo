@@ -4,7 +4,6 @@ using System.Data;
 using System.Text.RegularExpressions;
 using Tracer.Contracts;
 using ZoNo.Contracts.Services;
-using ZoNo.Models;
 
 namespace ZoNo.Services
 {

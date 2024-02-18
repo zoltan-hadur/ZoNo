@@ -10,14 +10,14 @@ namespace ZoNo.Helpers
     public static IEnumerable OrEmpty(this IEnumerable enumerable)
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([enumerable == null]));
+      trace.Debug(Format([enumerable is null]));
       return enumerable ?? Enumerable.Empty<object>();
     }
 
     public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> enumerable)
     {
       using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([enumerable == null, GetTypeName(typeof(T))]));
+      trace.Debug(Format([enumerable is null, GetTypeName(typeof(T))]));
       return enumerable ?? Enumerable.Empty<T>();
     }
   }

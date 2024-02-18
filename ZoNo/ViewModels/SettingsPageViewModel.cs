@@ -140,7 +140,7 @@ namespace ZoNo.ViewModels
       openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       openPicker.FileTypeFilter.Add(".json");
 
-      if (await openPicker.PickSingleFileAsync() is var file && file != null)
+      if (await openPicker.PickSingleFileAsync() is var file && file is not null)
       {
         var success = false;
         if (await file.OpenStreamForReadAsync() is var stream &&
@@ -162,7 +162,7 @@ namespace ZoNo.ViewModels
           }
           if (await Json.StringifyAsync(jsonObject) is var json &&
               await Json.ToObjectAsync<Dictionary<RuleType, IList<Rule>>>(json) is var rules &&
-              rules != null)
+              rules is not null)
           {
             foreach (var rule in rules)
             {
@@ -204,7 +204,7 @@ namespace ZoNo.ViewModels
       }
       savePicker.SuggestedFileName = $"Rules{lastIndex + 1}.json";
 
-      if (await savePicker.PickSaveFileAsync() is var file && file != null)
+      if (await savePicker.PickSaveFileAsync() is var file && file is not null)
       {
         var rules = new Dictionary<RuleType, IReadOnlyCollection<Rule>>();
         foreach (var ruleType in Enum.GetValues<RuleType>())
@@ -247,7 +247,7 @@ namespace ZoNo.ViewModels
         savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
         savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
         savePicker.SuggestedFileName = GetTraceFileName();
-        if (await savePicker.PickSaveFileAsync() is var file && file != null)
+        if (await savePicker.PickSaveFileAsync() is var file && file is not null)
         {
           path = file.Path;
           shouldCloseOnOk = true;
@@ -273,7 +273,7 @@ namespace ZoNo.ViewModels
       folderPicker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
       folderPicker.ViewMode = PickerViewMode.List;
 
-      if (await folderPicker.PickSingleFolderAsync() is var folder && folder != null)
+      if (await folderPicker.PickSingleFolderAsync() is var folder && folder is not null)
       {
         FileTraceSinkSettings.Path = folder.Path;
       }

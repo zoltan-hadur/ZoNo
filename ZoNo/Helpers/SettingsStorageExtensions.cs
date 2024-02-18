@@ -97,7 +97,7 @@ namespace ZoNo.Helpers
       using var trace = _traceFactory.CreateNew();
       var item = await folder.TryGetItemAsync(fileName).AsTask().ConfigureAwait(false);
       trace.Debug(Format([item.Path]));
-      if ((item != null) && item.IsOfType(StorageItemTypes.File))
+      if ((item is not null) && item.IsOfType(StorageItemTypes.File))
       {
         var storageFile = await folder.GetFileAsync(fileName);
         var content = await storageFile.ReadBytesAsync();
@@ -111,7 +111,7 @@ namespace ZoNo.Helpers
     {
       using var trace = _traceFactory.CreateNew();
 
-      if (file != null)
+      if (file is not null)
       {
         trace.Debug(Format([file.Path]));
         using IRandomAccessStream stream = await file.OpenReadAsync();

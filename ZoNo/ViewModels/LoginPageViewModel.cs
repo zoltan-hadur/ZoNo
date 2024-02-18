@@ -74,7 +74,7 @@ namespace ZoNo.ViewModels
     public async Task LoadAsync()
     {
       IsRememberMe = await _localSettingsService.ReadSettingAsync<bool>(SettingRememberMe);
-      if (IsRememberMe && _tokenService.Token != null)
+      if (IsRememberMe && _tokenService.Token is not null)
       {
         Email = await _localSettingsService.ReadSettingAsync<string>(SettingEmail) ?? string.Empty;
         Password = "0123456789";
@@ -118,7 +118,7 @@ namespace ZoNo.ViewModels
 
       IsWrongCredentials = false;
 
-      if (IsRememberMe && _tokenService.Token != null)
+      if (IsRememberMe && _tokenService.Token is not null)
       {
         _splitwiseService.Token = _tokenService.Token;
         _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());

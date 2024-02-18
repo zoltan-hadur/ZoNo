@@ -29,7 +29,7 @@ namespace ZoNo.ViewModels
       }
 
       var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
-      if (selectedItem != null)
+      if (selectedItem is not null)
       {
         Selected = selectedItem;
       }

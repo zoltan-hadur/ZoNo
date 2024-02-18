@@ -53,7 +53,7 @@ namespace ZoNo.Services
       var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
 
       trace.Debug(Format([activationHandler]));
-      if (activationHandler != null)
+      if (activationHandler is not null)
       {
         await activationHandler.HandleAsync(activationArgs);
       }
