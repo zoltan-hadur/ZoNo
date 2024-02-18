@@ -27,9 +27,17 @@ namespace ZoNo.Services
           {
             var uri = Package.Current.GetAppInstallerInfo().Uri;
             trace.Debug(Format([uri.LocalPath]));
-            using var stream = File.OpenRead(uri.LocalPath);
-            var appinstaller = await XDocument.LoadAsync(stream, LoadOptions.None, CancellationToken.None);
-            var version = appinstaller.Root.Attribute("Version").Value;
+            var version = "UNKNOWN";
+            try
+            {
+              using var stream = File.OpenRead(uri.LocalPath);
+              var appinstaller = await XDocument.LoadAsync(stream, LoadOptions.None, CancellationToken.None);
+              version = appinstaller.Root.Attribute("Version").Value;
+            }
+            catch (Exception e)
+            {
+              trace.Warn(e.ToString());
+            }
             trace.Debug(Format([version]));
             _notificationService.AddNotification(new NotificationViewModel()
             {
