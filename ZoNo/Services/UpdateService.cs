@@ -26,8 +26,8 @@ namespace ZoNo.Services
         case PackageUpdateAvailability.Required:
           {
             var uri = Package.Current.GetAppInstallerInfo().Uri;
-            trace.Debug(Format([uri]));
-            using var stream = File.OpenRead(uri.ToString());
+            trace.Debug(Format([uri.LocalPath]));
+            using var stream = File.OpenRead(uri.LocalPath);
             var appinstaller = await XDocument.LoadAsync(stream, LoadOptions.None, CancellationToken.None);
             var version = appinstaller.Root.Attribute("Version").Value;
             trace.Debug(Format([version]));
