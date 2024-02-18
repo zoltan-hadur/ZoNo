@@ -1,7 +1,7 @@
 ﻿namespace ZoNo.Contracts.Services
 {
-  public interface IRuleEvaluatorService<Input, Output>
+  public interface IRuleEvaluatorService<TInput, TOutput> : IDisposable
   {
-    Task<bool> EvaluateRulesAsync(Input input, Output output);
+    bool EvaluateRules(TInput input, TOutput output);
   }
 }

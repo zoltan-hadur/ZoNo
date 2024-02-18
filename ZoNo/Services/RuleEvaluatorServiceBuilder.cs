@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using System.Reflection;
+using System.Runtime.Loader;
 using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Models;
@@ -11,13 +13,27 @@ namespace ZoNo.Services
   {
     private readonly ITraceFactory _traceFactory = traceFactory;
 
-    private class RuleEvaluatorService<Input, Output>(
+    private class RuleEvaluatorService<TInput, TOutput>(
       IEnumerable<Rule> rules,
-      ITraceFactory traceFactory) : IRuleEvaluatorService<Input, Output>
+      ITraceFactory traceFactory) : IRuleEvaluatorService<TInput, TOutput>
     {
+      private class CustomAssemblyLoadContext : AssemblyLoadContext
+      {
+        public CustomAssemblyLoadContext() : base(isCollectible: true)
+        {
+
+        }
+
+        protected override Assembly Load(AssemblyName name)
+        {
+          return null;
+        }
+      }
+
       private readonly ITraceFactory _traceFactory = traceFactory;
       private readonly IList<Rule> _rules = rules.Select(rule => rule.Clone()).ToArray();
-      private ScriptRunner<bool> _evaluator;
+      private CustomAssemblyLoadContext _assemblyLoadContext = new();
+      private MethodInfo _ruleEvaluator = null;
 
       public async Task InitializeAsync()
       {
@@ -25,60 +41,94 @@ namespace ZoNo.Services
 
         await Task.Run(() =>
         {
-          var code = $$"""
-            switch (RuleId)
+          var className = "RuleEvaluator";
+          var methodName = "Evaluate";
+          string code = $$"""
+            using System;
+            using System.Linq;
+            using ZoNo.Models;
+
+            public static class {{className}}
             {
-              case "ForDefaultType": return false;
+              public static bool {{methodName}}(string RuleId, {{typeof(TInput).Name}} Input, {{typeof(TOutput).Name}} Output, {{typeof(ExecutionType).Name}} ExecutionType)
+              {
+                var RemoveThisElementFromList = false;
+
+                switch (RuleId)
+                {
+                  case "ForDefaultType": return false;
             {{string.Join("\r", _rules.Select(rule => $$"""
 
-              // {{rule.Description}}
-              case "{{rule.Id}}":
-                {
-                  switch (ExecutionType)
-                  {
-                    case ExecutionType.Condition:
+                  // {{rule.Description}}
+                  case "{{rule.Id}}":
+                    {
+                      switch (ExecutionType)
                       {
-                        {{rule.InputExpression.Replace("\r", $"\r            ")}}
-                      } break;
-                    case ExecutionType.Action:
-                      {
-                        {{string.Join("\r            ", rule.OutputExpressions)}}
-                        return RemoveThisElementFromList;
-                      } break;
-                  }
-                } break;
+                        case ExecutionType.Condition:
+                          {
+                            {{rule.InputExpression.Replace("\r", $"\r                ")}}
+                          }
+                        case ExecutionType.Action:
+                          {
+                            {{string.Join("\r                ", rule.OutputExpressions)}}
+                            return RemoveThisElementFromList;
+                          }
+                        default: throw new ArgumentException($"ExecutionType '{ExecutionType}' is not valid.");
+                      }
+                    }
             """))}}
-
-              default: throw new NotImplementedException();
+            
+                  default: throw new ArgumentException($"RuleId '{RuleId}' is not valid.");
+                }
+              }
             }
             """;
-
           trace.Debug(Format([code]));
-          var script = CSharpScript.Create<bool>(
-            code,
-            options: ScriptOptions.Default
-              .WithReferences("System.Core", "ZoNo")
-              .WithImports("System", "System.Linq", "ZoNo.Models"),
-            globalsType: typeof(GlobalType<Input, Output>)
+
+          var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+          var compilation = CSharpCompilation.Create(
+            assemblyName: Path.GetRandomFileName(),
+            syntaxTrees: [CSharpSyntaxTree.ParseText(code)],
+            references:
+            [
+              MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
+              MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Linq.dll")),
+              MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Collections.dll")),
+              MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
+              MetadataReference.CreateFromFile(typeof(TInput).Assembly.Location),
+              MetadataReference.CreateFromFile(typeof(TOutput).Assembly.Location),
+              MetadataReference.CreateFromFile(typeof(ExecutionType).Assembly.Location)
+            ],
+            options: new CSharpCompilationOptions(
+              outputKind: OutputKind.DynamicallyLinkedLibrary,
+              optimizationLevel: OptimizationLevel.Release,
+              platform: Platform.X64
+            )
           );
-          _evaluator = script.CreateDelegate();
+
+          using var memoryStream = new MemoryStream();
+          var result = compilation.Emit(memoryStream);
+          if (!result.Success)
+          {
+            throw new InvalidOperationException(string.Join(Environment.NewLine, result.Diagnostics.Select(diagnostic => diagnostic.ToString())));
+          }
+          memoryStream.Seek(0, SeekOrigin.Begin);
+          _ruleEvaluator = _assemblyLoadContext.LoadFromStream(memoryStream).GetType(className).GetMethod(methodName);
         });
       }
 
-      public async Task<bool> EvaluateRulesAsync(Input input, Output output)
+      public bool EvaluateRules(TInput input, TOutput output)
       {
         using var trace = _traceFactory.CreateNew();
         trace.Debug(Format([input, output]));
         foreach (var rule in _rules)
         {
           trace.Debug(Format([rule.Description]));
-          var condition = new GlobalType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = default, ExecutionType = ExecutionType.Condition };
-          var result = await _evaluator(condition);
+          var result = EvaluateRule(rule.Id.ToString(), input, default, ExecutionType.Condition);
           trace.Debug(Format([rule.InputExpression, result]));
           if (result)
           {
-            var action = new GlobalType<Input, Output>() { RuleId = rule.Id.ToString(), Input = input, Output = output, ExecutionType = ExecutionType.Action };
-            var removeThisElementFromList = await _evaluator(action);
+            var removeThisElementFromList = EvaluateRule(rule.Id.ToString(), input, output, ExecutionType.Action);
             trace.Debug(Format([string.Join(Environment.NewLine, rule.OutputExpressions), removeThisElementFromList]));
             if (removeThisElementFromList)
             {
@@ -88,19 +138,35 @@ namespace ZoNo.Services
         }
         return true;
       }
+
+      private bool EvaluateRule(string ruleId, TInput input, TOutput output, ExecutionType executionType)
+      {
+        return (bool)_ruleEvaluator.Invoke(null, [ruleId, input, output, executionType]);
+      }
+
+      public void Dispose()
+      {
+        if (_assemblyLoadContext != null)
+        {
+          _ruleEvaluator = null;
+          _assemblyLoadContext.Unload();
+          _assemblyLoadContext = null;
+          GC.Collect();
+        }
+      }
     }
 
     public async Task InitializeAsync()
     {
       using var trace = _traceFactory.CreateNew();
-      await BuildAsync<object, object>([]);
+      using var ruleEvaluator = await BuildAsync<object, object>([]);
     }
 
-    public async Task<IRuleEvaluatorService<Input, Output>> BuildAsync<Input, Output>(IEnumerable<Rule> rules)
+    public async Task<IRuleEvaluatorService<TInput, TOutput>> BuildAsync<TInput, TOutput>(IEnumerable<Rule> rules)
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format([rules.Count()]));
-      var ruleEvaluator = new RuleEvaluatorService<Input, Output>(rules, _traceFactory);
+      var ruleEvaluator = new RuleEvaluatorService<TInput, TOutput>(rules, _traceFactory);
       await ruleEvaluator.InitializeAsync();
       return ruleEvaluator;
     }

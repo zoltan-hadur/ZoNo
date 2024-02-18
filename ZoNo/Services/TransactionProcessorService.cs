@@ -30,6 +30,8 @@ namespace ZoNo.Services
       // Generate the code and compile it only in case the rules have changed
       if (rulesJson != _rulesJson)
       {
+        _transactionRuleEvaluatorService?.Dispose();
+        _expenseRuleEvaluatorService?.Dispose();
         _rulesJson = rulesJson;
         var taskTransaction = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(transactionRules);
         var taskExpense = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(expenseRules);
@@ -48,7 +50,7 @@ namespace ZoNo.Services
         throw new InvalidOperationException($"{nameof(InitializeAsync)} should be called first!");
       }
 
-      if (await _transactionRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: transaction))
+      if (_transactionRuleEvaluatorService.EvaluateRules(input: transaction, output: transaction))
       {
         var expense = new Expense()
         {
@@ -61,7 +63,7 @@ namespace ZoNo.Services
           Date = transaction.TransactionTime,
           Group = "Non-group expenses"
         };
-        if (await _expenseRuleEvaluatorService.EvaluateRulesAsync(input: transaction, output: expense))
+        if (_expenseRuleEvaluatorService.EvaluateRules(input: transaction, output: expense))
         {
           TransactionProcessed?.Invoke(this, (transaction, expense));
         }

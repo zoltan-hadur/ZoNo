@@ -5,6 +5,6 @@ namespace ZoNo.Contracts.Services
   public interface IRuleEvaluatorServiceBuilder
   {
     Task InitializeAsync();
-    Task<IRuleEvaluatorService<Input, Output>> BuildAsync<Input, Output>(IEnumerable<Rule> rules);
+    Task<IRuleEvaluatorService<TInput, TOutput>> BuildAsync<TInput, TOutput>(IEnumerable<Rule> rules);
   }
 }
