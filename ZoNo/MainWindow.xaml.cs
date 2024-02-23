@@ -52,6 +52,7 @@ namespace ZoNo
 
       var scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
 
+      if (AppWindow.TitleBar.RightInset < 0) return;
       RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
       LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
 
