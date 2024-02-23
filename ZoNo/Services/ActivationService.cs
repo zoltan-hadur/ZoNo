@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using Tracer;
 using Tracer.Contracts;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
@@ -70,9 +71,9 @@ namespace ZoNo.Services
       await _themeSelectorService.InitializeAsync();
       await Task.WhenAll(
       [
-        _tokenService.InitializeAsync(),
-        _themeSelectorService.SetRequestedThemeAsync(),
-        _settingsPageViewModel.LoadAsync()
+        TraceFactory.HandleAsAsyncVoid(_tokenService.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_themeSelectorService.SetRequestedThemeAsync),
+        TraceFactory.HandleAsAsyncVoid(_settingsPageViewModel.LoadAsync)
       ]);
     }
 
@@ -81,9 +82,9 @@ namespace ZoNo.Services
       using var trace = _traceFactory.CreateNew();
       await Task.WhenAll(
       [
-        _rulesService.InitializeAsync(),
-        _ruleEvaluatorServiceBuilder.InitializeAsync(),
-        _updateService.CheckForUpdateAsync()
+        TraceFactory.HandleAsAsyncVoid(_rulesService.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_ruleEvaluatorServiceBuilder.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_updateService.CheckForUpdateAsync)
       ]);
       await _transactionProcessorService.InitializeAsync();
     }

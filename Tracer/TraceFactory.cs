@@ -11,6 +11,7 @@ namespace Tracer
   {
     private static int _correlationId = 1;
     private static readonly AsyncLocal<int> _asyncLocalCorrelationId = new() { Value = _correlationId };
+    private static readonly AsyncLocal<bool> _asyncLocalHandleAsAsyncVoid = new() { Value = false };
     private readonly ITraceDetailFactory _traceDetailFactory = traceDetailFactory;
     private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
 
@@ -42,8 +43,9 @@ namespace Tracer
       var traceMethodInfo = TraceDatabase.GetTraceMethodInfo(filePath, lineNumber);
       Debug.Assert(traceMethodInfo is not null, "method info is null!");
       string message = null;
-      if (traceMethodInfo.Value.IsAsyncVoid)
+      if (traceMethodInfo.Value.IsAsyncVoid || _asyncLocalHandleAsAsyncVoid.Value)
       {
+        _asyncLocalHandleAsAsyncVoid.Value = false;
         var previousCorrelationId = CorrelationId;
         IncrementCorrelationId();
         message = $"{previousCorrelationId} -> {CorrelationId}";
@@ -53,6 +55,18 @@ namespace Tracer
         message = $"0 -> {CorrelationId}";
       }
       return new Trace(_traceDetailFactory, _traceDetailProcessor, traceMethodInfo.Value.Method, message);
+    }
+
+    public static async Task HandleAsAsyncVoid(Func<Task> func)
+    {
+      _asyncLocalHandleAsAsyncVoid.Value = true;
+      await func();
+    }
+
+    public static async Task<T> HandleAsAsyncVoid<T>(Func<Task<T>> func)
+    {
+      _asyncLocalHandleAsAsyncVoid.Value = true;
+      return await func();
     }
   }
 }
