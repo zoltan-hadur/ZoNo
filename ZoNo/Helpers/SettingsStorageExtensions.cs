@@ -39,6 +39,7 @@ namespace ZoNo.Helpers
       trace.Debug(Format([path]));
       if (!File.Exists(path))
       {
+        trace.Debug("File does not exist");
         return default;
       }
 
