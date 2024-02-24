@@ -34,25 +34,25 @@ namespace ZoNo.Converters
     public double? ParseDouble(string text)
     {
       using var trace = _traceFactory.CreateNew();
-      var result = double.Parse(text.Trim('%'));
-      trace.Debug(Format([text, result]));
-      return result;
+      var success = double.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
     }
 
     public long? ParseInt(string text)
     {
       using var trace = _traceFactory.CreateNew();
-      var result = long.Parse(text.Trim('%'));
-      trace.Debug(Format([text, result]));
-      return result;
+      var success = long.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
     }
 
     public ulong? ParseUInt(string text)
     {
       using var trace = _traceFactory.CreateNew();
-      var result = ulong.Parse(text.Trim('%'));
-      trace.Debug(Format([text, result]));
-      return result;
+      var success = ulong.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
     }
   }
 }
