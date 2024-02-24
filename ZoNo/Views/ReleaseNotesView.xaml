@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="ZoNo.Views.ReleaseNotesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:ZoNo.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
-  <ScrollViewer>
+  <ScrollViewer Padding="0,0,12,0">
     <ScrollViewer.Resources>
       <Style TargetType="TextBlock">
         <Setter Property="TextWrapping" Value="Wrap"/>
@@ -44,10 +42,62 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.4.0 / 2023-02-24" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <ListView Header="Tracing:">
+          <TextBlock Text="In memory and file."/>
+          <TextBlock Text="In memory trace can be viewed and filtered in settings."/>
+          <TextBlock Text="Upon unhandled exception, the in memory trace can be saved to file."/>
+        </ListView>
+        <ListView Header="New update mechanism:">
+          <TextBlock Text="No more update checking window before app startup."/>
+          <TextBlock Text="Update check is happening after app startup."/>
+          <TextBlock Text="If update is available, a yellowish flag indicates it in the top right corner."/>
+          <TextBlock Text="Update check can be executed manually from settings."/>
+        </ListView>
+        <ListView Header="Dialog buttons changed:">
+          <TextBlock Text="Besides OK and Cancel, there are now also Save and Close."/>
+          <TextBlock Text="Clicking Save will open a folder/file picker dialog."/>
+        </ListView>
+        <ListView Header="Rule processing:">
+          <TextBlock Text="Validating rule syntax is faster and uses less memory."/>
+          <TextBlock Text="Evaluating rules is faster and uses less memory."/>
+          <TextBlock Text="A memory leak fixed."/>
+        </ListView>
+        <TextBlock Text="New design for account page."/>
+        <TextBlock Text="Faster load of account page."/>
+        <TextBlock Text="Faster upload of expenses to Splitwise."/>
+        <TextBlock Text="Automatically append/increase number when exporting rules."/>
+        <TextBlock Text="App crash during startup is fixed."/>
+        <TextBlock Text="App exe does not exit after app closes is fixed."/>
+        <TextBlock Text="App title flickering during startup in dark mode is fixed."/>
+        <TextBlock Text="Missing app icons is fixed."/>
+        <TextBlock Text="Default theme not respecting Windows setting is fixed."/>
+        <TextBlock Text="Scroll bar overlapping with text in release notes is fixed."/>
+        <TextBlock Text="Minor typos in release notes are fixed."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.2.3.0 / 2023-12-15" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Support USD."/>
+        <TextBlock Text="Import rules renamed to Transaction rules."/>
+        <TextBlock Text="Splitwise rules renamed to Expense rules."/>
+        <TextBlock Text="Open expense editor upon double clicking on an expense."/>
+        <TextBlock Text="Expense group color fixed."/>
+        <TextBlock Text="Show animation for dialog."/>
+        <TextBlock Text="Apply theme at application start to prevent flickering."/>
+        <ListView Header="Windows 11 style custom title bar:">
+          <TextBlock Text="The app now has an icon."/>
+          <TextBlock Text="Icon, title and caption buttons gray out when app is inactive."/>
+        </ListView>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.2.0 / 2023-11-20" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Fix login issue."/>
-        <TextBlock Text="Fix that sometimes the expense category selectory is empty."/>
+        <TextBlock Text="Fix that sometimes the expense category selector is empty."/>
         <TextBlock Text="Increase login screen width."/>
         <TextBlock Text="Increase space between login button and remember me checkbox."/>
       </ListView>
@@ -89,7 +139,7 @@
         <TextBlock Text="Remove animation of expenses list when refreshing."/>
         <TextBlock Text="Defer refresh of transactions and expenses when more than 30 are added/removed."/>
         <TextBlock Text="Fix that theme of transactions data grid and rule editor text boxes were not reloading properly."/>
-        <TextBlock Text="Fix animation of already loaded transactions data grid rows when navigating back to import page. "/>
+        <TextBlock Text="Fix animation of already loaded transactions data grid rows when navigating back to import page."/>
         <TextBlock Text="Add text indicating transactions and expenses count to the bottom of the import page."/>
         <TextBlock Text="Animate transactions data grid only when scrolling via mouse wheel."/>
       </ListView>

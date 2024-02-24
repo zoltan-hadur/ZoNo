@@ -12,9 +12,4 @@ namespace ZoNo.Contracts.Services
 
     bool NavigateTo(string pageKey, object parameter = null, NavigationTransitionInfo infoOverride = null);
   }
-
-  public interface ITopLevelNavigationService : INavigationService
-  {
-
-  }
 }

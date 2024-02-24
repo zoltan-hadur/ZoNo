@@ -1,4 +1,7 @@
-﻿using Windows.Storage;
+﻿using Microsoft.UI.Xaml.Controls;
+using System.Xml.Linq;
+using Tracer.Contracts;
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace ZoNo.Helpers
@@ -7,27 +10,36 @@ namespace ZoNo.Helpers
   // More details regarding storing and retrieving app data at https://docs.microsoft.com/windows/apps/design/app-settings/store-and-retrieve-app-data
   public static class SettingsStorageExtensions
   {
+    private static readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
     private const string FileExtension = ".json";
 
     public static bool IsRoamingStorageAvailable(this ApplicationData appData)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([appData.RoamingStorageQuota]));
       return appData.RoamingStorageQuota == 0;
     }
 
     public static async Task SaveAsync<T>(this StorageFolder folder, string name, T content)
     {
+      using var trace = _traceFactory.CreateNew();
       ArgumentNullException.ThrowIfNull(content);
 
       var file = await folder.CreateFileAsync(GetFileName(name), CreationCollisionOption.ReplaceExisting);
       var fileContent = await Json.StringifyAsync(content);
+      trace.Debug(Format([file.Path]));
 
       await FileIO.WriteTextAsync(file, fileContent);
     }
 
     public static async Task<T> ReadAsync<T>(this StorageFolder folder, string name)
     {
-      if (!File.Exists(Path.Combine(folder.Path, GetFileName(name))))
+      using var trace = _traceFactory.CreateNew();
+      var path = Path.Combine(folder.Path, GetFileName(name));
+      trace.Debug(Format([path]));
+      if (!File.Exists(path))
       {
+        trace.Debug("File does not exist");
         return default;
       }
 
@@ -39,6 +51,8 @@ namespace ZoNo.Helpers
 
     public static async Task SaveAsync<T>(this ApplicationDataContainer settings, string key, T value)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([key, value]));
       ArgumentNullException.ThrowIfNull(value);
 
       settings.SaveString(key, await Json.StringifyAsync(value));
@@ -46,14 +60,16 @@ namespace ZoNo.Helpers
 
     public static void SaveString(this ApplicationDataContainer settings, string key, string value)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([key, value]));
       settings.Values[key] = value;
     }
 
     public static async Task<T> ReadAsync<T>(this ApplicationDataContainer settings, string key)
     {
-      object obj;
-
-      if (settings.Values.TryGetValue(key, out obj))
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([key]));
+      if (settings.Values.TryGetValue(key, out object obj))
       {
         return await Json.ToObjectAsync<T>((string)obj);
       }
@@ -63,15 +79,14 @@ namespace ZoNo.Helpers
 
     public static async Task<StorageFile> SaveFileAsync(this StorageFolder folder, byte[] content, string fileName, CreationCollisionOption options = CreationCollisionOption.ReplaceExisting)
     {
-      if (content == null)
-      {
-        throw new ArgumentNullException(nameof(content));
-      }
+      using var trace = _traceFactory.CreateNew();
+      ArgumentNullException.ThrowIfNull(content);
 
       if (string.IsNullOrEmpty(fileName))
       {
         throw new ArgumentException("File name is null or empty. Specify a valid file name", nameof(fileName));
       }
+      trace.Debug(Format([fileName, options, content.Length]));
 
       var storageFile = await folder.CreateFileAsync(fileName, options);
       await FileIO.WriteBytesAsync(storageFile, content);
@@ -80,9 +95,10 @@ namespace ZoNo.Helpers
 
     public static async Task<byte[]> ReadFileAsync(this StorageFolder folder, string fileName)
     {
+      using var trace = _traceFactory.CreateNew();
       var item = await folder.TryGetItemAsync(fileName).AsTask().ConfigureAwait(false);
-
-      if ((item != null) && item.IsOfType(StorageItemTypes.File))
+      trace.Debug(Format([item.Path]));
+      if ((item is not null) && item.IsOfType(StorageItemTypes.File))
       {
         var storageFile = await folder.GetFileAsync(fileName);
         var content = await storageFile.ReadBytesAsync();
@@ -94,8 +110,11 @@ namespace ZoNo.Helpers
 
     public static async Task<byte[]> ReadBytesAsync(this StorageFile file)
     {
-      if (file != null)
+      using var trace = _traceFactory.CreateNew();
+
+      if (file is not null)
       {
+        trace.Debug(Format([file.Path]));
         using IRandomAccessStream stream = await file.OpenReadAsync();
         using var reader = new DataReader(stream.GetInputStreamAt(0));
         await reader.LoadAsync((uint)stream.Size);

@@ -1,34 +1,39 @@
 ﻿using Microsoft.UI.Xaml;
+using Tracer;
+using Tracer.Contracts;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
-using ZoNo.Models;
+using ZoNo.ViewModels;
 
 namespace ZoNo.Services
 {
-  public class ActivationService : IActivationService
+  public class ActivationService(
+    ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+    IEnumerable<IActivationHandler> activationHandlers,
+    ITokenService tokenService,
+    IThemeSelectorService themeSelectorService,
+    IRulesService rulesService,
+    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
+    ITransactionProcessorService transactionProcessorService,
+    IUpdateService updateService,
+    ITraceFactory traceFactory,
+    SettingsPageViewModel settingsPageViewModel) : IActivationService
   {
-    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
-    private readonly IEnumerable<IActivationHandler> _activationHandlers;
-    private readonly IThemeSelectorService _themeSelectorService;
-    private readonly IRulesService _rulesService;
-    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder;
-
-    public ActivationService(
-      ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
-      IEnumerable<IActivationHandler> activationHandlers,
-      IThemeSelectorService themeSelectorService,
-      IRulesService rulesService,
-      IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder)
-    {
-      _defaultHandler = defaultHandler;
-      _activationHandlers = activationHandlers;
-      _themeSelectorService = themeSelectorService;
-      _rulesService = rulesService;
-      _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
-    }
+    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler = defaultHandler;
+    private readonly IEnumerable<IActivationHandler> _activationHandlers = activationHandlers;
+    private readonly ITokenService _tokenService = tokenService;
+    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
+    private readonly IRulesService _rulesService = rulesService;
+    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
+    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+    private readonly IUpdateService _updateService = updateService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly SettingsPageViewModel _settingsPageViewModel = settingsPageViewModel;
 
     public async Task ActivateAsync(object activationArgs)
     {
+      using var trace = _traceFactory.CreateNew();
+
       // Execute tasks before activation.
       await InitializeAsync();
 
@@ -36,6 +41,7 @@ namespace ZoNo.Services
       await HandleActivationAsync(activationArgs);
 
       // Activate the MainWindow.
+      trace.Info("Activate MainWindow");
       App.MainWindow.Activate();
 
       // Execute tasks after activation.
@@ -44,9 +50,11 @@ namespace ZoNo.Services
 
     private async Task HandleActivationAsync(object activationArgs)
     {
+      using var trace = _traceFactory.CreateNew();
       var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
 
-      if (activationHandler != null)
+      trace.Debug(Format([activationHandler]));
+      if (activationHandler is not null)
       {
         await activationHandler.HandleAsync(activationArgs);
       }
@@ -59,16 +67,26 @@ namespace ZoNo.Services
 
     private async Task InitializeAsync()
     {
-      await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
-      _ = _rulesService.LoadRulesAsync();
-      _ = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(Array.Empty<Rule>());
-      await Task.CompletedTask;
+      using var trace = _traceFactory.CreateNew();
+      await _themeSelectorService.InitializeAsync();
+      await Task.WhenAll(
+      [
+        TraceFactory.HandleAsAsyncVoid(_tokenService.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_themeSelectorService.SetRequestedThemeAsync),
+        TraceFactory.HandleAsAsyncVoid(_settingsPageViewModel.LoadAsync)
+      ]);
     }
 
     private async Task StartupAsync()
     {
-      await _themeSelectorService.SetRequestedThemeAsync();
-      await Task.CompletedTask;
+      using var trace = _traceFactory.CreateNew();
+      await Task.WhenAll(
+      [
+        TraceFactory.HandleAsAsyncVoid(_rulesService.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_ruleEvaluatorServiceBuilder.InitializeAsync),
+        TraceFactory.HandleAsAsyncVoid(_updateService.CheckForUpdateAsync)
+      ]);
+      await _transactionProcessorService.InitializeAsync();
     }
   }
 }

@@ -2,7 +2,7 @@
 {
   public interface IRuleExpressionSyntaxCheckerService
   {
-    Task<(bool IsValid, string ErrorMessage)> TryCheckSyntaxAsync<Input>(string inputExpression);
-    Task<(bool IsValid, string ErrorMessage)> TryCheckSyntaxAsync<Input, Output>(string outputExpression);
+    Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<TInput>(string inputExpression);
+    Task<(bool IsValid, string ErrorMessage)> CheckSyntaxAsync<TInput, TOutput>(string outputExpression);
   }
 }

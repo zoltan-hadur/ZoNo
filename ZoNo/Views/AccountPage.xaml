@@ -1,0 +1,78 @@
+<Page x:Class="ZoNo.Views.AccountPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:views="using:ZoNo.Views"
+      xmlns:controls="using:ZoNo.Controls"
+      xmlns:models="using:ZoNo.Models"
+      xmlns:helpers="using:ZoNo.Helpers"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Loading="Page_Loading">
+  <controls:LoaderContentControl HorizontalContentAlignment="Stretch"
+                                 VerticalContentAlignment="Stretch"
+                                 IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <!-- My account -->
+      <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+        <StackPanel.Resources>
+          <Style x:Key="TextWithHeader" TargetType="StackPanel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Spacing" Value="6"/>
+          </Style>
+          <Style x:Key="SelectableText" TargetType="TextBlock">
+            <Setter Property="IsTextSelectionEnabled" Value="True"/>
+          </Style>
+        </StackPanel.Resources>
+        <Border Width="48" Height="48" CornerRadius="7" VerticalAlignment="Top">
+          <Image Source="{x:Bind ViewModel.ProfilePicture, Mode=OneWay}"/>
+        </Border>
+        <StackPanel Style="{StaticResource TextWithHeader}">
+          <TextBlock Text="First Name"/>
+          <TextBlock Style="{StaticResource SelectableText}" Text="{x:Bind ViewModel.FirstName, Mode=OneWay}"/>
+        </StackPanel>
+        <StackPanel Style="{StaticResource TextWithHeader}">
+          <TextBlock Text="Last Name"/>
+          <TextBlock Style="{StaticResource SelectableText}" Text="{x:Bind ViewModel.LastName, Mode=OneWay}"/>
+        </StackPanel>
+        <StackPanel Style="{StaticResource TextWithHeader}">
+          <TextBlock Text="E-mail"/>
+          <TextBlock Style="{StaticResource SelectableText}" Text="{x:Bind ViewModel.Email, Mode=OneWay}"/>
+        </StackPanel>
+        <StackPanel Style="{StaticResource TextWithHeader}">
+          <TextBlock Text="Default Currency"/>
+          <TextBlock Style="{StaticResource SelectableText}" Text="{x:Bind ViewModel.DefaultCurrency, Mode=OneWay}"/>
+        </StackPanel>
+      </StackPanel>
+      <!-- Groups -->
+      <Grid Grid.Row="1" Margin="0,12,0,0" helpers:Grid.IsSharedSizeScope="True">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="24" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Groups"/>
+        <MenuFlyoutSeparator Grid.Row="1" Margin="12,0,12,0"/>
+        <ListView Grid.Row="2" SelectionMode="None" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
+          <ListView.ItemTemplate>
+            <DataTemplate x:DataType="models:Group">
+              <StackPanel>
+                <views:GroupView Picture="{x:Bind Picture}" Margin="-16,8,0,8"
+                                 Name="{x:Bind Name}"
+                                 Members="{x:Bind Members}"
+                                 IsTextSelectionEnabled="True"/>
+                <MenuFlyoutSeparator/>
+              </StackPanel>
+            </DataTemplate>
+          </ListView.ItemTemplate>
+        </ListView>
+      </Grid>
+      <Button Grid.Row="2" Content="Logout" HorizontalAlignment="Right" Margin="0,12,0,12" Command="{x:Bind ViewModel.LogoutCommand, Mode=OneWay}"/>
+    </Grid>
+  </controls:LoaderContentControl>
+</Page>

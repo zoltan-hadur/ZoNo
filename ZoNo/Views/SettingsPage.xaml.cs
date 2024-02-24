@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using ZoNo.ViewModels;
 
 namespace ZoNo.Views
@@ -13,6 +12,11 @@ namespace ZoNo.Views
     {
       ViewModel = App.GetService<SettingsPageViewModel>();
       InitializeComponent();
+    }
+
+    private async void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
+    {
+      await ViewModel.LoadAsync();
     }
   }
 }

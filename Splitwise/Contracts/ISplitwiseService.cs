@@ -1,4 +1,5 @@
 ﻿using Splitwise.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Splitwise.Contracts
@@ -8,6 +9,11 @@ namespace Splitwise.Contracts
   /// </summary>
   public interface ISplitwiseService
   {
+    /// <summary>
+    /// Bearer token.
+    /// </summary>
+    Token Token { get; set; }
+
     /// <summary>
     /// Get information about the current user.
     /// </summary>
@@ -35,6 +41,20 @@ namespace Splitwise.Contracts
     /// </summary>
     /// <param name="expense"></param>
     /// <returns></returns>
-    Task<Expense[]> CreateExpense(Expense expense);
+    Task<Expense[]> CreateExpenseAsync(Expense expense);
+
+    /// <summary>
+    /// Gets the current user's expenses within a group.
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
+    Task<Expense[]> GetExpensesInGroupAsync(int groupId, int limit = 20, int offset = 0);
+
+    /// <summary>
+    /// Delete an expense.
+    /// </summary>
+    /// <param name="expenseId"></param>
+    /// <returns></returns>
+    Task<bool> DeleteExpenseAsync(Int64 expenseId);
   }
 }

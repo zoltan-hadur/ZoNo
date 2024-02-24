@@ -1,18 +1,58 @@
-﻿using System.Numerics;
+﻿using Tracer.Contracts;
 using Windows.Globalization.NumberFormatting;
-using ZoNo.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZoNo.Converters
 {
   public class PercentageFormatter : INumberFormatter2, INumberParser
   {
-    public string FormatDouble(double value) => $"{value.ToString("0.00")} %";
-    public string FormatInt(long value) => $"{value.ToString("0.00")} %";
-    public string FormatUInt(ulong value) => $"{value.ToString("0.00")} %";
+    private readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
 
-    public double? ParseDouble(string text) => double.Parse(text.Trim('%'));
-    public long? ParseInt(string text) => long.Parse(text.Trim('%'));
-    public ulong? ParseUInt(string text) => ulong.Parse(text.Trim('%'));
+    public string FormatDouble(double value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public string FormatInt(long value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public string FormatUInt(ulong value)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var result = $"{value:0.00} %";
+      trace.Debug(Format([value, result]));
+      return result;
+    }
+
+    public double? ParseDouble(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var success = double.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
+    }
+
+    public long? ParseInt(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var success = long.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
+    }
+
+    public ulong? ParseUInt(string text)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var success = ulong.TryParse(text.Trim('%'), out var result);
+      trace.Debug(Format([success, text, result]));
+      return success ? result : null;
+    }
   }
 }

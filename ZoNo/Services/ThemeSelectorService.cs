@@ -1,30 +1,33 @@
 ﻿using Microsoft.UI.Xaml;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
-using ZoNo.Helpers;
 
 namespace ZoNo.Services
 {
-  public class ThemeSelectorService : IThemeSelectorService
+  public class ThemeSelectorService(
+    ILocalSettingsService localSettingsService,
+    ITraceFactory traceFactory) : IThemeSelectorService
   {
+    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
+
     private const string SettingsKey = "AppBackgroundRequestedTheme";
-    private readonly ILocalSettingsService _localSettingsService;
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
 
-    public ThemeSelectorService(ILocalSettingsService localSettingsService)
-    {
-      _localSettingsService = localSettingsService;
-    }
-
     public async Task InitializeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       Theme = await LoadThemeFromSettingsAsync();
+      trace.Debug(Format([Theme]));
       await Task.CompletedTask;
     }
 
     public async Task SetThemeAsync(ElementTheme theme)
     {
+      using var trace = _traceFactory.CreateNew();
       Theme = theme;
+      trace.Debug(Format([Theme]));
 
       await SetRequestedThemeAsync();
       await SaveThemeInSettingsAsync(Theme);
@@ -32,9 +35,11 @@ namespace ZoNo.Services
 
     public async Task SetRequestedThemeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       if (App.MainWindow.Content is FrameworkElement rootElement)
       {
         rootElement.RequestedTheme = Theme;
+        trace.Debug(Format([rootElement.RequestedTheme]));
       }
 
       await Task.CompletedTask;
@@ -42,7 +47,9 @@ namespace ZoNo.Services
 
     private async Task<ElementTheme> LoadThemeFromSettingsAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       var themeName = await _localSettingsService.ReadSettingAsync<string>(SettingsKey);
+      trace.Debug(Format([themeName]));
 
       if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
       {
@@ -54,6 +61,8 @@ namespace ZoNo.Services
 
     private async Task SaveThemeInSettingsAsync(ElementTheme theme)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([theme]));
       await _localSettingsService.SaveSettingAsync(SettingsKey, theme.ToString());
     }
   }

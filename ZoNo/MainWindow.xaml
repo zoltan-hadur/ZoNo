@@ -4,6 +4,11 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:windowex="using:WinUIEx"
+                   xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+                   xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+                   xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+                   xmlns:viewmodels="using:ZoNo.ViewModels"
+                   xmlns:views="using:ZoNo.Views"
                    MinWidth="500"
                    MinHeight="500"
                    Title="ZoNo"
@@ -13,6 +18,87 @@
     <MicaBackdrop/>
   </Window.SystemBackdrop>
   <windowex:WindowEx.Content>
-    <Frame IsNavigationStackEnabled="False"/>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition/>
+      </Grid.RowDefinitions>
+      <!-- Title bar -->
+      <Grid Grid.Row="0" x:Name="AppTitleBar" Height="32">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
+        <!-- Icon -->
+        <Image Grid.Column="1" x:Name="TitleBarImage" Width="16" Height="16" Margin="16,0,0,0" VerticalAlignment="Center" Source="ms-appx:///Assets/ZoNo.png" />
+        <!-- Title -->
+        <TextBlock Grid.Column="2" x:Name="TitleBarTextBlock" Margin="16,0,0,0" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Title}" TextWrapping="NoWrap">
+          <TextBlock.Resources>
+            <SolidColorBrush x:Key="TitleFillColorDisabled" Color="{ThemeResource TextFillColorDisabled}"/>
+            <SolidColorBrush x:Key="TitleFillColorPrimary" Color="{ThemeResource TextFillColorPrimary}"/>
+          </TextBlock.Resources>
+        </TextBlock>
+        <!-- Notifications button -->
+        <Button Grid.Column="3" x:Name="NotificationsButton" Background="Goldenrod" HorizontalAlignment="Right" Margin="0,0,12,0">
+          <animations:Implicit.ShowAnimations>
+            <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1"/>
+          </animations:Implicit.ShowAnimations>
+          <animations:Implicit.HideAnimations>
+            <animations:OpacityAnimation Duration="0:0:0.3" From="1" To="0"/>
+          </animations:Implicit.HideAnimations>
+          <interactivity:Interaction.Behaviors>
+            <core:DataTriggerBehavior Binding="{x:Bind _notificationService.Notifications.Count, Mode=OneWay}" ComparisonCondition="Equal" Value="0">
+              <core:ChangePropertyAction TargetObject="{Binding ElementName=NotificationsButton}" PropertyName="Visibility" Value="Collapsed"/>
+            </core:DataTriggerBehavior>
+            <core:DataTriggerBehavior Binding="{x:Bind _notificationService.Notifications.Count, Mode=OneWay}" ComparisonCondition="GreaterThan" Value="0">
+              <core:ChangePropertyAction TargetObject="{Binding ElementName=NotificationsButton}" PropertyName="Visibility" Value="Visible" />
+            </core:DataTriggerBehavior>
+          </interactivity:Interaction.Behaviors>
+          <Button.Resources>
+            <ResourceDictionary>
+              <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                  <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#C6961D"/>
+                  <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="DarkGoldenrod"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                  <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#FFBE26"/>
+                  <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Gold"/>
+                </ResourceDictionary>
+              </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+          </Button.Resources>
+          <SymbolIcon x:Name="Flag" Symbol="Flag"/>
+          <!-- Notifications list -->
+          <Button.Flyout>
+            <Flyout x:Name="NotificationsFlyout">
+              <Flyout.FlyoutPresenterStyle>
+                <Style TargetType="FlyoutPresenter" BasedOn="{StaticResource DefaultFlyoutPresenterStyle}">
+                  <Setter Property="Padding" Value="4"/>
+                  <Setter Property="MinWidth" Value="300"/>
+                </Style>
+              </Flyout.FlyoutPresenterStyle>
+              <ItemsRepeater ItemsSource="{x:Bind _notificationService.Notifications, Mode=OneWay}">
+                <ItemsRepeater.Layout>
+                  <StackLayout Orientation="Vertical" Spacing="4"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                  <DataTemplate x:DataType="viewmodels:NotificationViewModel">
+                    <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" DataContext="{x:Bind (viewmodels:NotificationViewModel), Mode=OneWay}" Command="{x:Bind ClickCommand}" Click="NotificationView_Click">
+                      <views:NotificationView Title="{x:Bind Title, Mode=OneWay}" Description="{x:Bind Description, Mode=OneWay}"/>
+                    </Button>
+                  </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+      </Grid>
+      <!-- Navigation frame -->
+      <Frame Grid.Row="1" x:Name="NavigationFrame" IsNavigationStackEnabled="False"/>
+    </Grid>
   </windowex:WindowEx.Content>
 </windowex:WindowEx>

@@ -12,7 +12,7 @@
   <Identity
     Name="D590054A-4893-4B3B-A7F3-416C85DBCD06"
     Publisher="CN=Zoltan Hadur"
-    Version="1.2.2.0" />
+    Version="1.2.4.0" />
 
   <Properties>
     <DisplayName>ZoNo</DisplayName>
@@ -38,8 +38,8 @@
         Description="ZoNo"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        Square44x44Logo="Assets\ZoNo256x256.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>

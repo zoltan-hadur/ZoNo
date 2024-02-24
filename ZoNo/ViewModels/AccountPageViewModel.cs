@@ -3,16 +3,24 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Animation;
 using Splitwise.Contracts;
+using Tracer;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
-  public partial class AccountPageViewModel : ObservableRecipient
+  public partial class AccountPageViewModel(
+    ITopLevelNavigationService topLevelNavigationService,
+    ISplitwiseService splitwiseService,
+    ITraceFactory traceFactory,
+    IMessenger messenger) : ObservableRecipient(messenger)
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService;
-    private readonly ISplitwiseService _splitwiseService;
+    private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
+    private readonly ISplitwiseService _splitwiseService = splitwiseService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
+
     private bool _isLoaded = false;
 
     [ObservableProperty]
@@ -34,26 +42,27 @@ namespace ZoNo.ViewModels
     private bool _isLoading = false;
 
     [ObservableProperty]
-    private Group[] _groups = Array.Empty<Group>();
+    private Group[] _groups = [];
 
-    public AccountPageViewModel(ITopLevelNavigationService topLevelNavigationService, ISplitwiseService splitwiseService, IMessenger messenger) : base(messenger)
+    public async Task LoadAsync()
     {
-      _topLevelNavigationService = topLevelNavigationService;
-      _splitwiseService = splitwiseService;
-    }
-
-    public async Task Load()
-    {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
       IsLoading = true;
 
-      var user = await _splitwiseService.GetCurrentUserAsync();
+      var taskUser = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetCurrentUserAsync);
+      var taskGroups = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetGroupsAsync);
+      await Task.WhenAll([taskUser, taskGroups]);
+      var user = taskUser.Result;
+      var groups = taskGroups.Result;
+
       ProfilePicture = user.Picture.Medium;
       FirstName = user.FirstName;
       LastName = user.LastName;
       Email = user.Email;
       DefaultCurrency = Enum.Parse<Currency>(user.DefaultCurrency.ToString());
-      var groups = await _splitwiseService.GetGroupsAsync();
+
       Groups = groups.Select(group => new Group()
       {
         Picture = group.Avatar.Medium,
@@ -74,8 +83,9 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private void Logout()
     {
+      using var trace = _traceFactory.CreateNew();
       Messenger.Send(new UserLoggedOutMessage());
-      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName!, infoOverride: new DrillInNavigationTransitionInfo());
+      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
     }
   }
 }

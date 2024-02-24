@@ -1,0 +1,48 @@
+<UserControl x:Class="ZoNo.Views.RuleManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewmodels="using:ZoNo.ViewModels"
+             xmlns:sys="using:System"
+             xmlns:controls="using:ZoNo.Controls"
+             mc:Ignorable="d">
+  <Border Background="{x:Bind Background, Mode=OneWay}"
+          Padding="{x:Bind Padding, Mode=OneWay}"
+          CornerRadius="{x:Bind CornerRadius, Mode=OneWay}"
+          BorderThickness="{x:Bind BorderThickness, Mode=OneWay}"
+          BorderBrush="{x:Bind BorderBrush, Mode=OneWay}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <ListViewHeaderItem Grid.Row="0" HorizontalContentAlignment="Stretch">
+        <Grid>
+          <TextBlock Text="{x:Bind Header, Mode=OneWay}"/>
+          <Button Content="New Rule" HorizontalAlignment="Right" Command="{x:Bind NewRuleCommand, Mode=OneWay}"/>
+        </Grid>
+      </ListViewHeaderItem>
+      <ListView Grid.Row="1" CanReorderItems="True" AllowDrop="True" ItemsSource="{x:Bind Rules, Mode=OneWay}" DoubleTapped="ListView_DoubleTapped">
+        <ListView.ItemContainerStyle>
+          <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="ContextFlyout">
+              <Setter.Value>
+                <controls:BindableMenuFlyout>
+                  <MenuFlyoutItem Text="Edit" Icon="Edit" Command="{x:Bind EditRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem Text="Duplicate" Icon="Copy" Command="{x:Bind DuplicateRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                  <MenuFlyoutItem Text="Delete" Icon="Delete" Command="{x:Bind DeleteRuleCommand, Mode=OneWay}" CommandParameter="{Binding}"/>
+                </controls:BindableMenuFlyout>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemTemplate>
+          <DataTemplate x:DataType="viewmodels:RuleViewModel">
+            <TextBlock Text="{x:Bind sys:String.Format(x:Null, '{0}, {1}', Index, Description), Mode=OneWay}"/>
+          </DataTemplate>
+        </ListView.ItemTemplate>
+      </ListView>
+    </Grid>
+  </Border>
+</UserControl>

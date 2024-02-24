@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using ZoNo.ViewModels;
-using ZoNo.ViewModels.Import;
 
 namespace ZoNo.Views
 {
@@ -11,6 +10,7 @@ namespace ZoNo.Views
     public ShellPage()
     {
       ViewModel = App.GetService<ShellPageViewModel>();
+      ViewModel.Initialize();
       InitializeComponent();
 
       ViewModel.NavigationService.Frame = NavigationFrame;
@@ -19,7 +19,7 @@ namespace ZoNo.Views
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-      ViewModel.NavigationService.NavigateTo(typeof(ImportPageViewModel).FullName!);
+      ViewModel.NavigationService.NavigateTo(typeof(ImportPageViewModel).FullName);
     }
   }
 }

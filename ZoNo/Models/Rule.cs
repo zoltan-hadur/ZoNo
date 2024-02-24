@@ -1,19 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ZoNo.Models
+﻿namespace ZoNo.Models
 {
-  public enum RuleType
-  {
-    Import,
-    Splitwise
-  }
-
   public class Rule
   {
     public Guid Id { get; init; } = Guid.NewGuid();

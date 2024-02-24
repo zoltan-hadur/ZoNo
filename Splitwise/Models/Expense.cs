@@ -2,21 +2,16 @@
 
 namespace Splitwise.Models
 {
-  public class Expense
+  public record Expense
   {
-    public string Cost { get; set; }
-    public string Description { get; set; }
-    public DateTimeOffset Date { get; set; }
-    public CurrencyCode CurrencyCode { get; set; }
-    public int CategoryId { get; set; }
-    public int? GroupId { get; set; }
-    public Share[] Users { get; set; }
-  }
-
-  public class Share
-  {
-    public int UserId { get; set; }
-    public string PaidShare { get; set; }
-    public string OwedShare { get; set; }
+    public Int64 Id { get; init; }
+    public string Cost { get; init; }
+    public string Description { get; init; }
+    public DateTimeOffset Date { get; init; }
+    public CurrencyCode CurrencyCode { get; init; }
+    public int CategoryId { get; init; }
+    public int? GroupId { get; init; }
+    public Share[] Users { get; init; }
+    public DateTimeOffset? DeletedAt { get; init; }
   }
 }

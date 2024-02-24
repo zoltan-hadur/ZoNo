@@ -4,9 +4,4 @@
   {
     Type GetPageType(string key);
   }
-
-  public interface ITopLevelPageService : IPageService
-  {
-
-  }
 }

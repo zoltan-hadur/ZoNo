@@ -1,12 +1,18 @@
-﻿namespace ZoNo.Activation
+﻿using Tracer.Contracts;
+
+namespace ZoNo.Activation
 {
   // Extend this class to implement new ActivationHandlers. See DefaultActivationHandler for an example.
   // https://github.com/microsoft/TemplateStudio/blob/main/docs/WinUI/activation.md
-  public abstract class ActivationHandler<T> : IActivationHandler where T : class
+  public abstract class ActivationHandler<T>(
+    ITraceFactory traceFactory) : IActivationHandler where T : class
   {
+    protected readonly ITraceFactory _traceFactory = traceFactory;
+
     // Override this method to add the logic for whether to handle the activation.
     protected virtual bool CanHandleInternal(T args)
     {
+      using var trace = _traceFactory.CreateNew();
       return true;
     }
 
@@ -15,12 +21,14 @@
 
     public bool CanHandle(object args)
     {
-      return args is T && CanHandleInternal((args as T)!);
+      using var trace = _traceFactory.CreateNew();
+      return args is T && CanHandleInternal(args as T);
     }
 
     public async Task HandleAsync(object args)
     {
-      await HandleInternalAsync((args as T)!);
+      using var trace = _traceFactory.CreateNew();
+      await HandleInternalAsync(args as T);
     }
   }
 }

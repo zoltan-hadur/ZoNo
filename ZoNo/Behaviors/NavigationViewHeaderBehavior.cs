@@ -2,25 +2,27 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
-
+using Tracer.Contracts;
+using Tracer.Utilities;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Behaviors
 {
   public class NavigationViewHeaderBehavior : Behavior<NavigationView>
   {
+    private readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
     private static NavigationViewHeaderBehavior _current;
     private Page _currentPage;
     private readonly INavigationService _navigationService = App.GetService<INavigationService>();
 
     public static readonly DependencyProperty DefaultHeaderProperty =
-        DependencyProperty.Register("DefaultHeader", typeof(object), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current!.UpdateHeader()));
+        DependencyProperty.Register("DefaultHeader", typeof(object), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current.UpdateHeader()));
     public static readonly DependencyProperty HeaderModeProperty =
-        DependencyProperty.RegisterAttached("HeaderMode", typeof(bool), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(NavigationViewHeaderMode.Always, (d, e) => _current!.UpdateHeader()));
+        DependencyProperty.RegisterAttached("HeaderMode", typeof(bool), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(NavigationViewHeaderMode.Always, (d, e) => _current.UpdateHeader()));
     public static readonly DependencyProperty HeaderContextProperty =
-        DependencyProperty.RegisterAttached("HeaderContext", typeof(object), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current!.UpdateHeader()));
+        DependencyProperty.RegisterAttached("HeaderContext", typeof(object), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current.UpdateHeader()));
     public static readonly DependencyProperty HeaderTemplateProperty =
-        DependencyProperty.RegisterAttached("HeaderTemplate", typeof(DataTemplate), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current!.UpdateHeaderTemplate()));
+        DependencyProperty.RegisterAttached("HeaderTemplate", typeof(DataTemplate), typeof(NavigationViewHeaderBehavior), new PropertyMetadata(null, (d, e) => _current.UpdateHeaderTemplate()));
 
     public DataTemplate DefaultHeaderTemplate { get; set; }
 
@@ -62,26 +64,26 @@ namespace ZoNo.Behaviors
 
     protected override void OnAttached()
     {
+      using var trace = _traceFactory.CreateNew();
       base.OnAttached();
-
       _navigationService.Navigated += OnNavigated;
-
       _current = this;
     }
 
     protected override void OnDetaching()
     {
+      using var trace = _traceFactory.CreateNew();
       base.OnDetaching();
-
       _navigationService.Navigated -= OnNavigated;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is Frame frame && frame.Content is Page page)
       {
+        trace.Debug(Format([page.GetType().Name]));
         _currentPage = page;
-
         UpdateHeader();
         UpdateHeaderTemplate();
       }
@@ -89,7 +91,8 @@ namespace ZoNo.Behaviors
 
     private void UpdateHeader()
     {
-      if (_currentPage != null)
+      using var trace = _traceFactory.CreateNew();
+      if (_currentPage is not null)
       {
         var headerMode = GetHeaderMode(_currentPage);
         if (headerMode == NavigationViewHeaderMode.Never)
@@ -100,7 +103,7 @@ namespace ZoNo.Behaviors
         else
         {
           var headerFromPage = GetHeaderContext(_currentPage);
-          if (headerFromPage != null)
+          if (headerFromPage is not null)
           {
             AssociatedObject.Header = headerFromPage;
           }
@@ -123,7 +126,8 @@ namespace ZoNo.Behaviors
 
     private void UpdateHeaderTemplate()
     {
-      if (_currentPage != null)
+      using var trace = _traceFactory.CreateNew();
+      if (_currentPage is not null)
       {
         var headerTemplate = GetHeaderTemplate(_currentPage);
         AssociatedObject.HeaderTemplate = headerTemplate ?? DefaultHeaderTemplate;

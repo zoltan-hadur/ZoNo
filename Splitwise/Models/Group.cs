@@ -1,39 +1,14 @@
 ﻿namespace Splitwise.Models
 {
-  public class Group
+  public record Group
   {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public GroupType GroupType { get; set; }
-    public bool SimplifyByDefault { get; set; }
-    public User[] Members { get; set; }
-    public Avatar Avatar { get; set; }
-    public bool CustomAvatar { get; set; }
-    public CoverPhoto CoverPhoto { get; set; }
-  }
-
-  public enum GroupType
-  {
-    Apartment,
-    Home = Apartment,
-    House,
-    Trip,
-    Other
-  }
-
-  public class Avatar
-  {
-    public string Original { get; set; }
-    public string XXLarge { get; set; }
-    public string XLarge { get; set; }
-    public string Large { get; set; }
-    public string Medium { get; set; }
-    public string Small { get; set; }
-  }
-
-  public class CoverPhoto
-  {
-    public string XXLarge { get; set; }
-    public string XLarge { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public GroupType GroupType { get; init; }
+    public bool SimplifyByDefault { get; init; }
+    public User[] Members { get; init; }
+    public Avatar Avatar { get; init; }
+    public bool CustomAvatar { get; init; }
+    public CoverPhoto CoverPhoto { get; init; }
   }
 }

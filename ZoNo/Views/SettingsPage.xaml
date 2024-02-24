@@ -4,14 +4,19 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:xaml="using:Microsoft.UI.Xaml"
-      mc:Ignorable="d">
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:numberformatting="using:Windows.Globalization.NumberFormatting"
+      mc:Ignorable="d"
+      Loading="Page_Loading">
   <Grid>
     <StackPanel>
+      <!-- Rules -->
       <TextBlock Text="Rules" Style="{ThemeResource SubtitleTextBlockStyle}"/>
       <StackPanel Orientation="Horizontal" Margin="{StaticResource SmallTopBottomMargin}">
         <Button Content="Import" Margin="{StaticResource SmallRightMargin}" Command="{x:Bind ViewModel.ImportRulesCommand}"/>
         <Button Content="Export" Command="{x:Bind ViewModel.ExportRulesCommand}"/>
       </StackPanel>
+      <!-- Personalization -->
       <TextBlock Text="Personalization" Style="{ThemeResource SubtitleTextBlockStyle}"/>
       <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
         <TextBlock Text="Theme"/>
@@ -41,13 +46,68 @@
                        GroupName="AppTheme"/>
         </StackPanel>
       </StackPanel>
-      <TextBlock Text="About this application" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-      <StackPanel Margin="{StaticResource XSmallTopMargin}">
-        <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}"/>
-        <TextBlock Text="TODO: Replace with your app description." Margin="{StaticResource XSmallTopMargin}" Style="{ThemeResource BodyTextBlockStyle}"/>
-        <HyperlinkButton Content="Privacy Statement" NavigateUri="https://YourPrivacyUrlGoesHere/" Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"/>
+      <!-- Traces -->
+      <TextBlock Text="Traces" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+      <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
+        <!-- In memory trace -->
+        <Grid ColumnSpacing="12">
+          <Grid.Resources>
+            <numberformatting:DecimalFormatter x:Key="DecimalFormatter" IsGrouped="True" FractionDigits="0" IsDecimalPointAlwaysDisplayed="False"/>
+          </Grid.Resources>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="75"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="In memory:" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.InMemoryTraceSinkSettings.IsEnabled, Mode=TwoWay}"/>
+          <TextBlock Grid.Column="2" Text="Level:" VerticalAlignment="Center"/>
+          <ComboBox Grid.Column="3" Width="130" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModel.TraceLevels}" SelectedItem="{x:Bind ViewModel.InMemoryTraceSinkSettings.Level, Mode=TwoWay}"/>
+          <TextBlock Grid.Column="4" Text="Size:" VerticalAlignment="Center"/>
+          <NumberBox Grid.Column="5" VerticalAlignment="Center" SpinButtonPlacementMode="Inline" SmallChange="100" LargeChange="1000" Minimum="1" Value="{x:Bind ViewModel.InMemoryTraceSinkSettings.Size, Mode=TwoWay}" NumberFormatter="{StaticResource DecimalFormatter}"/>
+          <Button Grid.Column="6" Content="Open" Command="{x:Bind ViewModel.OpenInMemoryTraceCommand}"/>
+        </Grid>
+        <!-- File trace -->
+        <controls:DockPanel HorizontalAlignment="Left">
+          <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="70"/>
+              <ColumnDefinition Width="75"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="File:" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.FileTraceSinkSettings.IsEnabled, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="2" Text="Level:" VerticalAlignment="Center"/>
+            <ComboBox Grid.Column="3" Width="130" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModel.TraceLevels}" SelectedItem="{x:Bind ViewModel.FileTraceSinkSettings.Level, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="4" Text="Output:" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="{x:Bind ViewModel.FileTraceSinkSettings.Path, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.FileTraceSinkSettings.Path, Mode=OneWay}" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True" VerticalAlignment="Center"/>
+            <Button Grid.Column="6" Content="Select" Command="{x:Bind ViewModel.SelectFileTraceOutputFolderCommand, Mode=OneWay}"/>
+            <Button Grid.Column="7" Content="Open" Command="{x:Bind ViewModel.OpenFileTraceCommand, Mode=OneWay}"/>
+          </Grid>
+        </controls:DockPanel>
       </StackPanel>
-      <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
+      <!-- About this application -->
+      <TextBlock Text="About this application" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+      <StackPanel Margin="{StaticResource SmallTopBottomMargin}" Spacing="8">
+        <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}"/>
+        <TextBlock Text="Little app to convert bank transactions to expenses and upload them to Splitwise." Style="{ThemeResource BodyTextBlockStyle}"/>
+        <Button Content="Release Notes" Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
+        <Button Content="Check for updates" Command="{x:Bind ViewModel.CheckForUpdatesCommand}"/>
+      </StackPanel>
     </StackPanel>
+    <!-- App icon -->
+    <Border VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8" Margin="0,-33,0,0">
+      <Image Width="64" Height="64" Source="ms-appx:///Assets/ZoNo.png" ToolTipService.ToolTip="I love you, Nora! 🥰"/>
+    </Border>
   </Grid>
 </Page>

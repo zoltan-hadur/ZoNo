@@ -4,8 +4,8 @@ namespace ZoNo.Contracts.Services
 {
   public interface IRulesService
   {
-    Task LoadRulesAsync();
-    Task<IList<Rule>> GetRulesAsync(RuleType type);
-    Task SaveRulesAsync(RuleType type, IList<Rule> rules);
+    Task InitializeAsync();
+    IReadOnlyCollection<Rule> GetRules(RuleType type);
+    Task SaveRulesAsync(RuleType type, IEnumerable<Rule> rules);
   }
 }

@@ -1,46 +1,38 @@
 ﻿using Splitwise.Models;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
-  public class TokenService : ITokenService
+  public class TokenService(
+    ILocalSettingsService localSettingsService,
+    ITraceFactory traceFactory) : ITokenService
   {
+    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
+
     private const string SettingToken = "Protected_Token";
-    private readonly ILocalSettingsService _localSettingsService;
-    private Token _token = null;
 
-    public TokenService(ILocalSettingsService localSettingsService)
+    public Token Token { get; set; } = null;
+
+    public async Task InitializeAsync()
     {
-      _localSettingsService = localSettingsService;
+      using var trace = _traceFactory.CreateNew();
+      Token = await _localSettingsService.ReadSettingAsync<Token>(SettingToken, encrypted: true);
     }
 
-    public async Task<Token> GetTokenAsync()
+    public async Task SaveAsync()
     {
-      return _token ?? (_token = await _localSettingsService.ReadProtectedSettingAsync<Token>(SettingToken));
-    }
-
-    public async Task SetTokenAsync(Token token)
-    {
-      _token = token;
-      await Task.CompletedTask;
-    }
-
-    public async Task SaveTokenAsync()
-    {
-      if (_token == null)
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([Token is null]));
+      if (Token is null)
       {
-        await _localSettingsService.RemoveSettingAsync(SettingToken);
+        _localSettingsService.RemoveSetting(SettingToken);
       }
       else
       {
-        await _localSettingsService.SaveProtectedSettingAsync(SettingToken, _token);
+        await _localSettingsService.SaveSettingAsync(SettingToken, Token, encrypt: true);
       }
-    }
-
-    public async Task<bool> DeleteSavedTokenAsync()
-    {
-      _token = null;
-      return await _localSettingsService.RemoveSettingAsync(SettingToken);
     }
   }
 }

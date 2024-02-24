@@ -1,9 +1,7 @@
-﻿using static ZoNo.Services.RuleEvaluatorServiceBuilder;
-
-namespace ZoNo.Contracts.Services
+﻿namespace ZoNo.Contracts.Services
 {
-  public interface IRuleEvaluatorService<Input, Output>
+  public interface IRuleEvaluatorService<TInput, TOutput> : IDisposable
   {
-    Task<EvaluationResult> EvaluateRulesAsync(Input input, Output output);
+    bool EvaluateRules(TInput input, TOutput output);
   }
 }

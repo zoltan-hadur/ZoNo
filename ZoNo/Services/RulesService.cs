@@ -1,39 +1,50 @@
-﻿using Windows.Storage;
+﻿using Tracer.Contracts;
+using Windows.Storage;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
 
 namespace ZoNo.Services
 {
-  public class RulesService : IRulesService
+  public class RulesService(
+    ITraceFactory traceFactory) : IRulesService
   {
-    private Dictionary<RuleType, Rule[]> _rules = new Dictionary<RuleType, Rule[]>();
-    private SemaphoreSlim _guard = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+    private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly Dictionary<RuleType, Rule[]> _rules = [];
 
-    public RulesService()
+    public async Task InitializeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
 
-    }
-
-    public async Task LoadRulesAsync()
-    {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       foreach (var type in Enum.GetValues<RuleType>())
       {
-        _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? Array.Empty<Rule>();
+        _rules[type] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>($"Rules_{type}") ?? [];
+        trace.Debug(Format([type, _rules[type].Length]));
+      }
+
+      // Handle previous versions of rules
+      if (_rules[RuleType.Transaction].Length == 0)
+      {
+        _rules[RuleType.Transaction] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>("Rules_Import") ?? [];
+      }
+      if (_rules[RuleType.Expense].Length == 0)
+      {
+        _rules[RuleType.Expense] = await ApplicationData.Current.LocalFolder.ReadAsync<Rule[]>("Rules_Splitwise") ?? [];
       }
     }
 
-    public async Task<IList<Rule>> GetRulesAsync(RuleType type)
+    public IReadOnlyCollection<Rule> GetRules(RuleType type)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
-      return _rules[type].Select(rule => rule.Clone()).ToArray();
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([type]));
+      return _rules[type].AsReadOnly();
     }
 
-    public async Task SaveRulesAsync(RuleType type, IList<Rule> rules)
+    public async Task SaveRulesAsync(RuleType type, IEnumerable<Rule> rules)
     {
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
+      using var trace = _traceFactory.CreateNew();
       _rules[type] = rules.Select(rule => rule.Clone()).ToArray();
+      trace.Debug(Format([type, _rules[type].Length]));
       await ApplicationData.Current.LocalFolder.SaveAsync($"Rules_{type}", _rules[type]);
     }
   }

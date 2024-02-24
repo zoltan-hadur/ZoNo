@@ -1,11 +1,16 @@
 ﻿using Microsoft.UI.Xaml;
+using Tracer.Contracts;
 
 namespace ZoNo.Helpers
 {
   public static class FrameworkElementExtensions
   {
+    private static readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
+
     public static void ReloadThemeResources(this FrameworkElement frameworkElement)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([frameworkElement.ActualTheme]));
       switch (frameworkElement.ActualTheme)
       {
         case ElementTheme.Light:

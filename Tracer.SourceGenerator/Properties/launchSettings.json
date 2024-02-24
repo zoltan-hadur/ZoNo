@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Tracer.SourceGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\ZoNo\\ZoNo.csproj"
+    }
+  }
+}

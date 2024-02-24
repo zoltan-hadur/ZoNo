@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Tracer.Contracts;
 
 namespace ZoNo.Helpers
 {
   public sealed class LockGuard : IDisposable
   {
-    private SemaphoreSlim _semaphore;
+    private static readonly ITraceFactory _traceFactory = App.GetService<ITraceFactory>();
+    private readonly SemaphoreSlim _semaphore;
 
     private LockGuard(SemaphoreSlim semaphore)
     {
+      using var trace = _traceFactory.CreateNew();
       _semaphore = semaphore;
     }
 
     public static async Task<LockGuard> CreateAsync(SemaphoreSlim semaphore, TimeSpan timeout)
     {
+      using var trace = _traceFactory.CreateNew();
       if (await semaphore.WaitAsync(timeout) == false)
       {
         throw new InvalidOperationException("Lock has timed out!");
@@ -26,6 +25,7 @@ namespace ZoNo.Helpers
 
     public void Dispose()
     {
+      using var trace = _traceFactory.CreateNew();
       _semaphore.Release();
     }
   }

@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise", "Splitwise\Spli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoNo", "ZoNo\ZoNo.csproj", "{DB7F68B2-E044-48E5-8FE5-2622109707C3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tracer", "Tracer\Tracer.csproj", "{508ECED4-68B8-4B9B-B2A9-64399C273BAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tracer.SourceGenerator", "Tracer.SourceGenerator\Tracer.SourceGenerator.csproj", "{54EFB2BC-340F-4A85-8517-416F0B0AF865}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -23,6 +27,14 @@ Global
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.ActiveCfg = Release|x64
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.Build.0 = Release|x64
 		{DB7F68B2-E044-48E5-8FE5-2622109707C3}.Release|x64.Deploy.0 = Release|x64
+		{508ECED4-68B8-4B9B-B2A9-64399C273BAF}.Debug|x64.ActiveCfg = Debug|x64
+		{508ECED4-68B8-4B9B-B2A9-64399C273BAF}.Debug|x64.Build.0 = Debug|x64
+		{508ECED4-68B8-4B9B-B2A9-64399C273BAF}.Release|x64.ActiveCfg = Release|x64
+		{508ECED4-68B8-4B9B-B2A9-64399C273BAF}.Release|x64.Build.0 = Release|x64
+		{54EFB2BC-340F-4A85-8517-416F0B0AF865}.Debug|x64.ActiveCfg = Debug|x64
+		{54EFB2BC-340F-4A85-8517-416F0B0AF865}.Debug|x64.Build.0 = Debug|x64
+		{54EFB2BC-340F-4A85-8517-416F0B0AF865}.Release|x64.ActiveCfg = Release|x64
+		{54EFB2BC-340F-4A85-8517-416F0B0AF865}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
