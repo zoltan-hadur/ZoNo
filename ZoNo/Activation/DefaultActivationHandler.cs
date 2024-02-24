@@ -10,7 +10,6 @@ namespace ZoNo.Activation
     ITraceFactory traceFactory,
     ITopLevelNavigationService topLevelNavigationService) : ActivationHandler<LaunchActivatedEventArgs>(traceFactory)
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
     private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
 
     protected override bool CanHandleInternal(LaunchActivatedEventArgs args)

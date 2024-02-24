@@ -7,7 +7,7 @@ namespace ZoNo.Activation
   public abstract class ActivationHandler<T>(
     ITraceFactory traceFactory) : IActivationHandler where T : class
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
+    protected readonly ITraceFactory _traceFactory = traceFactory;
 
     // Override this method to add the logic for whether to handle the activation.
     protected virtual bool CanHandleInternal(T args)
