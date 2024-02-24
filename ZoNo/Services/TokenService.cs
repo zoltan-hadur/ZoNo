@@ -1,12 +1,15 @@
 ﻿using Splitwise.Models;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Services
 {
   public class TokenService(
-    ILocalSettingsService localSettingsService) : ITokenService
+    ILocalSettingsService localSettingsService,
+    ITraceFactory traceFactory) : ITokenService
   {
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private const string SettingToken = "Protected_Token";
 
@@ -14,11 +17,14 @@ namespace ZoNo.Services
 
     public async Task InitializeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       Token = await _localSettingsService.ReadSettingAsync<Token>(SettingToken, encrypted: true);
     }
 
     public async Task SaveAsync()
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([Token is null]));
       if (Token is null)
       {
         _localSettingsService.RemoveSetting(SettingToken);

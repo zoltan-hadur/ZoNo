@@ -1,4 +1,6 @@
-﻿using ZoNo.Contracts.Services;
+﻿using Tracer;
+using Tracer.Contracts;
+using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
 
@@ -6,10 +8,12 @@ namespace ZoNo.Services
 {
   public class TransactionProcessorService(
     IRulesService rulesService,
-    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder) : ITransactionProcessorService
+    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
+    ITraceFactory traceFactory) : ITransactionProcessorService
   {
     private readonly IRulesService _rulesService = rulesService;
     private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
     private string _rulesJson = null;
@@ -21,6 +25,7 @@ namespace ZoNo.Services
 
     public async Task InitializeAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
 
       var transactionRules = _rulesService.GetRules(RuleType.Transaction);
@@ -30,11 +35,12 @@ namespace ZoNo.Services
       // Generate the code and compile it only in case the rules have changed
       if (rulesJson != _rulesJson)
       {
+        trace.Info("Regenerating and compiling rules");
         _transactionRuleEvaluatorService?.Dispose();
         _expenseRuleEvaluatorService?.Dispose();
         _rulesJson = rulesJson;
-        var taskTransaction = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(transactionRules);
-        var taskExpense = _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(expenseRules);
+        var taskTransaction = TraceFactory.HandleAsAsyncVoid(() => _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Transaction>(transactionRules));
+        var taskExpense = TraceFactory.HandleAsAsyncVoid(() => _ruleEvaluatorServiceBuilder.BuildAsync<Transaction, Expense>(expenseRules));
         await Task.WhenAll([taskTransaction, taskExpense]);
         _transactionRuleEvaluatorService = taskTransaction.Result;
         _expenseRuleEvaluatorService = taskExpense.Result;
@@ -43,6 +49,7 @@ namespace ZoNo.Services
 
     public async Task ProcessAsync(Transaction transaction)
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
 
       if (_transactionRuleEvaluatorService is null || _expenseRuleEvaluatorService is null)
@@ -50,8 +57,10 @@ namespace ZoNo.Services
         throw new InvalidOperationException($"{nameof(InitializeAsync)} should be called first!");
       }
 
+      trace.Debug(Format([transaction]));
       if (_transactionRuleEvaluatorService.EvaluateRules(input: transaction, output: transaction))
       {
+        trace.Debug(Format([transaction]));
         var expense = new Expense()
         {
           Id = transaction.Id,
@@ -65,6 +74,7 @@ namespace ZoNo.Services
         };
         if (_expenseRuleEvaluatorService.EvaluateRules(input: transaction, output: expense))
         {
+          trace.Debug(Format([expense]));
           TransactionProcessed?.Invoke(this, (transaction, expense));
         }
       }

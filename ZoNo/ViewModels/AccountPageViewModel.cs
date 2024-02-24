@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Animation;
 using Splitwise.Contracts;
+using Tracer;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
 using ZoNo.Models;
@@ -12,10 +14,12 @@ namespace ZoNo.ViewModels
   public partial class AccountPageViewModel(
     ITopLevelNavigationService topLevelNavigationService,
     ISplitwiseService splitwiseService,
+    ITraceFactory traceFactory,
     IMessenger messenger) : ObservableRecipient(messenger)
   {
     private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
     private readonly ISplitwiseService _splitwiseService = splitwiseService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private bool _isLoaded = false;
 
@@ -42,11 +46,13 @@ namespace ZoNo.ViewModels
 
     public async Task LoadAsync()
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
       IsLoading = true;
 
-      var taskUser = _splitwiseService.GetCurrentUserAsync();
-      var taskGroups = _splitwiseService.GetGroupsAsync();
+      var taskUser = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetCurrentUserAsync);
+      var taskGroups = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetGroupsAsync);
       await Task.WhenAll([taskUser, taskGroups]);
       var user = taskUser.Result;
       var groups = taskGroups.Result;
@@ -77,6 +83,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private void Logout()
     {
+      using var trace = _traceFactory.CreateNew();
       Messenger.Send(new UserLoggedOutMessage());
       _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
     }

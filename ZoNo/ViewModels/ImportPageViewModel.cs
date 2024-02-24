@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Specialized;
+using Tracer;
+using Tracer.Contracts;
 using Windows.Foundation.Collections;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
@@ -9,10 +11,12 @@ namespace ZoNo.ViewModels
 {
   public partial class ImportPageViewModel(
     ITransactionProcessorService transactionProcessorService,
+    ITraceFactory traceFactory,
     TransactionsViewModel transactionsViewModel,
     ExpensesViewModel expensesViewModel) : ObservableObject
   {
     private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
@@ -38,10 +42,16 @@ namespace ZoNo.ViewModels
 
     public async Task LoadAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
-      await Task.WhenAll([TransactionsViewModel.Load(), ExpensesViewModel.LoadAsync()]);
+      await Task.WhenAll(
+      [
+        TraceFactory.HandleAsAsyncVoid(TransactionsViewModel.LoadAsync),
+        TraceFactory.HandleAsAsyncVoid(ExpensesViewModel.LoadAsync)
+      ]);
 
       TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
       ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
@@ -52,6 +62,7 @@ namespace ZoNo.ViewModels
 
     private void TransactionProcessorService_TransactionProcessed(object sender, (Transaction Transaction, Expense Expense) e)
     {
+      using var trace = _traceFactory.CreateNew();
       TransactionsViewModel.TransactionsView.Add(e.Transaction);
       var index = TransactionsViewModel.TransactionsView.IndexOf(e.Transaction);
       ExpensesViewModel.Expenses.Insert(index, ExpenseViewModel.FromModel(e.Expense));

@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Tracer;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -12,11 +14,13 @@ namespace ZoNo.ViewModels
   public partial class TransactionsViewModel(
     ILocalSettingsService localSettingsService,
     IExcelDocumentLoaderService excelDocumentLoaderService,
-    ITransactionProcessorService transactionProcessorService) : ObservableObject
+    ITransactionProcessorService transactionProcessorService,
+    ITraceFactory traceFactory) : ObservableObject
   {
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly IExcelDocumentLoaderService _excelDocumentLoaderService = excelDocumentLoaderService;
     private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
@@ -25,9 +29,11 @@ namespace ZoNo.ViewModels
 
     public Dictionary<string, ColumnViewModel> Columns { get; private set; } = null;
 
-    public async Task Load()
+    public async Task LoadAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
       Columns = new Dictionary<string, ColumnViewModel>()
@@ -53,6 +59,7 @@ namespace ZoNo.ViewModels
         {
           column.IsVisible = isColumnVisible.Value;
         }
+        trace.Debug(Format([column.ColumnHeader, column.IsVisible]));
       }
 
       foreach (var column in Columns.Values)
@@ -68,11 +75,13 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task LoadExcelDocuments(IList<string> paths)
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
 
       await _transactionProcessorService.InitializeAsync();
 
-      var transactions = (await Task.WhenAll(paths.Select(_excelDocumentLoaderService.LoadDocumentAsync)))
+      var transactions = (await Task
+        .WhenAll(paths.Select(path => TraceFactory.HandleAsAsyncVoid(() => _excelDocumentLoaderService.LoadDocumentAsync(path)))))
         .SelectMany(transactions => transactions);
 
       foreach (var transaction in transactions)
@@ -84,6 +93,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task DeleteTransactionsAsync(List<Transaction> transactions)
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
 
       var deferRefresh = transactions.Count > 30 ? TransactionsView.DeferRefresh() : null;
@@ -112,12 +122,15 @@ namespace ZoNo.ViewModels
 
     private async void Column_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
       if (sender is ColumnViewModel senderColumn && e.PropertyName == nameof(ColumnViewModel.IsVisible))
       {
         var visibleColumnCount = Columns.Values.Count(column => column.IsVisible);
+        trace.Debug(Format([senderColumn.ColumnHeader, senderColumn.IsVisible, visibleColumnCount]));
         foreach (var column in Columns.Values)
         {
           column.IsEnabled = !(column.IsVisible && visibleColumnCount == 1);
+          trace.Debug(Format([column.ColumnHeader, column.IsEnabled]));
         }
         await _localSettingsService.SaveSettingAsync(SettingColumnIsVisible(senderColumn.ColumnHeader), senderColumn.IsVisible);
       }

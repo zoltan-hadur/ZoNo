@@ -6,6 +6,8 @@ using Splitwise.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Data;
+using Tracer;
+using Tracer.Contracts;
 using ZoNo.Contracts.Services;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -15,10 +17,12 @@ namespace ZoNo.ViewModels
 {
   public partial class ExpensesViewModel(
     ISplitwiseService splitwiseService,
-    IDialogService dialogService) : ObservableObject
+    IDialogService dialogService,
+    ITraceFactory traceFactory) : ObservableObject
   {
     private readonly ISplitwiseService _splitwiseService = splitwiseService;
     private readonly IDialogService _dialogService = dialogService;
+    private readonly ITraceFactory _traceFactory = traceFactory;
 
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
@@ -43,11 +47,13 @@ namespace ZoNo.ViewModels
 
     public async Task LoadAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
-      var taskGroups = _splitwiseService.GetGroupsAsync();
-      var taskCategories = _splitwiseService.GetCategoriesAsync();
+      var taskGroups = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetGroupsAsync);
+      var taskCategories = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetCategoriesAsync);
       await Task.WhenAll([taskGroups, taskCategories]);
 
       _splitwiseGroups = taskGroups.Result;
@@ -63,6 +69,8 @@ namespace ZoNo.ViewModels
 
     private async void Expenses_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+      using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([e.Action]));
       if (e.Action == NotifyCollectionChangedAction.Add)
       {
         using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
@@ -92,20 +100,19 @@ namespace ZoNo.ViewModels
         }
       }
       IsExpensesNotEmpty = Expenses.Count != 0;
+      trace.Debug(Format([IsExpensesNotEmpty]));
     }
 
     [RelayCommand(CanExecute = nameof(IsExpensesNotEmpty))]
     private async Task UploadExpensesToSplitwise()
     {
+      using var trace = _traceFactory.CreateNew();
       IsUploadingToSplitwise = true;
 
-      var tasks = Expenses.Select(expense =>
-      {
-        var splitwiseExpense = ExpenseViewModel.ToSplitwiseModel(expense, _splitwiseGroups, _splitwiseCategories);
-        return _splitwiseService.CreateExpenseAsync(splitwiseExpense)
-          .ContinueWith(task => Expenses.Remove(expense), TaskContinuationOptions.ExecuteSynchronously);
-      }).ToArray();
-      await Task.WhenAll(tasks);
+      await Task.WhenAll(Expenses
+        .Select(expense => TraceFactory.HandleAsAsyncVoid(() => _splitwiseService
+          .CreateExpenseAsync(ExpenseViewModel.ToSplitwiseModel(expense, _splitwiseGroups, _splitwiseCategories))
+          .ContinueWith(task => Expenses.Remove(expense), TaskContinuationOptions.ExecuteSynchronously))).ToArray());
 
       IsUploadingToSplitwise = false;
     }
@@ -113,6 +120,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task EditExpense(ExpenseViewModel expense)
     {
+      using var trace = _traceFactory.CreateNew();
       var index = Expenses.IndexOf(expense);
       var copiedExpense = expense.Clone();
       copiedExpense.Group = Groups.Single(group => group.Name == copiedExpense.Group.Name);
@@ -127,6 +135,7 @@ namespace ZoNo.ViewModels
         Categories = Categories,
         Groups = Groups
       }, isPrimaryButtonEnabledBinding);
+      trace.Debug(Format([result]));
       if (result)
       {
         Expenses[index] = copiedExpense;
@@ -136,7 +145,9 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private void DeleteExpense(ExpenseViewModel expense)
     {
-      Expenses.Remove(expense);
+      using var trace = _traceFactory.CreateNew();
+      var success = Expenses.Remove(expense);
+      trace.Debug(Format([success]));
     }
   }
 }

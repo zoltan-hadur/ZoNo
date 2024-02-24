@@ -9,8 +9,7 @@ namespace ZoNo.Services
 {
   public class UpdateService(
     INotificationService notificationService,
-    ITraceFactory traceFactory
-    ) : IUpdateService
+    ITraceFactory traceFactory) : IUpdateService
   {
     private readonly INotificationService _notificationService = notificationService;
     private readonly ITraceFactory _traceFactory = traceFactory;

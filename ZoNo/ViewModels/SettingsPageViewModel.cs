@@ -66,6 +66,7 @@ namespace ZoNo.ViewModels
     public async Task LoadAsync()
     {
       using var trace = _traceFactory.CreateNew();
+      trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
       ElementTheme = _themeSelectorService.Theme;
@@ -296,6 +297,7 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task CheckForUpdatesAsync()
     {
+      using var trace = _traceFactory.CreateNew();
       await _updateService.CheckForUpdateAsync();
     }
 
