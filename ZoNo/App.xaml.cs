@@ -80,6 +80,7 @@ namespace ZoNo
       services.AddSingleton<ISplitwiseAuthorizationService, SplitwiseAuthorizationService>();
       services.AddScoped<ISplitwiseService, SplitwiseService>();
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
+      services.AddTransient<PageService.Builder>();
       services.AddSingleton<IEncryptionService, EncryptionService>();
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();
@@ -89,14 +90,14 @@ namespace ZoNo
       services.AddSingleton<IActivationService, ActivationService>();
       services.AddSingleton<ITopLevelPageService, PageService>(provider =>
       {
-        return new PageService.Builder(provider.GetService<ITraceFactory>())
+        return provider.GetService<PageService.Builder>()
           .Configure<LoginPageViewModel, LoginPage>()
           .Configure<ShellPageViewModel, ShellPage>()
           .Build();
       });
       services.AddSingleton<IPageService, PageService>(provider =>
       {
-        return new PageService.Builder(provider.GetService<ITraceFactory>())
+        return provider.GetService<PageService.Builder>()
           .Configure<ImportPageViewModel, ImportPage>()
           .Configure<RulesPageViewModel, RulesPage>()
           .Configure<QueryPageViewModel, QueryPage>()
