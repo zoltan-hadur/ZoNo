@@ -13,21 +13,22 @@ namespace ZoNo.ViewModels
   public partial class RulesViewModel(
     IRuleExpressionSyntaxCheckerService ruleExpressionSyntaxCheckerService,
     IDialogService dialogService,
-    IRulesService rulesService,
-    RuleType ruleType) : ObservableObject
+    IRulesService rulesService) : ObservableObject
   {
     private readonly IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService = ruleExpressionSyntaxCheckerService;
     private readonly IDialogService _dialogService = dialogService;
     private readonly IRulesService _rulesService = rulesService;
-    private readonly RuleType _ruleType = ruleType;
+    private RuleType? _ruleType = null;
 
     public ObservableCollection<RuleViewModel> Rules { get; } = [];
 
-    public void Load()
+    public void Load(RuleType ruleType)
     {
+      _ruleType = ruleType;
+
       Rules.CollectionChanged -= Rules_CollectionChanged;
       Rules.Clear();
-      var rules = _rulesService.GetRules(_ruleType);
+      var rules = _rulesService.GetRules(_ruleType.Value);
       foreach (var rule in rules.Select(RuleViewModel.FromModel))
       {
         Rules.Add(rule);
@@ -42,7 +43,7 @@ namespace ZoNo.ViewModels
         Rules[i].Index = i + 1;
       }
       var rules = Rules.Select(RuleViewModel.ToModel).ToArray();
-      await _rulesService.SaveRulesAsync(_ruleType, rules);
+      await _rulesService.SaveRulesAsync(_ruleType.Value, rules);
     }
 
     private async void Rule_InputExpressionChanged(object sender, string e)
@@ -78,6 +79,8 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task NewRule()
     {
+      if (_ruleType is null) throw new InvalidOperationException($"{nameof(Load)} must be called first!");
+
       var rule = new RuleViewModel()
       {
         Index = Rules.Count + 1,
@@ -103,6 +106,8 @@ namespace ZoNo.ViewModels
     [RelayCommand]
     private async Task EditRule(RuleViewModel rule)
     {
+      if (_ruleType is null) throw new InvalidOperationException($"{nameof(Load)} must be called first!");
+
       var index = Rules.IndexOf(rule);
       var copiedRule = RuleViewModel.FromModel(RuleViewModel.ToModel(rule), index);
       copiedRule.InputExpressionChanged += Rule_InputExpressionChanged;

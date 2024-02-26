@@ -15,8 +15,7 @@ namespace ZoNo.Views
 
     private void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
     {
-      ViewModel.TransactionRulesViewModel.Load();
-      ViewModel.ExpenseRulesViewModel.Load();
+      ViewModel.Load();
     }
   }
 }

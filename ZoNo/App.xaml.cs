@@ -14,7 +14,6 @@ using WinRT.Interop;
 using ZoNo.Activation;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
-using ZoNo.Models;
 using ZoNo.Services;
 using ZoNo.ViewModels;
 using ZoNo.Views;
@@ -133,18 +132,8 @@ namespace ZoNo
       services.AddScoped<ImportPageViewModel>();
       services.AddScoped<TransactionsViewModel>();
       services.AddScoped<ExpensesViewModel>();
-      services.AddScoped<RulesPageViewModel>(provider => new RulesPageViewModel(
-        new RulesViewModel(
-          provider.GetService<IRuleExpressionSyntaxCheckerService>(),
-          provider.GetService<IDialogService>(),
-          provider.GetService<IRulesService>(),
-          RuleType.Transaction),
-        new RulesViewModel(
-          provider.GetService<IRuleExpressionSyntaxCheckerService>(),
-          provider.GetService<IDialogService>(),
-          provider.GetService<IRulesService>(),
-          RuleType.Expense))
-      );
+      services.AddTransient<RulesViewModel>();  // Transient so a new instance can be created for RulesPageViewModel
+      services.AddScoped<RulesPageViewModel>();
       services.AddScoped<QueryPageViewModel>();
       services.AddScoped<AccountPageViewModel>();
       services.AddSingleton<SettingsPageViewModel>();
