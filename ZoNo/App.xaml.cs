@@ -4,6 +4,7 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Splitwise;
 using Splitwise.Contracts;
 using Tracer;
@@ -11,7 +12,6 @@ using Tracer.Contracts;
 using Tracer.Sinks;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
-using ZoNo.Activation;
 using ZoNo.Contracts.Services;
 using ZoNo.Messages;
 using ZoNo.Services;
@@ -20,36 +20,15 @@ using ZoNo.Views;
 
 namespace ZoNo
 {
-  public partial class App : Application
+  public partial class App : Application,
+    IRecipient<UserLoggedInMessage>,
+    IRecipient<UserLoggedOutMessage>,
+    IRecipient<ActivateMainWindowMessage>
   {
     private new static App Current => (App)Application.Current;
     private IServiceScope ServiceScope { get; set; }
     private ServiceProvider _serviceProvider;
-    private AutoResetEvent _windowClosed = new(false);
-
-    public static MainWindow MainWindow { get; } = new MainWindow(
-      GetService<INotificationService>(),
-      GetService<ITraceFactory>()
-    );
-    public static bool IsClosed { get; private set; } = false;
-
-    public static T GetService<T>() where T : class
-    {
-      if (Current.ServiceScope.ServiceProvider.GetService<T>() is not T service)
-      {
-        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
-      }
-      return service;
-    }
-
-    public static IEnumerable<T> GetServices<T>() where T : class
-    {
-      if (Current.ServiceScope.ServiceProvider.GetServices<T>() is not IEnumerable<T> services)
-      {
-        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
-      }
-      return services;
-    }
+    private readonly AutoResetEvent _windowClosed = new(false);
 
     public App()
     {
@@ -64,11 +43,6 @@ namespace ZoNo
 
       var services = new ServiceCollection();
 
-      // Default Activation Handler
-      services.AddSingleton<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
-
-      // Other Activation Handlers
-
       // Services
       services.AddHttpClient();
       services.AddSingleton<ISplitwiseConsumerCredentials>(new SplitwiseConsumerCredentials()
@@ -79,40 +53,14 @@ namespace ZoNo
       services.AddSingleton<ISplitwiseAuthorizationService, SplitwiseAuthorizationService>();
       services.AddScoped<ISplitwiseService, SplitwiseService>();
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
-      services.AddTransient<PageService.Builder>();
       services.AddSingleton<IEncryptionService, EncryptionService>();
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
       services.AddSingleton<ITokenService, TokenService>();
       services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
       services.AddScoped<INavigationViewService, NavigationViewService>();
-
       services.AddSingleton<IActivationService, ActivationService>();
-      services.AddSingleton<ITopLevelPageService, PageService>(provider =>
-      {
-        return provider.GetService<PageService.Builder>()
-          .Configure<LoginPageViewModel, LoginPage>()
-          .Configure<ShellPageViewModel, ShellPage>()
-          .Build();
-      });
-      services.AddSingleton<IPageService, PageService>(provider =>
-      {
-        return provider.GetService<PageService.Builder>()
-          .Configure<ImportPageViewModel, ImportPage>()
-          .Configure<RulesPageViewModel, RulesPage>()
-          .Configure<QueryPageViewModel, QueryPage>()
-          .Configure<AccountPageViewModel, AccountPage>()
-          .Configure<SettingsPageViewModel, SettingsPage>()
-          .Build();
-      });
-      services.AddSingleton<ITopLevelNavigationService, NavigationService>(provider =>
-      {
-        return new NavigationService(provider.GetService<ITopLevelPageService>(), provider.GetService<ITraceFactory>())
-        {
-          Frame = MainWindow.Frame
-        };
-      });
+      services.AddSingleton<IPageService, PageService>();
       services.AddScoped<INavigationService, NavigationService>();
-
       services.AddSingleton<IExcelDocumentLoaderService, ExcelDocumentLoaderService>();
       services.AddSingleton<ITransactionProcessorService, TransactionProcessorService>();
       services.AddSingleton<IRulesService, RulesService>();
@@ -139,13 +87,64 @@ namespace ZoNo
       services.AddSingleton<SettingsPageViewModel>();
       services.AddTransient<TracesViewModel>();
       services.AddScoped<ShellPageViewModel>();
+      services.AddSingleton<MainWindow>();
 
       _serviceProvider = services.BuildServiceProvider();
       ServiceScope = _serviceProvider.CreateScope();
 
       UnhandledException += App_UnhandledException;
 
-      GetService<IMessenger>().Register<App, UserLoggedOutMessage>(this, OnUserLoggedOut);
+      GetService<IMessenger>().RegisterAll(this);
+    }
+
+    public static T GetService<T>() where T : class
+    {
+      if (Current.ServiceScope.ServiceProvider.GetService<T>() is not T service)
+      {
+        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      }
+      return service;
+    }
+
+    public static IEnumerable<T> GetServices<T>() where T : class
+    {
+      if (Current.ServiceScope.ServiceProvider.GetServices<T>() is not IEnumerable<T> services)
+      {
+        throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+      }
+      return services;
+    }
+
+    public void Receive(UserLoggedInMessage message)
+    {
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      NavigateToShellPage();
+    }
+
+    public void Receive(UserLoggedOutMessage message)
+    {
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      ReplaceServiceScope();
+      NavigateToLoginPage();
+    }
+
+    public void Receive(ActivateMainWindowMessage message)
+    {
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      GetService<MainWindow>().Activate();
+      NavigateToLoginPage();
+    }
+
+    private void NavigateToLoginPage()
+    {
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      GetService<MainWindow>().Frame.Navigate(typeof(LoginPage), parameter: null, infoOverride: new DrillInNavigationTransitionInfo());
+    }
+
+    private void NavigateToShellPage()
+    {
+      using var trace = GetService<ITraceFactory>().CreateNew();
+      GetService<MainWindow>().Frame.Navigate(typeof(ShellPage), parameter: null, infoOverride: new DrillInNavigationTransitionInfo());
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
@@ -176,10 +175,10 @@ namespace ZoNo
         var shouldCloseDialog = false;
 
         var savePicker = new FileSavePicker();
-        var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+        var hWnd = WindowNative.GetWindowHandle(GetService<MainWindow>());
         InitializeWithWindow.Initialize(savePicker, hWnd);
         savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-        savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
+        savePicker.FileTypeChoices.Add("TRACE", [".trace"]);
         savePicker.SuggestedFileName = "ZoNo.trace";
         if (await savePicker.PickSaveFileAsync() is var file && file is not null)
         {
@@ -199,17 +198,11 @@ namespace ZoNo
       Exit();
     }
 
-    private void OnUserLoggedOut(App recipient, UserLoggedOutMessage message)
-    {
-      using var trace = GetService<ITraceFactory>().CreateNew();
-      ReplaceServiceScope();
-    }
-
     private void ReplaceServiceScope()
     {
       using var trace = GetService<ITraceFactory>().CreateNew();
       var newScope = ServiceScope.ServiceProvider.CreateScope();
-      ServiceScope?.Dispose();
+      ServiceScope.Dispose();
       ServiceScope = newScope;
     }
 
@@ -226,9 +219,8 @@ namespace ZoNo
         _serviceProvider = null;
       }).Start();
 
-      MainWindow.Closed += (s, e) =>
+      GetService<MainWindow>().Closed += (s, e) =>
       {
-        IsClosed = true;
         _windowClosed.Set();
       };
 

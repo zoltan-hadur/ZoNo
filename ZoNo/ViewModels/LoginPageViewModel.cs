@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -10,25 +11,26 @@ using System.Drawing;
 using System.Text.Json.Nodes;
 using Tracer.Contracts;
 using ZoNo.Contracts.Services;
+using ZoNo.Messages;
 
 namespace ZoNo.ViewModels
 {
   public partial class LoginPageViewModel(
-    ITopLevelNavigationService topLevelNavigationService,
     ILocalSettingsService localSettingsService,
     IThemeSelectorService themeSelectorService,
     ISplitwiseAuthorizationService splitwiseAuthorizationService,
     ISplitwiseService splitwiseService,
     ITokenService tokenService,
-    ITraceFactory traceFactory) : ObservableRecipient
+    ITraceFactory traceFactory,
+    IMessenger messenger) : ObservableObject
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
     private readonly ISplitwiseAuthorizationService _splitwiseAuthorizationService = splitwiseAuthorizationService;
     private readonly ISplitwiseService _splitwiseService = splitwiseService;
     private readonly ITokenService _tokenService = tokenService;
     private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly IMessenger _messenger = messenger;
 
     private enum State
     {
@@ -126,7 +128,7 @@ namespace ZoNo.ViewModels
       {
         trace.Info("Has token, navigating to shell");
         _splitwiseService.Token = _tokenService.Token;
-        _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
+        _messenger.Send<UserLoggedInMessage>();
       }
       else
       {
@@ -337,7 +339,7 @@ namespace ZoNo.ViewModels
               {
                 await _tokenService.SaveAsync();
               }
-              _topLevelNavigationService.NavigateTo(typeof(ShellPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
+              _messenger.Send<UserLoggedInMessage>();
             }
             else
             {

@@ -30,7 +30,7 @@ namespace ZoNo.ViewModels
     ITraceFactory traceFactory,
     ITraceDetailProcessor traceDetailProcessor,
     IEnumerable<ITraceSink> traceSinks,
-    IMessenger messenger) : ObservableRecipient(messenger)
+    MainWindow mainWindow) : ObservableObject
   {
     private const string SettingInMemoryTraceSink = "Settings_InMemoryTraceSink";
     private const string SettingFileTraceSink = "Settings_FileTraceSink";
@@ -43,6 +43,7 @@ namespace ZoNo.ViewModels
     private readonly ITraceFactory _traceFactory = traceFactory;
     private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
     private readonly IEnumerable<ITraceSink> _traceSinks = traceSinks;
+    private readonly MainWindow _mainWindow = mainWindow;
 
     private InMemoryTraceSink InMemoryTraceSink => _traceSinks.Single(traceSink => traceSink is InMemoryTraceSink) as InMemoryTraceSink;
     private FileTraceSink FileTraceSink => _traceSinks.Single(traceSink => traceSink is FileTraceSink) as FileTraceSink;
@@ -136,7 +137,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var openPicker = new FileOpenPicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(openPicker, hWnd);
       openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       openPicker.FileTypeFilter.Add(".json");
@@ -186,7 +187,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var savePicker = new FileSavePicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(savePicker, hWnd);
       savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       savePicker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
@@ -243,7 +244,7 @@ namespace ZoNo.ViewModels
         var shouldCloseOnOk = false;
 
         var savePicker = new FileSavePicker();
-        var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+        var hWnd = WindowNative.GetWindowHandle(_mainWindow);
         InitializeWithWindow.Initialize(savePicker, hWnd);
         savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
         savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
@@ -269,7 +270,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var folderPicker = new FolderPicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(folderPicker, hWnd);
       folderPicker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
       folderPicker.ViewMode = PickerViewMode.List;

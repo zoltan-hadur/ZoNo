@@ -1,25 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.UI.Xaml.Media.Animation;
 using Splitwise.Contracts;
 using Tracer;
 using Tracer.Contracts;
-using ZoNo.Contracts.Services;
 using ZoNo.Messages;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels
 {
   public partial class AccountPageViewModel(
-    ITopLevelNavigationService topLevelNavigationService,
     ISplitwiseService splitwiseService,
     ITraceFactory traceFactory,
-    IMessenger messenger) : ObservableRecipient(messenger)
+    IMessenger messenger) : ObservableObject
   {
-    private readonly ITopLevelNavigationService _topLevelNavigationService = topLevelNavigationService;
     private readonly ISplitwiseService _splitwiseService = splitwiseService;
     private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly IMessenger _messenger = messenger;
 
     private bool _isLoaded = false;
 
@@ -84,8 +81,7 @@ namespace ZoNo.ViewModels
     private void Logout()
     {
       using var trace = _traceFactory.CreateNew();
-      Messenger.Send(new UserLoggedOutMessage());
-      _topLevelNavigationService.NavigateTo(typeof(LoginPageViewModel).FullName, infoOverride: new DrillInNavigationTransitionInfo());
+      _messenger.Send(new UserLoggedOutMessage());
     }
   }
 }

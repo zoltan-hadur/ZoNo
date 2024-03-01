@@ -31,16 +31,6 @@ namespace ZoNo.Services
       _navigationView.ItemInvoked += OnItemInvoked;
     }
 
-    public void UnregisterEvents()
-    {
-      using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_navigationView is null]));
-      if (_navigationView is not null)
-      {
-        _navigationView.ItemInvoked -= OnItemInvoked;
-      }
-    }
-
     public NavigationViewItem GetSelectedItem(Type pageType)
     {
       using var trace = _traceFactory.CreateNew();

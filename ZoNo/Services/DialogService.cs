@@ -9,10 +9,12 @@ namespace ZoNo.Services
 {
   public class DialogService(
     IThemeSelectorService themeSelectorService,
-    ITraceFactory traceFactory) : IDialogService
+    ITraceFactory traceFactory,
+    MainWindow mainWindow) : IDialogService
   {
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
     private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly MainWindow _mainWindow = mainWindow;
 
     public async Task<bool> ShowDialogAsync<T>(DialogType dialogType, string title, T content, Binding isPrimaryButtonEnabled = null, Func<Task<bool>> shouldCloseDialogOnPrimaryButtonClick = null)
     {
@@ -21,7 +23,7 @@ namespace ZoNo.Services
 
       var dialog = new ContentDialog()
       {
-        XamlRoot = App.MainWindow.Content.XamlRoot,
+        XamlRoot = _mainWindow.Content.XamlRoot,
         RequestedTheme = _themeSelectorService.Theme,
         Title = title,
         Content = content,

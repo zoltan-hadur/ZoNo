@@ -6,10 +6,12 @@ namespace ZoNo.Services
 {
   public class ThemeSelectorService(
     ILocalSettingsService localSettingsService,
-    ITraceFactory traceFactory) : IThemeSelectorService
+    ITraceFactory traceFactory,
+    MainWindow mainWindow) : IThemeSelectorService
   {
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly ITraceFactory _traceFactory = traceFactory;
+    private readonly MainWindow _mainWindow = mainWindow;
 
     private const string SettingsKey = "AppBackgroundRequestedTheme";
 
@@ -36,7 +38,7 @@ namespace ZoNo.Services
     public async Task SetRequestedThemeAsync()
     {
       using var trace = _traceFactory.CreateNew();
-      if (App.MainWindow.Content is FrameworkElement rootElement)
+      if (_mainWindow.Content is FrameworkElement rootElement)
       {
         rootElement.RequestedTheme = Theme;
         trace.Debug(Format([rootElement.RequestedTheme]));
