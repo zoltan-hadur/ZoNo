@@ -9,14 +9,10 @@ using ZoNo.ViewModels;
 namespace ZoNo.Services
 {
   public class NavigationViewService(
-    INavigationService navigationService,
-    IPageService pageService,
-    ITraceFactory traceFactory) : INavigationViewService
+    INavigationService _navigationService,
+    IPageService _pageService,
+    ITraceFactory _traceFactory) : INavigationViewService
   {
-    private readonly INavigationService _navigationService = navigationService;
-    private readonly IPageService _pageService = pageService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private NavigationView _navigationView;
 
     public IList<object> MenuItems => _navigationView?.MenuItems;

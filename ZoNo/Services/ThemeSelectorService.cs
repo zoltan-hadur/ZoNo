@@ -5,14 +5,10 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   public class ThemeSelectorService(
-    ILocalSettingsService localSettingsService,
-    ITraceFactory traceFactory,
-    MainWindow mainWindow) : IThemeSelectorService
+    ILocalSettingsService _localSettingsService,
+    ITraceFactory _traceFactory,
+    MainWindow _mainWindow) : IThemeSelectorService
   {
-    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-    private readonly MainWindow _mainWindow = mainWindow;
-
     private const string SettingsKey = "AppBackgroundRequestedTheme";
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;

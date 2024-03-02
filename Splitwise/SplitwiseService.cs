@@ -20,10 +20,8 @@ namespace Splitwise
   /// Implementation of <see cref="ISplitwiseAuthorizationService"/>.
   /// </summary>
   public class SplitwiseService(
-    IHttpClientFactory httpClientFactory) : ISplitwiseService
+    IHttpClientFactory _httpClientFactory) : ISplitwiseService
   {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-
     private const string _baseURL = "https://www.splitwise.com/api/v3.0";
 
     public Token Token { get; set; }

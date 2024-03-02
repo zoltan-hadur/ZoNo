@@ -11,13 +11,10 @@ using ZoNo.Views;
 namespace ZoNo.ViewModels
 {
   public partial class RulesViewModel(
-    IRuleExpressionSyntaxCheckerService ruleExpressionSyntaxCheckerService,
-    IDialogService dialogService,
-    IRulesService rulesService) : ObservableObject
+    IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService,
+    IDialogService _dialogService,
+    IRulesService _rulesService) : ObservableObject
   {
-    private readonly IRuleExpressionSyntaxCheckerService _ruleExpressionSyntaxCheckerService = ruleExpressionSyntaxCheckerService;
-    private readonly IDialogService _dialogService = dialogService;
-    private readonly IRulesService _rulesService = rulesService;
     private RuleType? _ruleType = null;
 
     public ObservableCollection<RuleViewModel> Rules { get; } = [];

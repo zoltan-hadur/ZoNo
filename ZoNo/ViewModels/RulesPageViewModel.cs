@@ -4,11 +4,11 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public class RulesPageViewModel(
-    RulesViewModel transactionRulesViewModel,
-    RulesViewModel expenseRulesViewModel) : ObservableObject
+    RulesViewModel _transactionRulesViewModel,
+    RulesViewModel _expenseRulesViewModel) : ObservableObject
   {
-    public RulesViewModel TransactionRulesViewModel { get; } = transactionRulesViewModel;
-    public RulesViewModel ExpenseRulesViewModel { get; } = expenseRulesViewModel;
+    public RulesViewModel TransactionRulesViewModel => _transactionRulesViewModel;
+    public RulesViewModel ExpenseRulesViewModel => _expenseRulesViewModel;
 
     public void Load()
     {

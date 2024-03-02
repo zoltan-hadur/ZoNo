@@ -10,19 +10,16 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class ImportPageViewModel(
-    ITransactionProcessorService transactionProcessorService,
-    ITraceFactory traceFactory,
-    TransactionsViewModel transactionsViewModel,
-    ExpensesViewModel expensesViewModel) : ObservableObject
+    ITransactionProcessorService _transactionProcessorService,
+    ITraceFactory _traceFactory,
+    TransactionsViewModel _transactionsViewModel,
+    ExpensesViewModel _expensesViewModel) : ObservableObject
   {
-    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public TransactionsViewModel TransactionsViewModel { get; } = transactionsViewModel;
-    public ExpensesViewModel ExpensesViewModel { get; } = expensesViewModel;
+    public TransactionsViewModel TransactionsViewModel => _transactionsViewModel;
+    public ExpensesViewModel ExpensesViewModel => _expensesViewModel;
 
     [ObservableProperty]
     private Transaction _selectedTransaction;

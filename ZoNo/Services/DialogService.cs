@@ -8,14 +8,10 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   public class DialogService(
-    IThemeSelectorService themeSelectorService,
-    ITraceFactory traceFactory,
-    MainWindow mainWindow) : IDialogService
+    IThemeSelectorService _themeSelectorService,
+    ITraceFactory _traceFactory,
+    MainWindow _mainWindow) : IDialogService
   {
-    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-    private readonly MainWindow _mainWindow = mainWindow;
-
     public async Task<bool> ShowDialogAsync<T>(DialogType dialogType, string title, T content, Binding isPrimaryButtonEnabled = null, Func<Task<bool>> shouldCloseDialogOnPrimaryButtonClick = null)
     {
       using var trace = _traceFactory.CreateNew();

@@ -5,12 +5,9 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   public class TokenService(
-    ILocalSettingsService localSettingsService,
-    ITraceFactory traceFactory) : ITokenService
+    ILocalSettingsService _localSettingsService,
+    ITraceFactory _traceFactory) : ITokenService
   {
-    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private const string SettingToken = "Protected_Token";
 
     public Token Token { get; set; } = null;

@@ -22,28 +22,18 @@ using ZoNo.Views;
 namespace ZoNo.ViewModels
 {
   public partial class SettingsPageViewModel(
-    IRulesService rulesService,
-    IDialogService dialogService,
-    IThemeSelectorService themeSelectorService,
-    ILocalSettingsService localSettingsService,
-    IUpdateService updateService,
-    ITraceFactory traceFactory,
-    ITraceDetailProcessor traceDetailProcessor,
-    IEnumerable<ITraceSink> traceSinks,
-    MainWindow mainWindow) : ObservableObject
+    IRulesService _rulesService,
+    IDialogService _dialogService,
+    IThemeSelectorService _themeSelectorService,
+    ILocalSettingsService _localSettingsService,
+    IUpdateService _updateService,
+    ITraceFactory _traceFactory,
+    ITraceDetailProcessor _traceDetailProcessor,
+    IEnumerable<ITraceSink> _traceSinks,
+    MainWindow _mainWindow) : ObservableObject
   {
     private const string SettingInMemoryTraceSink = "Settings_InMemoryTraceSink";
     private const string SettingFileTraceSink = "Settings_FileTraceSink";
-
-    private readonly IRulesService _rulesService = rulesService;
-    private readonly IDialogService _dialogService = dialogService;
-    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
-    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
-    private readonly IUpdateService _updateService = updateService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-    private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
-    private readonly IEnumerable<ITraceSink> _traceSinks = traceSinks;
-    private readonly MainWindow _mainWindow = mainWindow;
 
     private InMemoryTraceSink InMemoryTraceSink => _traceSinks.Single(traceSink => traceSink is InMemoryTraceSink) as InMemoryTraceSink;
     private FileTraceSink FileTraceSink => _traceSinks.Single(traceSink => traceSink is FileTraceSink) as FileTraceSink;

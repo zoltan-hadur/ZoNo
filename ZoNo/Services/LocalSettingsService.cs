@@ -6,12 +6,9 @@ using ZoNo.Helpers;
 namespace ZoNo.Services
 {
   public class LocalSettingsService(
-    IEncryptionService encryptionService,
-    ITraceFactory traceFactory) : ILocalSettingsService
+    IEncryptionService _encryptionService,
+    ITraceFactory _traceFactory) : ILocalSettingsService
   {
-    private readonly IEncryptionService _encryptionService = encryptionService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     public async Task<T> ReadSettingAsync<T>(string key, bool encrypted = false)
     {
       if (ReadStringifiedSetting(key) is string setting)

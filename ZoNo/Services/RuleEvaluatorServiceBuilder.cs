@@ -9,29 +9,18 @@ using ZoNo.Models;
 namespace ZoNo.Services
 {
   public class RuleEvaluatorServiceBuilder(
-    ITraceFactory traceFactory) : IRuleEvaluatorServiceBuilder
+    ITraceFactory _traceFactory) : IRuleEvaluatorServiceBuilder
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private class RuleEvaluatorService<TInput, TOutput>(
-      IEnumerable<Rule> rules,
-      ITraceFactory traceFactory) : IRuleEvaluatorService<TInput, TOutput>
+      Rule[] _rules,
+      ITraceFactory _traceFactory) : IRuleEvaluatorService<TInput, TOutput>
     {
       private class CustomAssemblyLoadContext : AssemblyLoadContext
       {
-        public CustomAssemblyLoadContext() : base(isCollectible: true)
-        {
-
-        }
-
-        protected override Assembly Load(AssemblyName name)
-        {
-          return null;
-        }
+        public CustomAssemblyLoadContext() : base(isCollectible: true) { }
+        protected override Assembly Load(AssemblyName name) => null;
       }
 
-      private readonly ITraceFactory _traceFactory = traceFactory;
-      private readonly IList<Rule> _rules = rules.Select(rule => rule.Clone()).ToArray();
       private CustomAssemblyLoadContext _assemblyLoadContext = new();
       private MethodInfo _ruleEvaluator = null;
 
@@ -168,7 +157,7 @@ namespace ZoNo.Services
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format([rules.Count()]));
-      var ruleEvaluator = new RuleEvaluatorService<TInput, TOutput>(rules, _traceFactory);
+      var ruleEvaluator = new RuleEvaluatorService<TInput, TOutput>(rules.Select(rule => rule.Clone()).ToArray(), _traceFactory);
       await ruleEvaluator.InitializeAsync();
       return ruleEvaluator;
     }

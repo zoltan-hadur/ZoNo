@@ -21,7 +21,6 @@ namespace ZoNo
 
     private bool _isClosed = false;
     private bool _firstActivation = true;
-    private IReadOnlyCollection<NotificationViewModel> Notifications => _notificationService.Notifications;
     public Frame Frame => NavigationFrame;
 
     public MainWindow(

@@ -14,11 +14,9 @@ namespace Splitwise
   /// Implementation of <see cref="ISplitwiseAuthorizationService"/>.
   /// </summary>
   public class SplitwiseAuthorizationService(
-    IHttpClientFactory httpClientFactory,
-    ISplitwiseConsumerCredentials splitwiseCredentials) : ISplitwiseAuthorizationService
+    IHttpClientFactory _httpClientFactory,
+    ISplitwiseConsumerCredentials _splitwiseCredentials) : ISplitwiseAuthorizationService
   {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-    private readonly ISplitwiseConsumerCredentials _splitwiseCredentials = splitwiseCredentials;
     private readonly string _state = Guid.NewGuid().ToString("N");
 
     private const string _baseURL = "https://secure.splitwise.com";

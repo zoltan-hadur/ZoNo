@@ -7,9 +7,8 @@ using ZoNo.Models;
 namespace ZoNo.Services
 {
   public class RulesService(
-    ITraceFactory traceFactory) : IRulesService
+    ITraceFactory _traceFactory) : IRulesService
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
     private readonly Dictionary<RuleType, Rule[]> _rules = [];
 
     public async Task InitializeAsync()

@@ -10,14 +10,10 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class AccountPageViewModel(
-    ISplitwiseService splitwiseService,
-    ITraceFactory traceFactory,
-    IMessenger messenger) : ObservableObject
+    ISplitwiseService _splitwiseService,
+    ITraceFactory _traceFactory,
+    IMessenger _messenger) : ObservableObject
   {
-    private readonly ISplitwiseService _splitwiseService = splitwiseService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-    private readonly IMessenger _messenger = messenger;
-
     private bool _isLoaded = false;
 
     [ObservableProperty]
