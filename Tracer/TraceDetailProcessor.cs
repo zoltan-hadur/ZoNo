@@ -6,6 +6,7 @@ namespace Tracer
 {
   public class TraceDetailProcessor : ITraceDetailProcessor
   {
+    private readonly object _lock = new object();
     private readonly InMemoryTraceSink _inMemoryTraceSink;
     private readonly Thread _distributorThread;
     private readonly (Thread ConsumerThread, BlockingCollection<ITraceDetail> ConsumerTraceDetails)[] _consumerThreads;
@@ -28,7 +29,7 @@ namespace Tracer
 
     public void Process(ITraceDetail traceDetail)
     {
-      lock (_inMemoryTraceSink)
+      lock (_lock)
       {
         if (_isRunning)
         {
@@ -40,7 +41,7 @@ namespace Tracer
 
     public void Start()
     {
-      lock (_inMemoryTraceSink)
+      lock (_lock)
       {
         _inMemoryTraceSink?.Write(_traceDetails);
         _isRunning = true;
