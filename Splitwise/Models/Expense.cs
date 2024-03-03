@@ -9,7 +9,7 @@ namespace Splitwise.Models
     public string Description { get; init; }
     public DateTimeOffset Date { get; init; }
     public CurrencyCode CurrencyCode { get; init; }
-    public int CategoryId { get; init; }
+    public Category Category { get; init; }
     public int? GroupId { get; init; }
     public Share[] Users { get; init; }
     public DateTimeOffset? DeletedAt { get; init; }

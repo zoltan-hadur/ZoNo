@@ -153,7 +153,7 @@ namespace ZoNo.ViewModels
         Description = vm.Description,
         Date = vm.Date,
         CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(vm.Currency.ToString()),
-        CategoryId = category.Id,
+        Category = category,
         GroupId = group.Id,
         Users = users
       };

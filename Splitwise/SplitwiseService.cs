@@ -69,7 +69,7 @@ namespace Splitwise
         "description": "{{{expense.Description}}}",
         "date": "{{{expense.Date.ToString("o")}}}",
         "currency_code": "{{{expense.CurrencyCode}}}",
-        "category_id": {{{expense.CategoryId}}},
+        "category_id": {{{expense.Category.Id}}},
         "group_id": {{{expense.GroupId}}},
       {{{string.Join($",{Environment.NewLine}", expense.Users.Select((user, index) =>
         $$"""
