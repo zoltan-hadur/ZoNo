@@ -48,7 +48,7 @@ namespace Splitwise.Contracts
     /// </summary>
     /// <param name="groupId"></param>
     /// <returns></returns>
-    Task<Expense[]> GetExpensesInGroupAsync(int groupId, int limit = 20, int offset = 0);
+    Task<Expense[]> GetExpensesInGroupAsync(int groupId, DateTimeOffset datedAfter, DateTimeOffset datedBefore, int limit = 20, int offset = 0);
 
     /// <summary>
     /// Delete an expense.

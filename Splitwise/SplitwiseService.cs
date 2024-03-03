@@ -81,12 +81,14 @@ namespace Splitwise
       """");
     }
 
-    public async Task<Expense[]> GetExpensesInGroupAsync(int groupId, int limit = 20, int offset = 0)
+    public async Task<Expense[]> GetExpensesInGroupAsync(int groupId, DateTimeOffset datedAfter, DateTimeOffset datedBefore, int limit = 20, int offset = 0)
     {
       return await SendRequest(HttpMethod.Get, "get_expenses",
         new()
         {
           ["group_id"] = groupId.ToString(),
+          ["dated_after"] = datedAfter.ToString("o"),
+          ["dated_before"] = datedBefore.ToString("o"),
           ["limit"] = limit.ToString(),
           ["offset"] = offset.ToString()
         }, (node, options) =>
