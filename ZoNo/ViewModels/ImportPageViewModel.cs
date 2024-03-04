@@ -12,6 +12,7 @@ namespace ZoNo.ViewModels
   public partial class ImportPageViewModel(
     ITransactionProcessorService _transactionProcessorService,
     ITraceFactory _traceFactory,
+    IConverterService _converterService,
     TransactionsViewModel _transactionsViewModel,
     ExpensesViewModel _expensesViewModel) : ObservableObject
   {
@@ -44,11 +45,8 @@ namespace ZoNo.ViewModels
       trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
-      await Task.WhenAll(
-      [
-        TraceFactory.HandleAsAsyncVoid(TransactionsViewModel.LoadAsync),
-        TraceFactory.HandleAsAsyncVoid(ExpensesViewModel.LoadAsync)
-      ]);
+      await TransactionsViewModel.LoadAsync();
+      ExpensesViewModel.Load();
 
       TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
       ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
@@ -62,7 +60,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
       TransactionsViewModel.TransactionsView.Add(e.Transaction);
       var index = TransactionsViewModel.TransactionsView.IndexOf(e.Transaction);
-      ExpensesViewModel.Expenses.Insert(index, ExpenseViewModel.FromModel(e.Expense));
+      ExpensesViewModel.Expenses.Insert(index, _converterService.ModelExpenseToViewModel(e.Expense));
     }
 
     private async void TransactionsView_VectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)

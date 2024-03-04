@@ -10,18 +10,18 @@ namespace ZoNo.Views
   {
     public ExpenseViewModel ViewModel { get; }
 
-    public static readonly DependencyProperty CategoriesProperty = DependencyProperty.Register(nameof(Categories), typeof(Category[]), typeof(ExpenseView), new PropertyMetadata(null));
-    public static readonly DependencyProperty GroupsProperty = DependencyProperty.Register(nameof(Groups), typeof(Group[]), typeof(ExpenseView), new PropertyMetadata(null));
+    public static readonly DependencyProperty CategoriesProperty = DependencyProperty.Register(nameof(Categories), typeof(IReadOnlyCollection<Category>), typeof(ExpenseView), new PropertyMetadata(null));
+    public static readonly DependencyProperty GroupsProperty = DependencyProperty.Register(nameof(Groups), typeof(IReadOnlyCollection<Group>), typeof(ExpenseView), new PropertyMetadata(null));
 
-    public Category[] Categories
+    public IReadOnlyCollection<Category> Categories
     {
-      get => (Category[])GetValue(CategoriesProperty);
+      get => (IReadOnlyCollection<Category>)GetValue(CategoriesProperty);
       set => SetValue(CategoriesProperty, value);
     }
 
-    public Group[] Groups
+    public IReadOnlyCollection<Group> Groups
     {
-      get => (Group[])GetValue(GroupsProperty);
+      get => (IReadOnlyCollection<Group>)GetValue(GroupsProperty);
       set => SetValue(GroupsProperty, value);
     }
 

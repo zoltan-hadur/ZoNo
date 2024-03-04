@@ -19,6 +19,7 @@ namespace ZoNo.ViewModels
     IThemeSelectorService _themeSelectorService,
     ISplitwiseAuthorizationService _splitwiseAuthorizationService,
     ISplitwiseService _splitwiseService,
+    ISplitwiseCacheService _splitwiseCacheService,
     ITokenService _tokenService,
     ITraceFactory _traceFactory,
     IMessenger _messenger) : ObservableObject
@@ -119,6 +120,7 @@ namespace ZoNo.ViewModels
       {
         trace.Info("Has token, navigating to shell");
         _splitwiseService.Token = _tokenService.Token;
+        await _splitwiseCacheService.InitializeAsync();
         _messenger.Send<UserLoggedInMessage>();
       }
       else
@@ -330,6 +332,7 @@ namespace ZoNo.ViewModels
               {
                 await _tokenService.SaveAsync();
               }
+              await _splitwiseCacheService.InitializeAsync();
               _messenger.Send<UserLoggedInMessage>();
             }
             else

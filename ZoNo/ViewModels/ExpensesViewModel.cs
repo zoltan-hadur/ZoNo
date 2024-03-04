@@ -17,22 +17,16 @@ namespace ZoNo.ViewModels
 {
   public partial class ExpensesViewModel(
     ISplitwiseService _splitwiseService,
+    ISplitwiseCacheService _splitwiseCacheService,
+    IConverterService _converterService,
     IDialogService _dialogService,
     ITraceFactory _traceFactory) : ObservableObject
   {
     private bool _isLoaded = false;
-    private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
-
-    private Splitwise.Models.Group[] _splitwiseGroups;
-    private Splitwise.Models.Category[] _splitwiseCategories;
 
     public ObservableCollection<ExpenseViewModel> Expenses { get; } = [];
-
-    [ObservableProperty]
-    private Category[] _categories;
-
-    [ObservableProperty]
-    private Group[] _groups;
+    public IReadOnlyCollection<Category> Categories => _splitwiseCacheService.ZoNoCategories;
+    public IReadOnlyCollection<Group> Groups => _splitwiseCacheService.ZoNoGroups;
 
     [ObservableProperty]
     private bool _isUploadingToSplitwise = false;
@@ -41,35 +35,23 @@ namespace ZoNo.ViewModels
     [NotifyCanExecuteChangedFor(nameof(UploadExpensesToSplitwiseCommand))]
     private bool _isExpensesNotEmpty = false;
 
-    public async Task LoadAsync()
+    public void Load()
     {
       using var trace = _traceFactory.CreateNew();
-      using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.Zero);
       trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
-
-      var taskGroups = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetGroupsAsync);
-      var taskCategories = TraceFactory.HandleAsAsyncVoid(_splitwiseService.GetCategoriesAsync);
-      await Task.WhenAll([taskGroups, taskCategories]);
-
-      _splitwiseGroups = taskGroups.Result;
-      _splitwiseCategories = taskCategories.Result.OrderBy(category => category.Name).ToArray();
-
-      Categories = _splitwiseCategories.Select(Category.FromSplitwiseModel).ToArray();
-      Groups = _splitwiseGroups.Select(Group.FromSplitwiseModel).ToArray();
 
       Expenses.CollectionChanged += Expenses_CollectionChanged;
 
       _isLoaded = true;
     }
 
-    private async void Expenses_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Expenses_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format([e.Action]));
       if (e.Action == NotifyCollectionChangedAction.Add)
       {
-        using var guard = await LockGuard.CreateAsync(_guard, TimeSpan.FromSeconds(5));
         foreach (ExpenseViewModel newItem in e.NewItems.OrEmpty())
         {
           newItem.Category = Categories.Single(category => category.Name == newItem.Category.ParentCategoryName)
@@ -107,7 +89,7 @@ namespace ZoNo.ViewModels
 
       await Task.WhenAll(Expenses
         .Select(expense => TraceFactory.HandleAsAsyncVoid(() => _splitwiseService
-          .CreateExpenseAsync(ExpenseViewModel.ToSplitwiseModel(expense, _splitwiseGroups, _splitwiseCategories))
+          .CreateExpenseAsync(_converterService.ViewModelExpenseToSplitwise(expense))
           .ContinueWith(task => Expenses.Remove(expense), TaskContinuationOptions.ExecuteSynchronously))).ToArray());
 
       IsUploadingToSplitwise = false;

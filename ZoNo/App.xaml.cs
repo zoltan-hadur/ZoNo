@@ -51,7 +51,9 @@ namespace ZoNo
         ConsumerSecret = Environment.GetEnvironmentVariable("ZoNo_ConsumerSecret")
       });
       services.AddSingleton<ISplitwiseAuthorizationService, SplitwiseAuthorizationService>();
-      services.AddScoped<ISplitwiseService, SplitwiseService>();
+      services.AddSingleton<ISplitwiseService, SplitwiseService>();
+      services.AddSingleton<ISplitwiseCacheService, SplitwiseCacheService>();
+      services.AddSingleton<IConverterService, ConverterService>();
       services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
       services.AddSingleton<IEncryptionService, EncryptionService>();
       services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
@@ -124,6 +126,7 @@ namespace ZoNo
     public void Receive(UserLoggedOutMessage message)
     {
       using var trace = GetService<ITraceFactory>().CreateNew();
+      GetService<ISplitwiseService>().Token = null;
       ReplaceServiceScope();
       NavigateToLoginPage();
     }

@@ -1,6 +1,4 @@
-﻿using ZoNo.Helpers;
-
-namespace ZoNo.Models
+﻿namespace ZoNo.Models
 {
   public class Category
   {
@@ -25,16 +23,6 @@ namespace ZoNo.Models
           }
         }
       }
-    }
-
-    public static Category FromSplitwiseModel(Splitwise.Models.Category category)
-    {
-      return new Category()
-      {
-        Name = category.Name,
-        Picture = category.IconTypes.Square.Large,
-        SubCategories = category.Subcategories.OrEmpty().Select(FromSplitwiseModel).ToArray()
-      };
     }
   }
 }
