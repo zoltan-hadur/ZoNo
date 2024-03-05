@@ -37,6 +37,7 @@ namespace ZoNo.Services
     {
       return new ZoNo.Models.Category()
       {
+        Id = category.Id,
         Name = category.Name,
         Picture = category.IconTypes.Square.Large,
         SubCategories = category.Subcategories.OrEmpty().Select(SplitwiseCategoryToModel).ToArray()
@@ -47,6 +48,7 @@ namespace ZoNo.Services
     {
       return new ZoNo.Models.Group()
       {
+        Id = group.Id,
         Picture = group.Avatar.Medium,
         Name = group.Name,
         Members = group.Members.Select(SplitwiseUserToModel).ToArray()
@@ -57,6 +59,7 @@ namespace ZoNo.Services
     {
       return new ZoNo.Models.User()
       {
+        Id = user.Id,
         Picture = user.Picture.Medium,
         FirstName = user.FirstName,
         LastName = user.LastName,

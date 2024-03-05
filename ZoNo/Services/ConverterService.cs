@@ -9,32 +9,34 @@ namespace ZoNo.Services
   {
     public ZoNo.ViewModels.ExpenseViewModel ModelExpenseToViewModel(ZoNo.Models.Expense expense)
     {
+      var group = _splitwiseCacheService.ZoNoGroups.Single(group => group.Name == expense.Group);
       return new ZoNo.ViewModels.ExpenseViewModel()
       {
         Id = expense.Id,
         Shares = new ObservableCollection<ZoNo.ViewModels.ShareViewModel>(
           expense.With.Select(with => new ZoNo.ViewModels.ShareViewModel
           {
-            User = new ZoNo.Models.User()
-            {
-              Email = with.User
-            },
+            User = group.Members.Single(member => member.Email == with.User),
             Percentage = with.Percentage
           })),
-        Category = expense.Category,
+        Category = _splitwiseCacheService.ZoNoCategories
+          .SelectMany(category => category.SubCategories)
+          .Single(category => category.ParentCategoryName == expense.Category.ParentCategoryName &&
+                              category.Name == expense.Category.Name),
         Description = expense.Description,
         Currency = expense.Currency,
         Cost = expense.Cost,
         Date = expense.Date,
-        Group = new ZoNo.Models.Group() { Name = expense.Group }
+        Group = group
       };
     }
 
     public Splitwise.Models.Expense ViewModelExpenseToSplitwise(ZoNo.ViewModels.ExpenseViewModel expense)
     {
-      var group = _splitwiseCacheService.SplitwiseGroups.Single(group => group.Name == expense.Group.Name);
-      var category = _splitwiseCacheService.SplitwiseCategories.Single(category => category.Name == expense.Category.ParentCategoryName)
-        .Subcategories.Single(subcategory => subcategory.Name == expense.Category.Name);
+      var group = _splitwiseCacheService.SplitwiseGroups.Single(group => group.Id == expense.Group.Id);
+      var category = _splitwiseCacheService.SplitwiseCategories
+        .SelectMany(category => category.Subcategories)
+        .Single(category => category.Id == expense.Category.Id);
 
       var sofar = 0.0;
       var users = expense.Shares.Select((with, index) =>
