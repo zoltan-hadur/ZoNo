@@ -5,10 +5,12 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   internal class ConverterService(
-    ISplitwiseCacheService _splitwiseCacheService) : IConverterService
+    ISplitwiseCacheService _splitwiseCacheService,
+    ITraceFactory _traceFactory) : IConverterService
   {
     public ZoNo.ViewModels.ExpenseViewModel ModelExpenseToViewModel(ZoNo.Models.Expense expense)
     {
+      using var trace = _traceFactory.CreateNew();
       var group = _splitwiseCacheService.ZoNoGroups.Single(group => group.Name == expense.Group);
       return new ZoNo.ViewModels.ExpenseViewModel()
       {
@@ -33,6 +35,7 @@ namespace ZoNo.Services
 
     public Splitwise.Models.Expense ViewModelExpenseToSplitwise(ZoNo.ViewModels.ExpenseViewModel expense)
     {
+      using var trace = _traceFactory.CreateNew();
       var group = _splitwiseCacheService.SplitwiseGroups.Single(group => group.Id == expense.Group.Id);
       var category = _splitwiseCacheService.SplitwiseCategories
         .SelectMany(category => category.Subcategories)
@@ -81,6 +84,32 @@ namespace ZoNo.Services
         GroupId = group.Id,
         Users = users
       };
+    }
+
+    public ZoNo.ViewModels.ExpenseViewModel SplitwiseExpenseToViewModel(Splitwise.Models.Expense expense)
+    {
+      using var trace = _traceFactory.CreateNew();
+      var cost = Convert.ToDouble(expense.Cost);
+      var group = _splitwiseCacheService.ZoNoGroups.Single(group => group.Id == expense.GroupId);
+
+      var result = new ZoNo.ViewModels.ExpenseViewModel()
+      {
+        Category = _splitwiseCacheService.ZoNoCategories
+          .SelectMany(category => category.SubCategories)
+          .Single(category => category.Id == expense.Category.Id),
+        Description = expense.Description,
+        Currency = Enum.Parse<ZoNo.Models.Currency>(expense.CurrencyCode.ToString()),
+        Cost = cost,
+        Date = expense.Date,
+        Group = group,
+        Shares = new(expense.Users.OrderByDescending(user => Convert.ToDouble(user.PaidShare))
+          .Select(user => new ZoNo.ViewModels.ShareViewModel()
+          {
+            User = group.Members.Single(member => member.Id == user.UserId),
+            Percentage = Convert.ToDouble(user.OwedShare) / cost * 100
+          }))
+      };
+      return result;
     }
   }
 }

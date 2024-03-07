@@ -3,8 +3,162 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      mc:Ignorable="d">
+      xmlns:models="using:ZoNo.Models"
+      xmlns:viewmodels="using:ZoNo.ViewModels"
+      xmlns:zcontrols="using:ZoNo.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:controlsprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
+      mc:Ignorable="d"
+      Loaded="Page_Loaded"
+      NavigationCacheMode="Required">
   <Grid>
-    <TextBlock Text="{x:Bind ViewModel.Id}"/>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel Spacing="12" Orientation="Horizontal">
+      <!-- Month and Year picker -->
+      <DatePicker Grid.Row="0" DayVisible="False"
+                  Date="{x:Bind ViewModel.DateTime, Mode=TwoWay}"
+                  MinYear="{x:Bind ViewModel.MinYear}" MaxYear="{x:Bind ViewModel.MaxYear}"
+                  IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
+      <!-- Group Selector -->
+      <ComboBox Grid.Column="2" HorizontalAlignment="Right" Padding="18,0,0,0" Width="215"
+                SelectedItem="{x:Bind ViewModel.Group, Mode=TwoWay}"
+                ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}"
+                IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="models:Group">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border CornerRadius="3">
+                <ImageIcon Width="20" Height="20" Source="{x:Bind Picture}"/>
+              </Border>
+              <TextBlock Text="{x:Bind Name}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+    <!-- Grouped Transactions -->
+    <Border Grid.Row="1" BorderThickness="1" CornerRadius="8"
+            BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}"
+            Margin="{StaticResource SmallTopBottomMargin}">
+      <zcontrols:LoaderContentControl HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                      IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+        <controls:DataGrid x:Name="DataGrid"
+                           ItemsSource="{x:Bind ViewModel.ExpenseGroups.View, Mode=OneWay}"
+                           GridLinesVisibility="All" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False"
+                           RowGroupHeaderPropertyNameAlternative="Category"
+                           LoadingRowGroup="DataGrid_LoadingRowGroup"
+                           IsEnabledChanged="DataGrid_IsEnabledChanged">
+          <controls:DataGrid.Resources>
+            <ResourceDictionary>
+              <SolidColorBrush x:Key="DataGridRowGroupHeaderColorPrimary" Color="{ThemeResource TextFillColorPrimary}"/>
+              <SolidColorBrush x:Key="DataGridRowGroupHeaderFillColorDisabled" Color="{ThemeResource TextFillColorDisabled}"/>
+              <x:Double x:Key="DataGridTextOpacity">1</x:Double>
+              <!-- So that it kinda looks like the default DataGridTextColumn -->
+              <Style TargetType="TextBlock">
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="Padding" Value="12,0,12,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Opacity" Value="{ThemeResource DataGridTextOpacity}"/>
+              </Style>
+              <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                  <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+                  <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+                  <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+                  <StaticResource x:Key="DataGridRowGroupHeaderBackgroundBrush" ResourceKey="ControlFillColorDefault"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                  <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="ControlFillColorDefault"/>
+                  <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+                  <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlForegroundListLowBrush"/>
+                  <StaticResource x:Key="DataGridRowGroupHeaderBackgroundBrush" ResourceKey="ControlFillColorDefault"/>
+                </ResourceDictionary>
+              </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+          </controls:DataGrid.Resources>
+          <controls:DataGrid.ColumnHeaderStyle>
+            <Style TargetType="controlsprimitives:DataGridColumnHeader">
+              <Setter Property="FontSize" Value="16"/>
+              <!-- Default padding so when column is not sorted, the invisible sort icon does not take up place -->
+              <Setter Property="Padding" Value="12,0,-20,0"/>
+              <!-- To have tooltip when column width is so small, the text is trimming -->
+              <Setter Property="ContentTemplate">
+                <Setter.Value>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding}" ToolTipService.ToolTip="{Binding}" TextTrimming="CharacterEllipsis" Opacity="{ThemeResource DataGridTextOpacity}"/>
+                  </DataTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </controls:DataGrid.ColumnHeaderStyle>
+          <controls:DataGrid.Columns>
+            <controls:DataGridTemplateColumn Header="Date" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <TextBlock Text="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"/>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+            <controls:DataGridTemplateColumn Header="Category" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <Grid Padding="12,0,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" CornerRadius="3" Width="20" Height="20">
+                      <Image Source="{x:Bind Category.Picture, Mode=OneWay}"/>
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Category.Name, Mode=OneWay}"/>
+                  </Grid>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+            <controls:DataGridTemplateColumn Header="Description" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <TextBlock Text="{x:Bind Description, Mode=OneWay}"/>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+            <controls:DataGridTemplateColumn Header="Cost" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <TextBlock Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+            <controls:DataGridTemplateColumn Header="Currency" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <TextBlock Text="{x:Bind Currency, Mode=OneWay}"/>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+            <controls:DataGridTemplateColumn Header="PaidBy" IsReadOnly="True">
+              <controls:DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
+                  <Grid Padding="12,0,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" CornerRadius="3" Width="20" Height="20">
+                      <Image Source="{x:Bind Shares[0].User.Picture, Mode=OneWay}"/>
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Shares[0].User.Email, Mode=OneWay}"/>
+                  </Grid>
+                </DataTemplate>
+              </controls:DataGridTemplateColumn.CellTemplate>
+            </controls:DataGridTemplateColumn>
+          </controls:DataGrid.Columns>
+        </controls:DataGrid>
+      </zcontrols:LoaderContentControl>
+    </Border>
   </Grid>
 </Page>
