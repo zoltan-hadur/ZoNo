@@ -21,7 +21,7 @@ namespace ZoNo.Services
           })),
         Category = _splitwiseCacheService.ZoNoCategories
           .SelectMany(category => category.SubCategories)
-          .Single(category => category.ParentCategoryName == expense.Category.ParentCategoryName &&
+          .Single(category => category.ParentCategory?.Name == expense.Category.ParentCategory?.Name &&
                               category.Name == expense.Category.Name),
         Description = expense.Description,
         Currency = expense.Currency,

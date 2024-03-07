@@ -54,7 +54,7 @@ namespace ZoNo.ViewModels
       {
         foreach (ExpenseViewModel newItem in e.NewItems.OrEmpty())
         {
-          newItem.Category = Categories.Single(category => category.Name == newItem.Category.ParentCategoryName)
+          newItem.Category = Categories.Single(category => category.Name == newItem.Category.ParentCategory?.Name)
             .SubCategories.Single(subCategory => subCategory.Name == newItem.Category.Name);
 
           newItem.Group = Groups.Single(group => group.Name == newItem.Group.Name);

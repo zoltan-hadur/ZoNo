@@ -5,7 +5,7 @@
     public int Id { get; set; }
     public string Picture { get; set; } = "invalid";
     public string Name { get; set; }
-    public string ParentCategoryName { get; set; }
+    public Category ParentCategory { get; set; }
     private Category[] _subCategories = [];
     public Category[] SubCategories
     {
@@ -20,7 +20,7 @@
           _subCategories = value;
           foreach (var category in _subCategories)
           {
-            category.ParentCategoryName = Name;
+            category.ParentCategory = this;
           }
         }
       }
