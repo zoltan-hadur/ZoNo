@@ -1,6 +1,6 @@
 ﻿namespace ZoNo.Models
 {
-  public class Category
+  public class Category : IComparable
   {
     public int Id { get; set; }
     public string Picture { get; set; } = "invalid";
@@ -23,6 +23,18 @@
             category.ParentCategory = this;
           }
         }
+      }
+    }
+
+    public int CompareTo(object obj)
+    {
+      if (obj is Category category)
+      {
+        return $"{ParentCategory?.Name} - {Name}".CompareTo($"{category.ParentCategory?.Name} - {category.Name}");
+      }
+      else
+      {
+        throw new ArgumentException($"Parameter type is not {nameof(Category)}", nameof(obj));
       }
     }
   }

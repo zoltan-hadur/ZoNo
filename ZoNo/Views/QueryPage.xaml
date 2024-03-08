@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:sys="using:System"
       xmlns:models="using:ZoNo.Models"
       xmlns:viewmodels="using:ZoNo.ViewModels"
       xmlns:zcontrols="using:ZoNo.Controls"
@@ -18,12 +19,12 @@
     </Grid.RowDefinitions>
     <StackPanel Spacing="12" Orientation="Horizontal">
       <!-- Month and Year picker -->
-      <DatePicker Grid.Row="0" DayVisible="False"
+      <DatePicker Grid.Row="0" DayVisible="False" Header="Date:"
                   Date="{x:Bind ViewModel.DateTime, Mode=TwoWay}"
                   MinYear="{x:Bind ViewModel.MinYear}" MaxYear="{x:Bind ViewModel.MaxYear}"
                   IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
       <!-- Group Selector -->
-      <ComboBox Grid.Column="2" HorizontalAlignment="Right" Padding="18,0,0,0" Width="215"
+      <ComboBox Grid.Column="2" HorizontalAlignment="Right" Padding="18,0,0,0" Width="215" Header="Group:"
                 SelectedItem="{x:Bind ViewModel.Group, Mode=TwoWay}"
                 ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}"
                 IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}">
@@ -38,6 +39,15 @@
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
+      <!-- Group By Selector -->
+      <ComboBox Header="Group Expenses By:" Width="140"
+                SelectedItem="{x:Bind ViewModel.QueryGroupBy, Mode=TwoWay}"
+                IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"
+                ItemsSource="{x:Bind ViewModel.QueryGroupBies}"/>
+      <!-- Refresh Button -->
+      <Button Content="Refresh" VerticalAlignment="Bottom"
+              Command="{x:Bind ViewModel.LoadExpensesCommand}"
+              IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
     </StackPanel>
     <!-- Grouped Transactions -->
     <Border Grid.Row="1" BorderThickness="1" CornerRadius="8"
@@ -48,7 +58,6 @@
         <controls:DataGrid x:Name="DataGrid"
                            ItemsSource="{x:Bind ViewModel.ExpenseGroups.View, Mode=OneWay}"
                            GridLinesVisibility="All" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False"
-                           RowGroupHeaderPropertyNameAlternative="Category"
                            LoadingRowGroup="DataGrid_LoadingRowGroup"
                            IsEnabledChanged="DataGrid_IsEnabledChanged">
           <controls:DataGrid.Resources>
@@ -96,6 +105,7 @@
             </Style>
           </controls:DataGrid.ColumnHeaderStyle>
           <controls:DataGrid.Columns>
+            <!-- Date -->
             <controls:DataGridTemplateColumn Header="Date" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
@@ -103,6 +113,7 @@
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
+            <!-- Category -->
             <controls:DataGridTemplateColumn Header="Category" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
@@ -114,11 +125,12 @@
                     <Border Grid.Column="0" CornerRadius="3" Width="20" Height="20">
                       <Image Source="{x:Bind Category.Picture, Mode=OneWay}"/>
                     </Border>
-                    <TextBlock Grid.Column="1" Text="{x:Bind Category.Name, Mode=OneWay}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategory.Name, Category.Name), Mode=OneWay}"/>
                   </Grid>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
+            <!-- Description -->
             <controls:DataGridTemplateColumn Header="Description" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
@@ -126,6 +138,7 @@
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
+            <!-- Cost -->
             <controls:DataGridTemplateColumn Header="Cost" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
@@ -133,6 +146,7 @@
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
+            <!-- Currency -->
             <controls:DataGridTemplateColumn Header="Currency" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
@@ -140,6 +154,7 @@
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
+            <!-- PaidBy -->
             <controls:DataGridTemplateColumn Header="PaidBy" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">

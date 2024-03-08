@@ -13,6 +13,12 @@ namespace ZoNo.Views
   public sealed partial class QueryPage : Page
   {
     private ThousandsSeparatorConverter _thousandsSeparatorConverter = new();
+    private Dictionary<QueryGroupBy, Func<object, string>> _groupByFormatter = new()
+    {
+      { QueryGroupBy.MainCategory, x => $"{(x as Category).Name}" },
+      { QueryGroupBy.SubCategory, x => $"{(x as Category).ParentCategory.Name} - {(x as Category).Name}" }
+    };
+
     public QueryPageViewModel ViewModel { get; }
 
     public QueryPage()
@@ -35,11 +41,13 @@ namespace ZoNo.Views
 
     private void DataGrid_LoadingRowGroup(object sender, CommunityToolkit.WinUI.UI.Controls.DataGridRowGroupHeaderEventArgs e)
     {
-      var expenseGroupByCategory = e.RowGroupHeader.CollectionViewGroup.Group as ReadOnlyObservableGroup<Category, ExpenseViewModel>;
-      var expenseGroupByCurrency = expenseGroupByCategory.Select(expense => expense).GroupBy(group => group.Currency);
+      var expenseGroup = e.RowGroupHeader.CollectionViewGroup.Group as ReadOnlyObservableGroup<object, ExpenseViewModel>;
+      var expenseGroupByCurrency = expenseGroup.Select(expense => expense).GroupBy(group => group.Currency);
 
-      e.RowGroupHeader.PropertyValue = $"{expenseGroupByCategory.Key.Name}, Total Cost: {string.Join(", ", expenseGroupByCurrency
+      e.RowGroupHeader.PropertyValue = $"{_groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key)}, Total Cost: {string.Join(", ", expenseGroupByCurrency
         .Select(group => $"{_thousandsSeparatorConverter.Convert(group.Sum(expense => expense.Cost), null, null, null)} {group.Key}"))}";
+
+      DataGrid.RowGroupHeaderPropertyNameAlternative = ViewModel.QueryGroupBy.ToString();
     }
 
     private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)

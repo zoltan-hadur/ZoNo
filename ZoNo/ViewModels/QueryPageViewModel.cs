@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Common.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Data;
 using Splitwise.Contracts;
 using System.ComponentModel;
@@ -17,8 +18,14 @@ namespace ZoNo.ViewModels
     ILocalSettingsService _localSettingsService) : ObservableObject
   {
     private const string SettingGroupName = "Query_GroupName";
+    private const string SettingQueryGroupBy = "Query_QueryGroupBy";
 
     private bool _isLoaded = false;
+    private readonly Dictionary<QueryGroupBy, Func<ExpenseViewModel, object>> _groupBySelectors = new()
+    {
+      { QueryGroupBy.MainCategory, expense => expense.Category.ParentCategory },
+      { QueryGroupBy.SubCategory, expense => expense.Category }
+    };
 
     [ObservableProperty]
     private DateTimeOffset _dateTime = DateTimeOffset.Now;
@@ -27,7 +34,8 @@ namespace ZoNo.ViewModels
     private Group _group;
 
     [ObservableProperty]
-    private CollectionViewSource _expenseGroups;
+    private QueryGroupBy _queryGroupBy;
+    public QueryGroupBy[] QueryGroupBies = Enum.GetValues<QueryGroupBy>();
 
     [ObservableProperty]
     private bool _isLoading = false;
@@ -36,6 +44,7 @@ namespace ZoNo.ViewModels
     public DateTimeOffset MaxYear = DateTimeOffset.Now;
 
     public IReadOnlyCollection<Group> Groups => _splitwiseCacheService.ZoNoGroups;
+    public CollectionViewSource ExpenseGroups = new() { IsSourceGrouped = true };
 
     public async Task LoadAsync()
     {
@@ -46,8 +55,10 @@ namespace ZoNo.ViewModels
       var groupName = await _localSettingsService.ReadSettingAsync<string>(SettingGroupName);
       Group = Groups.SingleOrDefault(group => group.Name == groupName) ?? Groups.First();
 
+      QueryGroupBy = await _localSettingsService.ReadSettingAsync<QueryGroupBy?>(SettingQueryGroupBy) ?? QueryGroupBy.SubCategory;
+
       PropertyChanged += QueryPageViewModel_PropertyChanged;
-      await LoadExpensesAsync();
+      await LoadExpenses();
 
       _isLoaded = true;
     }
@@ -56,16 +67,20 @@ namespace ZoNo.ViewModels
     {
       using var trace = _traceFactory.CreateNew();
       trace.Debug(Format([e.PropertyName]));
-      if (e.PropertyName != nameof(DateTime) && e.PropertyName != nameof(Group)) return;
 
-      if (e.PropertyName == nameof(Group))
+      switch (e.PropertyName)
       {
-        await _localSettingsService.SaveSettingAsync(SettingGroupName, Group.Name);
+        case nameof(Group):
+          await _localSettingsService.SaveSettingAsync(SettingGroupName, Group.Name);
+          break;
+        case nameof(QueryGroupBy):
+          await _localSettingsService.SaveSettingAsync(SettingQueryGroupBy, QueryGroupBy);
+          break;
       }
-      await LoadExpensesAsync();
     }
 
-    private async Task LoadExpensesAsync()
+    [RelayCommand]
+    private async Task LoadExpenses()
     {
       using var trace = _traceFactory.CreateNew();
       IsLoading = true;
@@ -77,12 +92,8 @@ namespace ZoNo.ViewModels
       var splitwiseExpenses = await _splitwiseService.GetExpensesInGroupAsync(splitwiseGroup.Id, datedAfter, datedBefore, 1000, 0);
       splitwiseExpenses = splitwiseExpenses.Where(expense => expense.DeletedAt is null).ToArray();
       var expenses = splitwiseExpenses.Select(_converterService.SplitwiseExpenseToViewModel).ToArray();
-      var expenseGroups = expenses.GroupBy(expense => expense.Category.ParentCategory);
-      ExpenseGroups = new CollectionViewSource()
-      {
-        Source = new ReadOnlyObservableGroupedCollection<Category, ExpenseViewModel>(expenseGroups),
-        IsSourceGrouped = true
-      };
+      var expenseGroups = expenses.GroupBy(_groupBySelectors[QueryGroupBy]).OrderBy(group => group.Key);
+      ExpenseGroups.Source = new ReadOnlyObservableGroupedCollection<object, ExpenseViewModel>(expenseGroups);
       IsLoading = false;
     }
   }
