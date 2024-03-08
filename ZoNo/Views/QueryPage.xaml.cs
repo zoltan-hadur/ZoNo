@@ -60,6 +60,11 @@ namespace ZoNo.Views
         new SolidColorBrush((DataGrid.Resources["DataGridRowGroupHeaderFillColorDisabled"] as SolidColorBrush).Color);
 
       DataGrid.ReloadThemeResources();
+
+      foreach (Image image in DataGrid.FindDescendants().Where(x => x is Image))
+      {
+        image.Opacity = DataGrid.IsEnabled ? 1 : 0.3;
+      }
     }
   }
 }
