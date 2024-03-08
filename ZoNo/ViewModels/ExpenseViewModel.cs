@@ -87,7 +87,22 @@ namespace ZoNo.ViewModels
 
     public ExpenseViewModel Clone()
     {
-      return JsonSerializer.Deserialize<ExpenseViewModel>(JsonSerializer.Serialize(this));
+      // Shares is view model, other is model, no need to deep copy them
+      return new ExpenseViewModel()
+      {
+        Id = Id,
+        Shares = new ObservableCollection<ShareViewModel>(Shares.Select(share => new ShareViewModel()
+        {
+          User = share.User,
+          Percentage = share.Percentage
+        })),
+        Category = Category,
+        Description = Description,
+        Currency = Currency,
+        Cost = Cost,
+        Date = Date,
+        Group = Group,
+      };
     }
 
     [RelayCommand]
