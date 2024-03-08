@@ -9,14 +9,10 @@ using ZoNo.ViewModels;
 namespace ZoNo.Services
 {
   public class NavigationViewService(
-    INavigationService navigationService,
-    IPageService pageService,
-    ITraceFactory traceFactory) : INavigationViewService
+    INavigationService _navigationService,
+    IPageService _pageService,
+    ITraceFactory _traceFactory) : INavigationViewService
   {
-    private readonly INavigationService _navigationService = navigationService;
-    private readonly IPageService _pageService = pageService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private NavigationView _navigationView;
 
     public IList<object> MenuItems => _navigationView?.MenuItems;
@@ -29,16 +25,6 @@ namespace ZoNo.Services
       using var trace = _traceFactory.CreateNew();
       _navigationView = navigationView;
       _navigationView.ItemInvoked += OnItemInvoked;
-    }
-
-    public void UnregisterEvents()
-    {
-      using var trace = _traceFactory.CreateNew();
-      trace.Debug(Format([_navigationView is null]));
-      if (_navigationView is not null)
-      {
-        _navigationView.ItemInvoked -= OnItemInvoked;
-      }
     }
 
     public NavigationViewItem GetSelectedItem(Type pageType)

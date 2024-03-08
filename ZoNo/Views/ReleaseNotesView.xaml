@@ -42,6 +42,13 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.5.0 / 2023-03-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Fix in memory trace size number box color when changing theme to Default."/>
+        <TextBlock Text="Query page implemented."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.4.0 / 2023-02-24" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <ListView Header="Tracing:">

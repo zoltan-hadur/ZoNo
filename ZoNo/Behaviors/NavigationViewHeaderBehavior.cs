@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
 using Tracer.Contracts;
-using Tracer.Utilities;
 using ZoNo.Contracts.Services;
 
 namespace ZoNo.Behaviors

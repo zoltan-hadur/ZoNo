@@ -20,10 +20,8 @@ namespace Splitwise
   /// Implementation of <see cref="ISplitwiseAuthorizationService"/>.
   /// </summary>
   public class SplitwiseService(
-    IHttpClientFactory httpClientFactory) : ISplitwiseService
+    IHttpClientFactory _httpClientFactory) : ISplitwiseService
   {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-
     private const string _baseURL = "https://www.splitwise.com/api/v3.0";
 
     public Token Token { get; set; }
@@ -71,7 +69,7 @@ namespace Splitwise
         "description": "{{{expense.Description}}}",
         "date": "{{{expense.Date.ToString("o")}}}",
         "currency_code": "{{{expense.CurrencyCode}}}",
-        "category_id": {{{expense.CategoryId}}},
+        "category_id": {{{expense.Category.Id}}},
         "group_id": {{{expense.GroupId}}},
       {{{string.Join($",{Environment.NewLine}", expense.Users.Select((user, index) =>
         $$"""
@@ -83,12 +81,14 @@ namespace Splitwise
       """");
     }
 
-    public async Task<Expense[]> GetExpensesInGroupAsync(int groupId, int limit = 20, int offset = 0)
+    public async Task<Expense[]> GetExpensesInGroupAsync(int groupId, DateTimeOffset datedAfter, DateTimeOffset datedBefore, int limit = 20, int offset = 0)
     {
       return await SendRequest(HttpMethod.Get, "get_expenses",
         new()
         {
           ["group_id"] = groupId.ToString(),
+          ["dated_after"] = datedAfter.ToString("o"),
+          ["dated_before"] = datedBefore.ToString("o"),
           ["limit"] = limit.ToString(),
           ["offset"] = offset.ToString()
         }, (node, options) =>

@@ -22,27 +22,18 @@ using ZoNo.Views;
 namespace ZoNo.ViewModels
 {
   public partial class SettingsPageViewModel(
-    IRulesService rulesService,
-    IDialogService dialogService,
-    IThemeSelectorService themeSelectorService,
-    ILocalSettingsService localSettingsService,
-    IUpdateService updateService,
-    ITraceFactory traceFactory,
-    ITraceDetailProcessor traceDetailProcessor,
-    IEnumerable<ITraceSink> traceSinks,
-    IMessenger messenger) : ObservableRecipient(messenger)
+    IRulesService _rulesService,
+    IDialogService _dialogService,
+    IThemeSelectorService _themeSelectorService,
+    ILocalSettingsService _localSettingsService,
+    IUpdateService _updateService,
+    ITraceFactory _traceFactory,
+    ITraceDetailProcessor _traceDetailProcessor,
+    IEnumerable<ITraceSink> _traceSinks,
+    MainWindow _mainWindow) : ObservableObject
   {
     private const string SettingInMemoryTraceSink = "Settings_InMemoryTraceSink";
     private const string SettingFileTraceSink = "Settings_FileTraceSink";
-
-    private readonly IRulesService _rulesService = rulesService;
-    private readonly IDialogService _dialogService = dialogService;
-    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
-    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
-    private readonly IUpdateService _updateService = updateService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-    private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
-    private readonly IEnumerable<ITraceSink> _traceSinks = traceSinks;
 
     private InMemoryTraceSink InMemoryTraceSink => _traceSinks.Single(traceSink => traceSink is InMemoryTraceSink) as InMemoryTraceSink;
     private FileTraceSink FileTraceSink => _traceSinks.Single(traceSink => traceSink is FileTraceSink) as FileTraceSink;
@@ -136,7 +127,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var openPicker = new FileOpenPicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(openPicker, hWnd);
       openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       openPicker.FileTypeFilter.Add(".json");
@@ -186,7 +177,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var savePicker = new FileSavePicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(savePicker, hWnd);
       savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
       savePicker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
@@ -243,7 +234,7 @@ namespace ZoNo.ViewModels
         var shouldCloseOnOk = false;
 
         var savePicker = new FileSavePicker();
-        var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+        var hWnd = WindowNative.GetWindowHandle(_mainWindow);
         InitializeWithWindow.Initialize(savePicker, hWnd);
         savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
         savePicker.FileTypeChoices.Add("TRACE", new List<string>() { ".trace" });
@@ -269,7 +260,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
 
       var folderPicker = new FolderPicker();
-      var hWnd = WindowNative.GetWindowHandle(App.MainWindow);
+      var hWnd = WindowNative.GetWindowHandle(_mainWindow);
       InitializeWithWindow.Initialize(folderPicker, hWnd);
       folderPicker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
       folderPicker.ViewMode = PickerViewMode.List;

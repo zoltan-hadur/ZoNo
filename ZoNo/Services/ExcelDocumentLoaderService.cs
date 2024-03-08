@@ -8,10 +8,8 @@ using ZoNo.Models;
 namespace ZoNo.Services
 {
   public class ExcelDocumentLoaderService(
-    ITraceFactory traceFactory) : IExcelDocumentLoaderService
+    ITraceFactory _traceFactory) : IExcelDocumentLoaderService
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private const int _expectedWorksheetCount = 1;
     private const string _expectedWorksheetName = "Tranzakciók";
     private readonly ImmutableArray<string> _expectedHeaders =

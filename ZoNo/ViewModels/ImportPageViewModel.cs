@@ -10,19 +10,17 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class ImportPageViewModel(
-    ITransactionProcessorService transactionProcessorService,
-    ITraceFactory traceFactory,
-    TransactionsViewModel transactionsViewModel,
-    ExpensesViewModel expensesViewModel) : ObservableObject
+    ITransactionProcessorService _transactionProcessorService,
+    ITraceFactory _traceFactory,
+    IConverterService _converterService,
+    TransactionsViewModel _transactionsViewModel,
+    ExpensesViewModel _expensesViewModel) : ObservableObject
   {
-    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 
-    public TransactionsViewModel TransactionsViewModel { get; } = transactionsViewModel;
-    public ExpensesViewModel ExpensesViewModel { get; } = expensesViewModel;
+    public TransactionsViewModel TransactionsViewModel => _transactionsViewModel;
+    public ExpensesViewModel ExpensesViewModel => _expensesViewModel;
 
     [ObservableProperty]
     private Transaction _selectedTransaction;
@@ -47,11 +45,8 @@ namespace ZoNo.ViewModels
       trace.Debug(Format([_isLoaded]));
       if (_isLoaded) return;
 
-      await Task.WhenAll(
-      [
-        TraceFactory.HandleAsAsyncVoid(TransactionsViewModel.LoadAsync),
-        TraceFactory.HandleAsAsyncVoid(ExpensesViewModel.LoadAsync)
-      ]);
+      await TransactionsViewModel.LoadAsync();
+      ExpensesViewModel.Load();
 
       TransactionsViewModel.TransactionsView.VectorChanged += TransactionsView_VectorChanged;
       ExpensesViewModel.Expenses.CollectionChanged += Expenses_CollectionChangedAsync;
@@ -65,7 +60,7 @@ namespace ZoNo.ViewModels
       using var trace = _traceFactory.CreateNew();
       TransactionsViewModel.TransactionsView.Add(e.Transaction);
       var index = TransactionsViewModel.TransactionsView.IndexOf(e.Transaction);
-      ExpensesViewModel.Expenses.Insert(index, ExpenseViewModel.FromModel(e.Expense));
+      ExpensesViewModel.Expenses.Insert(index, _converterService.ModelExpenseToViewModel(e.Expense));
     }
 
     private async void TransactionsView_VectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)

@@ -8,18 +8,16 @@ using ZoNo.Contracts.Services;
 namespace ZoNo.Services
 {
   public class RuleExpressionSyntaxCheckerService(
-    ITraceFactory traceFactory) : IRuleExpressionSyntaxCheckerService
+    ITraceFactory _traceFactory) : IRuleExpressionSyntaxCheckerService
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
-    private MetadataReference[] _metadataReferences =
+    private readonly MetadataReference[] _metadataReferences =
     [
       MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.Private.CoreLib.dll")),
       MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.Linq.dll")),
       MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.Collections.dll")),
       MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.Runtime.dll"))
     ];
-    private CSharpCompilation _compilation = CSharpCompilation.Create(
+    private readonly CSharpCompilation _compilation = CSharpCompilation.Create(
       assemblyName: Path.GetRandomFileName(),
       options: new CSharpCompilationOptions(
         outputKind: OutputKind.DynamicallyLinkedLibrary,

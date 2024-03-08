@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using ZoNo.ViewModels;
 
 namespace ZoNo.Views
@@ -17,7 +18,7 @@ namespace ZoNo.Views
       ViewModel.NavigationViewService.Initialize(NavigationViewControl);
     }
 
-    private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
       ViewModel.NavigationService.NavigateTo(typeof(ImportPageViewModel).FullName);
     }

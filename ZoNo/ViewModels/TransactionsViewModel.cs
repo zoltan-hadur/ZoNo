@@ -12,16 +12,11 @@ using ZoNo.Models;
 namespace ZoNo.ViewModels
 {
   public partial class TransactionsViewModel(
-    ILocalSettingsService localSettingsService,
-    IExcelDocumentLoaderService excelDocumentLoaderService,
-    ITransactionProcessorService transactionProcessorService,
-    ITraceFactory traceFactory) : ObservableObject
+    ILocalSettingsService _localSettingsService,
+    IExcelDocumentLoaderService _excelDocumentLoaderService,
+    ITransactionProcessorService _transactionProcessorService,
+    ITraceFactory _traceFactory) : ObservableObject
   {
-    private readonly ILocalSettingsService _localSettingsService = localSettingsService;
-    private readonly IExcelDocumentLoaderService _excelDocumentLoaderService = excelDocumentLoaderService;
-    private readonly ITransactionProcessorService _transactionProcessorService = transactionProcessorService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private bool _isLoaded = false;
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
 

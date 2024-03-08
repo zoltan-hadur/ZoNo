@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using ZoNo.ViewModels;
 
@@ -13,10 +14,9 @@ namespace ZoNo.Views
       InitializeComponent();
     }
 
-    private void Page_Loading(Microsoft.UI.Xaml.FrameworkElement sender, object args)
+    private void Page_Loading(FrameworkElement sender, object args)
     {
-      ViewModel.TransactionRulesViewModel.Load();
-      ViewModel.ExpenseRulesViewModel.Load();
+      ViewModel.Load();
     }
   }
 }

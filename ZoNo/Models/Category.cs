@@ -1,12 +1,11 @@
-﻿using ZoNo.Helpers;
-
-namespace ZoNo.Models
+﻿namespace ZoNo.Models
 {
-  public class Category
+  public class Category : IComparable
   {
+    public int Id { get; set; }
     public string Picture { get; set; } = "invalid";
     public string Name { get; set; }
-    public string ParentCategoryName { get; set; }
+    public Category ParentCategory { get; set; }
     private Category[] _subCategories = [];
     public Category[] SubCategories
     {
@@ -21,20 +20,22 @@ namespace ZoNo.Models
           _subCategories = value;
           foreach (var category in _subCategories)
           {
-            category.ParentCategoryName = Name;
+            category.ParentCategory = this;
           }
         }
       }
     }
 
-    public static Category FromSplitwiseModel(Splitwise.Models.Category category)
+    public int CompareTo(object obj)
     {
-      return new Category()
+      if (obj is Category category)
       {
-        Name = category.Name,
-        Picture = category.IconTypes.Square.Large,
-        SubCategories = category.Subcategories.OrEmpty().Select(FromSplitwiseModel).ToArray()
-      };
+        return $"{ParentCategory?.Name} - {Name}".CompareTo($"{category.ParentCategory?.Name} - {category.Name}");
+      }
+      else
+      {
+        throw new ArgumentException($"Parameter type is not {nameof(Category)}", nameof(obj));
+      }
     }
   }
 }

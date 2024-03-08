@@ -8,12 +8,9 @@ using ZoNo.ViewModels;
 namespace ZoNo.Services
 {
   public class UpdateService(
-    INotificationService notificationService,
-    ITraceFactory traceFactory) : IUpdateService
+    INotificationService _notificationService,
+    ITraceFactory _traceFactory) : IUpdateService
   {
-    private readonly INotificationService _notificationService = notificationService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     public async Task CheckForUpdateAsync()
     {
       using var trace = _traceFactory.CreateNew();

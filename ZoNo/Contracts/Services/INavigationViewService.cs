@@ -8,7 +8,6 @@ namespace ZoNo.Contracts.Services
     object SettingsItem { get; }
 
     void Initialize(NavigationView navigationView);
-    void UnregisterEvents();
     NavigationViewItem GetSelectedItem(Type pageType);
   }
 }

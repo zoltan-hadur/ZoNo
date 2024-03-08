@@ -19,8 +19,8 @@ namespace ZoNo
     private readonly INotificationService _notificationService;
     private readonly ITraceFactory _traceFactory;
 
+    private bool _isClosed = false;
     private bool _firstActivation = true;
-    private IReadOnlyCollection<NotificationViewModel> Notifications => _notificationService.Notifications;
     public Frame Frame => NavigationFrame;
 
     public MainWindow(
@@ -41,6 +41,7 @@ namespace ZoNo
       NotificationsButton.LayoutUpdated += (s, e) => SetRegionsForCustomTitleBar();
       ExtendsContentIntoTitleBar = true;
 
+      Closed += MainWindow_Closed;
       Activated += MainWindow_Activated;
       NavigationFrame.ActualThemeChanged += NavigationFrame_ActualThemeChanged;
       NavigationFrame_ActualThemeChanged(null, null);
@@ -48,7 +49,7 @@ namespace ZoNo
 
     private void SetRegionsForCustomTitleBar()
     {
-      if (App.IsClosed || !ExtendsContentIntoTitleBar) return;
+      if (_isClosed || !ExtendsContentIntoTitleBar) return;
 
       var scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
 
@@ -72,6 +73,11 @@ namespace ZoNo
           _Width: (int)Math.Round(bounds.Width * scale),
           _Height: (int)Math.Round(bounds.Height * scale)
       );
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+      _isClosed = true;
     }
 
     private void NavigationFrame_ActualThemeChanged(FrameworkElement sender, object args)
@@ -150,7 +156,7 @@ namespace ZoNo
             var r = Convert.ToByte(double.Lerp(from.R, to.R, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var g = Convert.ToByte(double.Lerp(from.G, to.G, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var b = Convert.ToByte(double.Lerp(from.B, to.B, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
-            if (!App.IsClosed)
+            if (!_isClosed)
             {
               AppWindow.TitleBar.ButtonInactiveForegroundColor = Color.FromArgb(255, r, g, b);
             }
@@ -161,7 +167,7 @@ namespace ZoNo
             await Task.Delay(1);
           }
           stopwatch.Stop();
-          if (!App.IsClosed)
+          if (!_isClosed)
           {
             AppWindow.TitleBar.ButtonInactiveForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.LightSlateGray : Colors.Gray;
           }
@@ -177,7 +183,7 @@ namespace ZoNo
             var r = Convert.ToByte(double.Lerp(from.R, to.R, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var g = Convert.ToByte(double.Lerp(from.G, to.G, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
             var b = Convert.ToByte(double.Lerp(from.B, to.B, Math.Min(stopwatch.ElapsedMilliseconds / duration, 1.0)));
-            if (!App.IsClosed)
+            if (!_isClosed)
             {
               AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(255, r, g, b);
             }
@@ -188,7 +194,7 @@ namespace ZoNo
             await Task.Delay(1);
           }
           stopwatch.Stop();
-          if (!App.IsClosed)
+          if (!_isClosed)
           {
             AppWindow.TitleBar.ButtonForegroundColor = NavigationFrame.ActualTheme == ElementTheme.Light ? Colors.Black : Colors.White;
           }

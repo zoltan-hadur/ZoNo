@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using System.Xml.Linq;
-using Tracer.Contracts;
+﻿using Tracer.Contracts;
 using Windows.Storage;
 using Windows.Storage.Streams;
 

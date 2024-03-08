@@ -6,14 +6,12 @@ using Tracer.Utilities;
 namespace Tracer
 {
   public class TraceFactory(
-    ITraceDetailFactory traceDetailFactory,
-    ITraceDetailProcessor traceDetailProcessor) : ITraceFactory
+    ITraceDetailFactory _traceDetailFactory,
+    ITraceDetailProcessor _traceDetailProcessor) : ITraceFactory
   {
     private static int _correlationId = 1;
     private static readonly AsyncLocal<int> _asyncLocalCorrelationId = new() { Value = _correlationId };
     private static readonly AsyncLocal<bool> _asyncLocalHandleAsAsyncVoid = new() { Value = false };
-    private readonly ITraceDetailFactory _traceDetailFactory = traceDetailFactory;
-    private readonly ITraceDetailProcessor _traceDetailProcessor = traceDetailProcessor;
 
     public static int CorrelationId
     {

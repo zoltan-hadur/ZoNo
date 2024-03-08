@@ -6,10 +6,8 @@ using ZoNo.ViewModels;
 namespace ZoNo.Services
 {
   public class NotificationService(
-    ITraceFactory traceFactory) : INotificationService
+    ITraceFactory _traceFactory) : INotificationService
   {
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private ObservableCollection<NotificationViewModel> _notifications = [];
     public ReadOnlyObservableCollection<NotificationViewModel> Notifications => new(_notifications);
 

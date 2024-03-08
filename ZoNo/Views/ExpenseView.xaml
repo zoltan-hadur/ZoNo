@@ -19,7 +19,7 @@
       <TextBlock Text="{x:Bind sys:String.Format('{0:D2}', Date.Day), Mode=OneWay}" FontSize="18" HorizontalAlignment="Center"/>
     </StackPanel>
     <!-- Category button/image and categories selector -->
-    <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategoryName, Category.Name), Mode=OneWay}">
+    <Button Grid.Column="1" Padding="3" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategory.Name, Category.Name), Mode=OneWay}">
       <Border CornerRadius="3">
         <Image Width="36" Height="36" Source="{x:Bind Category.Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
           <Image.OpacityTransition>

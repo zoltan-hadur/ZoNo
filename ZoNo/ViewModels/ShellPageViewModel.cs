@@ -7,13 +7,12 @@ using ZoNo.Views;
 namespace ZoNo.ViewModels
 {
   public partial class ShellPageViewModel(
-    INavigationService navigationService,
-    INavigationViewService navigationViewService,
-    ITraceFactory traceFactory) : ObservableRecipient
+    INavigationService _navigationService,
+    INavigationViewService _navigationViewService,
+    ITraceFactory _traceFactory) : ObservableRecipient
   {
-    public INavigationService NavigationService { get; } = navigationService;
-    public INavigationViewService NavigationViewService { get; } = navigationViewService;
-    private readonly ITraceFactory _traceFactory = traceFactory;
+    public INavigationService NavigationService => _navigationService;
+    public INavigationViewService NavigationViewService => _navigationViewService;
 
     [ObservableProperty]
     private object _selected;

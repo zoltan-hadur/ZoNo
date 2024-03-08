@@ -7,14 +7,10 @@ using ZoNo.Models;
 namespace ZoNo.Services
 {
   public class TransactionProcessorService(
-    IRulesService rulesService,
-    IRuleEvaluatorServiceBuilder ruleEvaluatorServiceBuilder,
-    ITraceFactory traceFactory) : ITransactionProcessorService
+    IRulesService _rulesService,
+    IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder,
+    ITraceFactory _traceFactory) : ITransactionProcessorService
   {
-    private readonly IRulesService _rulesService = rulesService;
-    private readonly IRuleEvaluatorServiceBuilder _ruleEvaluatorServiceBuilder = ruleEvaluatorServiceBuilder;
-    private readonly ITraceFactory _traceFactory = traceFactory;
-
     private readonly SemaphoreSlim _guard = new(initialCount: 1, maxCount: 1);
     private string _rulesJson = null;
 

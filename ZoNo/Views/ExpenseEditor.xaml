@@ -54,7 +54,7 @@
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Button Grid.Column="0" Padding="3" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', ViewModel.Category.ParentCategoryName, ViewModel.Category.Name), Mode=OneWay}">
+      <Button Grid.Column="0" Padding="3" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', ViewModel.Category.ParentCategory.Name, ViewModel.Category.Name), Mode=OneWay}">
         <Border CornerRadius="3">
           <Image Width="36" Height="36" Source="{x:Bind ViewModel.Category.Picture, Mode=OneWay}" PointerEntered="Image_PointerEntered" PointerExited="Image_PointerExited">
             <Image.OpacityTransition>

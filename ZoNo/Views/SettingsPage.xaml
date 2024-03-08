@@ -68,7 +68,8 @@
           <TextBlock Grid.Column="2" Text="Level:" VerticalAlignment="Center"/>
           <ComboBox Grid.Column="3" Width="130" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModel.TraceLevels}" SelectedItem="{x:Bind ViewModel.InMemoryTraceSinkSettings.Level, Mode=TwoWay}"/>
           <TextBlock Grid.Column="4" Text="Size:" VerticalAlignment="Center"/>
-          <NumberBox Grid.Column="5" VerticalAlignment="Center" SpinButtonPlacementMode="Inline" SmallChange="100" LargeChange="1000" Minimum="1" Value="{x:Bind ViewModel.InMemoryTraceSinkSettings.Size, Mode=TwoWay}" NumberFormatter="{StaticResource DecimalFormatter}"/>
+          <!-- Foreground is for fix when theme is set from dark to default and color is not changed -->
+          <NumberBox Grid.Column="5" Foreground="{ThemeResource TextFillColorPrimary}" x:Name="InMemoryTraceSinkSettingsSizeNumberBox" VerticalAlignment="Center" SpinButtonPlacementMode="Inline" SmallChange="100" LargeChange="1000" Minimum="1" Value="{x:Bind ViewModel.InMemoryTraceSinkSettings.Size, Mode=TwoWay}" NumberFormatter="{StaticResource DecimalFormatter}"/>
           <Button Grid.Column="6" Content="Open" Command="{x:Bind ViewModel.OpenInMemoryTraceCommand}"/>
         </Grid>
         <!-- File trace -->

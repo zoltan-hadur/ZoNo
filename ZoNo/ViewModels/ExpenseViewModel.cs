@@ -85,83 +85,24 @@ namespace ZoNo.ViewModels
       }
     }
 
-    public static ExpenseViewModel FromModel(Expense expense)
-    {
-      return new ExpenseViewModel()
-      {
-        Id = expense.Id,
-        Shares = new ObservableCollection<ShareViewModel>(
-          expense.With.Select(with => new ShareViewModel
-          {
-            User = new User()
-            {
-              Email = with.User
-            },
-            Percentage = with.Percentage
-          })),
-        Category = expense.Category,
-        Description = expense.Description,
-        Currency = expense.Currency,
-        Cost = expense.Cost,
-        Date = expense.Date,
-        Group = new Group() { Name = expense.Group }
-      };
-    }
-
-    public static Splitwise.Models.Expense ToSplitwiseModel(ExpenseViewModel vm, Splitwise.Models.Group[] groups, Splitwise.Models.Category[] categories)
-    {
-      var group = groups.Single(group => group.Name == vm.Group.Name);
-      var category = categories.Single(category => category.Name == vm.Category.ParentCategoryName)
-        .Subcategories.Single(subcategory => subcategory.Name == vm.Category.Name);
-
-      var sofar = 0.0;
-      var users = vm.Shares.Select((with, index) =>
-      {
-        var paidShare = string.Empty;
-        var owedShare = string.Empty;
-        if (index == 0)
-        {
-          paidShare = vm.Cost.ToString("0.00");
-        }
-        else
-        {
-          paidShare = "0";
-        }
-        if (index < vm.Shares.Count - 1)
-        {
-          owedShare = (vm.Cost * vm.Shares[index].Percentage / 100).ToString("0.00");
-          sofar = sofar + Convert.ToDouble(owedShare);
-        }
-        else
-        {
-          var total = Convert.ToDouble(vm.Cost.ToString("0.00"));
-          var rest = total - sofar;
-          owedShare = rest.ToString("0.00");
-        }
-
-        return new Splitwise.Models.Share()
-        {
-          UserId = group.Members.Single(user => user.Email == with.User.Email).Id,
-          PaidShare = paidShare,
-          OwedShare = owedShare
-        };
-      }).ToArray();
-
-      return new Splitwise.Models.Expense()
-      {
-        Cost = vm.Cost.ToString("0.00"),
-        Description = vm.Description,
-        Date = vm.Date,
-        CurrencyCode = Enum.Parse<Splitwise.Models.CurrencyCode>(vm.Currency.ToString()),
-        CategoryId = category.Id,
-        GroupId = group.Id,
-        Users = users
-      };
-    }
-
     public ExpenseViewModel Clone()
     {
-      return JsonSerializer.Deserialize<ExpenseViewModel>(JsonSerializer.Serialize(this));
+      // Shares is view model, other is model, no need to deep copy them
+      return new ExpenseViewModel()
+      {
+        Id = Id,
+        Shares = new ObservableCollection<ShareViewModel>(Shares.Select(share => new ShareViewModel()
+        {
+          User = share.User,
+          Percentage = share.Percentage
+        })),
+        Category = Category,
+        Description = Description,
+        Currency = Currency,
+        Cost = Cost,
+        Date = Date,
+        Group = Group,
+      };
     }
 
     [RelayCommand]
