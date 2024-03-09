@@ -8,6 +8,7 @@ using ZoNo.Converters;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels;
+using Grid = Microsoft.UI.Xaml.Controls.Grid;
 
 namespace ZoNo.Views
 {
@@ -110,6 +111,33 @@ namespace ZoNo.Views
         else
         {
           DataGrid.CollapseRowGroup(group, true);
+        }
+      }
+    }
+
+    private void DatePicker_Loaded(object sender, RoutedEventArgs e)
+    {
+      if (sender is DatePicker datePicker)
+      {
+        if (datePicker.FindDescendant("HeaderContentPresenter") is ContentPresenter headerContentPresenter)
+        {
+          headerContentPresenter.Height = 20;
+          headerContentPresenter.Margin = new Thickness(0, 0, 0, 8);
+        }
+        if (datePicker.FindDescendant("FlyoutButton") is Button flyoutButton)
+        {
+          if (flyoutButton.FindDescendant("FlyoutButtonContentGrid") is Grid flyoutButtonContentGrid)
+          {
+            flyoutButtonContentGrid.Height = 30;
+          }
+          if (flyoutButton.FindDescendant("MonthTextBlock") is TextBlock monthTextBlock)
+          {
+            monthTextBlock.VerticalAlignment = VerticalAlignment.Bottom;
+          }
+          if (flyoutButton.FindDescendant("YearTextBlock") is TextBlock yearTextBlock)
+          {
+            yearTextBlock.VerticalAlignment = VerticalAlignment.Bottom;
+          }
         }
       }
     }

@@ -22,7 +22,8 @@
       <DatePicker Grid.Row="0" DayVisible="False" Header="Date:"
                   Date="{x:Bind ViewModel.DateTime, Mode=TwoWay}"
                   MinYear="{x:Bind ViewModel.MinYear}" MaxYear="{x:Bind ViewModel.MaxYear}"
-                  IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
+                  IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"
+                  Loaded="DatePicker_Loaded"/>
       <!-- Group Selector -->
       <ComboBox Grid.Column="2" HorizontalAlignment="Right" Padding="18,0,0,0" Width="215" Header="Group:"
                 SelectedItem="{x:Bind ViewModel.Group, Mode=TwoWay}"
