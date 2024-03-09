@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Common.Collections;
 using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -36,18 +37,35 @@ namespace ZoNo.Views
       // Set default DataGridTextOpacity
       DataGrid_IsEnabledChanged(null, null);
 
+      ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+      ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+
       await ViewModel.LoadAsync();
     }
 
-    private void DataGrid_LoadingRowGroup(object sender, CommunityToolkit.WinUI.UI.Controls.DataGridRowGroupHeaderEventArgs e)
+    private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(ViewModel.IsLoading) && !ViewModel.IsLoading)
+      {
+        DataGrid.SelectedItem = null;
+        DataGrid.LayoutUpdated += DataGrid_LayoutUpdated;
+      }
+    }
+
+    private void DataGrid_LayoutUpdated(object sender, object e)
+    {
+      ExpandCollapseAll(isExpand: false);
+      DataGrid.LayoutUpdated -= DataGrid_LayoutUpdated;
+    }
+
+    private void DataGrid_LoadingRowGroup(object sender, DataGridRowGroupHeaderEventArgs e)
     {
       var expenseGroup = e.RowGroupHeader.CollectionViewGroup.Group as ReadOnlyObservableGroup<object, ExpenseViewModel>;
       var expenseGroupByCurrency = expenseGroup.Select(expense => expense).GroupBy(group => group.Currency);
 
-      e.RowGroupHeader.PropertyValue = $"{_groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key)}, Total Cost: {string.Join(", ", expenseGroupByCurrency
+      e.RowGroupHeader.PropertyName = ViewModel.QueryGroupBy.ToString();
+      e.RowGroupHeader.PropertyValue = $"{_groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key),-30} Total Cost: {string.Join(", ", expenseGroupByCurrency
         .Select(group => $"{_thousandsSeparatorConverter.Convert(group.Sum(expense => expense.Cost), null, null, null)} {group.Key}"))}";
-
-      DataGrid.RowGroupHeaderPropertyNameAlternative = ViewModel.QueryGroupBy.ToString();
     }
 
     private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -64,6 +82,35 @@ namespace ZoNo.Views
       foreach (Image image in DataGrid.FindDescendants().Where(x => x is Image))
       {
         image.Opacity = DataGrid.IsEnabled ? 1 : 0.3;
+      }
+    }
+
+    private void ExpandCollapse_Click(object sender, RoutedEventArgs e)
+    {
+      if (ExpandCollapseButton.Content is "Expand All")
+      {
+        ExpandCollapseAll(isExpand: true);
+      }
+      else
+      {
+        ExpandCollapseAll(isExpand: false);
+      }
+    }
+
+    private void ExpandCollapseAll(bool isExpand)
+    {
+      ExpandCollapseButton.Content = isExpand ? "Collapse All" : "Expand All";
+      foreach (var item in ViewModel.ExpenseGroups.View)
+      {
+        var group = DataGrid.GetGroupFromItem(item, 0);
+        if (isExpand)
+        {
+          DataGrid.ExpandRowGroup(group, true);
+        }
+        else
+        {
+          DataGrid.CollapseRowGroup(group, true);
+        }
       }
     }
   }

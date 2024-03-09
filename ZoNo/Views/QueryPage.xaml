@@ -48,6 +48,11 @@
       <Button Content="Refresh" VerticalAlignment="Bottom"
               Command="{x:Bind ViewModel.LoadExpensesCommand}"
               IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
+      <!-- ExpandCollapse Button -->
+      <Button x:Name="ExpandCollapseButton"
+              Content="Expand All" VerticalAlignment="Bottom" Width="100"
+              Click="ExpandCollapse_Click"
+              IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
     </StackPanel>
     <!-- Grouped Transactions -->
     <Border Grid.Row="1" BorderThickness="1" CornerRadius="8"
@@ -72,6 +77,12 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="Opacity" Value="{ThemeResource DataGridTextOpacity}"/>
+              </Style>
+              <!-- Style for DataGridRowGroupHeader text -->
+              <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Cascadia Mono"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="Light"/>
               </Style>
               <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
