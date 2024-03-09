@@ -109,7 +109,8 @@
             <controls:DataGridTemplateColumn Header="Date" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -117,7 +118,7 @@
             <controls:DataGridTemplateColumn Header="Category" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <Grid Padding="12,0,0,0">
+                  <Grid Padding="12,0,0,0" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategory.Name, Category.Name), Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="Auto"/>
                       <ColumnDefinition Width="*"/>
@@ -134,7 +135,8 @@
             <controls:DataGridTemplateColumn Header="Description" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Description, Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Description, Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -142,7 +144,8 @@
             <controls:DataGridTemplateColumn Header="Cost" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+                  <TextBlock Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"
+                             ToolTipService.ToolTip="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -150,7 +153,8 @@
             <controls:DataGridTemplateColumn Header="Currency" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Currency, Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Currency, Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Currency, Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -166,7 +170,8 @@
                     <Border Grid.Column="0" CornerRadius="3" Width="20" Height="20">
                       <Image Source="{x:Bind Shares[0].User.Picture, Mode=OneWay}"/>
                     </Border>
-                    <TextBlock Grid.Column="1" Text="{x:Bind Shares[0].User.Email, Mode=OneWay}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Shares[0].User.Email, Mode=OneWay}"
+                               ToolTipService.ToolTip="{x:Bind Shares[0].User.Email, Mode=OneWay}"/>
                   </Grid>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>

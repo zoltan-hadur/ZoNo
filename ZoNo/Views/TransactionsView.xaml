@@ -146,7 +146,7 @@
                                          IsReadOnly="True">
           <controls:DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:Transaction">
-              <TextBlock Text="{x:Bind TransactionTime}" ToolTipService.ToolTip="{x:Bind TransactionTime}"/>
+              <TextBlock Text="{x:Bind TransactionTime.ToString()}" ToolTipService.ToolTip="{x:Bind TransactionTime.ToString()}"/>
             </DataTemplate>
           </controls:DataGridTemplateColumn.CellTemplate>
         </controls:DataGridTemplateColumn>
