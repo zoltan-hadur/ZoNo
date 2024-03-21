@@ -157,7 +157,8 @@
             <controls:DataGridTemplateColumn Header="Cost" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"
+                  <TextBlock HorizontalAlignment="Right"
+                             Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"
                              ToolTipService.ToolTip="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
