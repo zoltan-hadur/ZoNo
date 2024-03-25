@@ -6,6 +6,7 @@ using Splitwise.Contracts;
 using System.ComponentModel;
 using Tracer.Contracts;
 using ZoNo.Contracts.Services;
+using ZoNo.Converters;
 using ZoNo.Models;
 
 namespace ZoNo.ViewModels
@@ -26,6 +27,7 @@ namespace ZoNo.ViewModels
       { QueryGroupBy.MainCategory, expense => expense.Category.ParentCategory },
       { QueryGroupBy.SubCategory, expense => expense.Category }
     };
+    private ThousandsSeparatorConverter _thousandsSeparatorConverter = new();
 
     [ObservableProperty]
     private DateTimeOffset _dateTime = DateTimeOffset.Now;
@@ -45,6 +47,20 @@ namespace ZoNo.ViewModels
 
     public IReadOnlyCollection<Group> Groups => _splitwiseCacheService.ZoNoGroups;
     public CollectionViewSource ExpenseGroups = new() { IsSourceGrouped = true };
+
+    public string TotalCost => $"{string.Join(", ",
+      (ExpenseGroups.Source as ReadOnlyObservableGroupedCollection<object, ExpenseViewModel>)
+        ?.SelectMany(group => group.Select(expense => expense))
+        ?.GroupBy(expense => expense.Currency)
+        ?.OrderBy(group => group.Key)
+        ?.Select(group => $"{_thousandsSeparatorConverter.Convert(group.Sum(expense => expense.Cost), null, null, null)} {group.Key}")
+        ?? []
+    )}";
+
+    public int NumberOfCurrencies => (ExpenseGroups.Source as ReadOnlyObservableGroupedCollection<object, ExpenseViewModel>)
+      ?.SelectMany(group => group.Select(expense => expense))
+      ?.DistinctBy(expense => expense.Currency)
+      ?.Count() ?? 0;
 
     public async Task LoadAsync()
     {
@@ -94,6 +110,7 @@ namespace ZoNo.ViewModels
       var expenses = splitwiseExpenses.Select(_converterService.SplitwiseExpenseToViewModel).ToArray();
       var expenseGroups = expenses.GroupBy(_groupBySelectors[QueryGroupBy]).OrderBy(group => group.Key);
       ExpenseGroups.Source = new ReadOnlyObservableGroupedCollection<object, ExpenseViewModel>(expenseGroups);
+      OnPropertyChanged(nameof(TotalCost));
       IsLoading = false;
     }
   }

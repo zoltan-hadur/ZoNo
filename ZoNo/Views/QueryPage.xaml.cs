@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Common.Collections;
 using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.Diagnostics;
 using ZoNo.Converters;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -62,11 +64,93 @@ namespace ZoNo.Views
     private void DataGrid_LoadingRowGroup(object sender, DataGridRowGroupHeaderEventArgs e)
     {
       var expenseGroup = e.RowGroupHeader.CollectionViewGroup.Group as ReadOnlyObservableGroup<object, ExpenseViewModel>;
-      var expenseGroupByCurrency = expenseGroup.Select(expense => expense).GroupBy(group => group.Currency);
+      var expenseGroupByCurrency = expenseGroup
+        .Select(expense => expense)
+        .GroupBy(group => group.Currency)
+        .OrderBy(group => group.Key);
 
-      e.RowGroupHeader.PropertyName = ViewModel.QueryGroupBy.ToString();
-      e.RowGroupHeader.PropertyValue = $"{_groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key),-30} Total Cost: {string.Join(", ", expenseGroupByCurrency
-        .Select(group => $"{_thousandsSeparatorConverter.Convert(group.Sum(expense => expense.Cost), null, null, null)} {group.Key}"))}";
+      var groupCount = expenseGroupByCurrency.Count();
+      var numberOfCurrencies = ViewModel.NumberOfCurrencies;
+      var costs = new List<(double TotalCost, Currency Currency)?>();
+      for (int i = 0; i < numberOfCurrencies; ++i)
+      {
+        if (i < groupCount)
+        {
+          var group = expenseGroupByCurrency.ElementAt(i);
+          costs.Add((
+            TotalCost: group.Sum(expense => expense.Cost),
+            Currency: group.Key
+          ));
+        }
+        else
+        {
+          costs.Add(null);
+        }
+      }
+
+      void RowGroupHeader_Loaded(object sender, RoutedEventArgs e2)
+      {
+        var dataGridFrozenGrid = e.RowGroupHeader.FindDescendant("RowGroupHeaderRoot") as DataGridFrozenGrid;
+        if (dataGridFrozenGrid is null)
+        {
+          return;
+        }
+        e.RowGroupHeader.Loaded -= RowGroupHeader_Loaded;
+
+        var grid = new Grid();
+        grid.SetValue(Grid.ColumnProperty, 3);
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(115) });
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(90) });
+        for (int i = 0; i < numberOfCurrencies; ++i)
+        {
+          grid.ColumnDefinitions.Add(new() { Width = new GridLength(130) });
+        }
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
+
+        int index = 0;
+        var groupByText = new TextBlock() { Text = $"{ViewModel.QueryGroupBy}:" };
+        groupByText.SetValue(Grid.ColumnProperty, index++);
+        grid.Children.Add(groupByText);
+
+        var groupByValueText = new TextBlock() { Text = _groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key) };
+        groupByValueText.SetValue(Grid.ColumnProperty, index++);
+        grid.Children.Add(groupByValueText);
+
+        var totalCostText = new TextBlock() { Text = "Total Cost:" };
+        totalCostText.SetValue(Grid.ColumnProperty, index++);
+        grid.Children.Add(totalCostText);
+
+        for (int i = 0; i < numberOfCurrencies; ++i)
+        {
+          if (costs[i] is not null)
+          {
+            var totalCostValueText = new TextBlock()
+            {
+              Text = $"{_thousandsSeparatorConverter.Convert(costs[i].Value.TotalCost, null, null, null) as string} {costs[i].Value.Currency}",
+              HorizontalAlignment = HorizontalAlignment.Right,
+              IsTextSelectionEnabled = true
+            };
+            totalCostValueText.SetValue(Grid.ColumnProperty, index++);
+            grid.Children.Add(totalCostValueText);
+          }
+          else
+          {
+            index = index + 2;
+          }
+        }
+
+        var groupedItemCountText = new TextBlock() { Text = expenseGroup.Count == 1 ? "(1 item)" : $"({expenseGroup.Count} items)" };
+        groupedItemCountText.SetValue(Grid.ColumnProperty, index++);
+        grid.Children.Add(groupedItemCountText);
+
+
+        dataGridFrozenGrid.Children[2] = grid;
+        Debug.WriteLine("Row Loaded");
+      }
+
+      e.RowGroupHeader.Loaded += RowGroupHeader_Loaded;
+      RowGroupHeader_Loaded(null, null);
     }
 
     private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
