@@ -99,9 +99,7 @@ namespace ZoNo.Views
 
         var grid = new Grid();
         grid.SetValue(Grid.ColumnProperty, 3);
-        grid.ColumnDefinitions.Add(new() { Width = new GridLength(115) });
         grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
-        grid.ColumnDefinitions.Add(new() { Width = new GridLength(90) });
         for (int i = 0; i < numberOfCurrencies; ++i)
         {
           grid.ColumnDefinitions.Add(new() { Width = new GridLength(130) });
@@ -109,17 +107,9 @@ namespace ZoNo.Views
         grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
 
         int index = 0;
-        var groupByText = new TextBlock() { Text = $"{ViewModel.QueryGroupBy}:" };
-        groupByText.SetValue(Grid.ColumnProperty, index++);
-        grid.Children.Add(groupByText);
-
         var groupByValueText = new TextBlock() { Text = _groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key) };
         groupByValueText.SetValue(Grid.ColumnProperty, index++);
         grid.Children.Add(groupByValueText);
-
-        var totalCostText = new TextBlock() { Text = "Total Cost:" };
-        totalCostText.SetValue(Grid.ColumnProperty, index++);
-        grid.Children.Add(totalCostText);
 
         for (int i = 0; i < numberOfCurrencies; ++i)
         {
@@ -131,22 +121,17 @@ namespace ZoNo.Views
               HorizontalAlignment = HorizontalAlignment.Right,
               IsTextSelectionEnabled = true
             };
-            totalCostValueText.SetValue(Grid.ColumnProperty, index++);
+            totalCostValueText.SetValue(Grid.ColumnProperty, index);
             grid.Children.Add(totalCostValueText);
           }
-          else
-          {
-            index = index + 2;
-          }
+          index++;
         }
 
         var groupedItemCountText = new TextBlock() { Text = expenseGroup.Count == 1 ? "(1 item)" : $"({expenseGroup.Count} items)" };
         groupedItemCountText.SetValue(Grid.ColumnProperty, index++);
         grid.Children.Add(groupedItemCountText);
 
-
         dataGridFrozenGrid.Children[2] = grid;
-        Debug.WriteLine("Row Loaded");
       }
 
       e.RowGroupHeader.Loaded += RowGroupHeader_Loaded;
