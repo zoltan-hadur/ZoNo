@@ -4,8 +4,8 @@ using CommunityToolkit.WinUI.UI.Controls;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
-using System.Diagnostics;
 using ZoNo.Converters;
 using ZoNo.Helpers;
 using ZoNo.Models;
@@ -90,12 +90,21 @@ namespace ZoNo.Views
 
       void RowGroupHeader_Loaded(object sender, RoutedEventArgs e2)
       {
-        var dataGridFrozenGrid = e.RowGroupHeader.FindDescendant("RowGroupHeaderRoot") as DataGridFrozenGrid;
-        if (dataGridFrozenGrid is null)
+        var rowGroupHeaderRoot = e.RowGroupHeader.FindDescendant("RowGroupHeaderRoot") as DataGridFrozenGrid;
+        if (rowGroupHeaderRoot is null)
         {
           return;
         }
         e.RowGroupHeader.Loaded -= RowGroupHeader_Loaded;
+
+        var expanderButton = rowGroupHeaderRoot.FindDescendant("ExpanderButton") as ToggleButton;
+        expanderButton.ClearValue(WidthProperty);
+        expanderButton.ClearValue(HeightProperty);
+        expanderButton.ClearValue(MarginProperty);
+
+        var arrow = expanderButton.FindDescendant("Arrow") as FontIcon;
+        arrow.Width = 30;
+        arrow.Height = 30;
 
         var grid = new Grid();
         grid.SetValue(Grid.ColumnProperty, 3);
@@ -131,7 +140,7 @@ namespace ZoNo.Views
         groupedItemCountText.SetValue(Grid.ColumnProperty, index++);
         grid.Children.Add(groupedItemCountText);
 
-        dataGridFrozenGrid.Children[2] = grid;
+        rowGroupHeaderRoot.Children[2] = grid;
       }
 
       e.RowGroupHeader.Loaded += RowGroupHeader_Loaded;
