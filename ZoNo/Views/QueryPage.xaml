@@ -12,17 +12,19 @@
       mc:Ignorable="d"
       Loaded="Page_Loaded"
       NavigationCacheMode="Required">
-  <Grid>
+  <Grid RowSpacing="12">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     <StackPanel Spacing="12" Orientation="Horizontal">
       <!-- Month and Year picker -->
       <DatePicker Grid.Row="0" DayVisible="False" Header="Date:"
                   Date="{x:Bind ViewModel.DateTime, Mode=TwoWay}"
                   MinYear="{x:Bind ViewModel.MinYear}" MaxYear="{x:Bind ViewModel.MaxYear}"
-                  IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
+                  IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"
+                  Loaded="DatePicker_Loaded"/>
       <!-- Group Selector -->
       <ComboBox Grid.Column="2" HorizontalAlignment="Right" Padding="18,0,0,0" Width="215" Header="Group:"
                 SelectedItem="{x:Bind ViewModel.Group, Mode=TwoWay}"
@@ -48,11 +50,15 @@
       <Button Content="Refresh" VerticalAlignment="Bottom"
               Command="{x:Bind ViewModel.LoadExpensesCommand}"
               IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
+      <!-- ExpandCollapse Button -->
+      <Button x:Name="ExpandCollapseButton"
+              Content="Expand All" VerticalAlignment="Bottom" Width="100"
+              Click="ExpandCollapse_Click"
+              IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
     </StackPanel>
     <!-- Grouped Transactions -->
     <Border Grid.Row="1" BorderThickness="1" CornerRadius="8"
-            BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}"
-            Margin="{StaticResource SmallTopBottomMargin}">
+            BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}">
       <zcontrols:LoaderContentControl HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                                       IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
         <controls:DataGrid x:Name="DataGrid"
@@ -109,7 +115,8 @@
             <controls:DataGridTemplateColumn Header="Date" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Date.ToString('MMM-dd', {x:Null}), Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -117,7 +124,7 @@
             <controls:DataGridTemplateColumn Header="Category" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <Grid Padding="12,0,0,0">
+                  <Grid Padding="12,0,0,0" ToolTipService.ToolTip="{x:Bind sys:String.Format(x:Null, '{0} - {1}', Category.ParentCategory.Name, Category.Name), Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="Auto"/>
                       <ColumnDefinition Width="*"/>
@@ -134,7 +141,8 @@
             <controls:DataGridTemplateColumn Header="Description" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Description, Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Description, Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -142,7 +150,9 @@
             <controls:DataGridTemplateColumn Header="Cost" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
+                  <TextBlock HorizontalAlignment="Right"
+                             Text="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"
+                             ToolTipService.ToolTip="{x:Bind Cost, Mode=OneWay, Converter={StaticResource ThousandsSeparatorConverter}}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -150,7 +160,8 @@
             <controls:DataGridTemplateColumn Header="Currency" IsReadOnly="True">
               <controls:DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="viewmodels:ExpenseViewModel">
-                  <TextBlock Text="{x:Bind Currency, Mode=OneWay}"/>
+                  <TextBlock Text="{x:Bind Currency, Mode=OneWay}"
+                             ToolTipService.ToolTip="{x:Bind Currency, Mode=OneWay}"/>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
             </controls:DataGridTemplateColumn>
@@ -166,7 +177,8 @@
                     <Border Grid.Column="0" CornerRadius="3" Width="20" Height="20">
                       <Image Source="{x:Bind Shares[0].User.Picture, Mode=OneWay}"/>
                     </Border>
-                    <TextBlock Grid.Column="1" Text="{x:Bind Shares[0].User.Email, Mode=OneWay}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Shares[0].User.Email, Mode=OneWay}"
+                               ToolTipService.ToolTip="{x:Bind Shares[0].User.Email, Mode=OneWay}"/>
                   </Grid>
                 </DataTemplate>
               </controls:DataGridTemplateColumn.CellTemplate>
@@ -175,5 +187,6 @@
         </controls:DataGrid>
       </zcontrols:LoaderContentControl>
     </Border>
+    <TextBlock Grid.Row="2" IsTextSelectionEnabled="True" Text="{x:Bind ViewModel.TotalCost, Mode=OneWay}" Margin="0,0,0,12"/>
   </Grid>
 </Page>

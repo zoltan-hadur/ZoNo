@@ -42,6 +42,22 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
+          <TextBlock Text="1.2.6.0 / 2023-03-30" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="TransactionTime tooltip fixed on import page."/>
+        <ListView Header="Query page modifications:">
+          <TextBlock Text="Tooltip on cells."/>
+          <TextBlock Text="Expand all / collapse all button."/>
+          <TextBlock Text="Groups are default collapsed."/>
+          <TextBlock Text="Month and year selector alignment."/>
+          <TextBlock Text="Cost column is aligned right."/>
+          <TextBlock Text="Groups are aligned vertically."/>
+          <TextBlock Text="Only Main/sub category and total cost are shown."/>
+          <TextBlock Text="Arrows are bigger so expanding / collapsing the groups are easier."/>
+        </ListView>
+      </ListView>
+      <ListView>
+        <ListView.Header>
           <TextBlock Text="1.2.5.0 / 2023-03-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Fix in memory trace size number box color when changing theme to Default."/>

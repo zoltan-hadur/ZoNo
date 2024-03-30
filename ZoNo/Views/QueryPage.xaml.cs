@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Common.Collections;
 using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using ZoNo.Converters;
 using ZoNo.Helpers;
 using ZoNo.Models;
 using ZoNo.ViewModels;
+using Grid = Microsoft.UI.Xaml.Controls.Grid;
 
 namespace ZoNo.Views
 {
@@ -36,18 +40,112 @@ namespace ZoNo.Views
       // Set default DataGridTextOpacity
       DataGrid_IsEnabledChanged(null, null);
 
+      ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+      ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+
       await ViewModel.LoadAsync();
     }
 
-    private void DataGrid_LoadingRowGroup(object sender, CommunityToolkit.WinUI.UI.Controls.DataGridRowGroupHeaderEventArgs e)
+    private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(ViewModel.IsLoading) && !ViewModel.IsLoading)
+      {
+        DataGrid.SelectedItem = null;
+        DataGrid.LayoutUpdated += DataGrid_LayoutUpdated;
+      }
+    }
+
+    private void DataGrid_LayoutUpdated(object sender, object e)
+    {
+      ExpandCollapseAll(isExpand: false);
+      DataGrid.LayoutUpdated -= DataGrid_LayoutUpdated;
+    }
+
+    private void DataGrid_LoadingRowGroup(object sender, DataGridRowGroupHeaderEventArgs e)
     {
       var expenseGroup = e.RowGroupHeader.CollectionViewGroup.Group as ReadOnlyObservableGroup<object, ExpenseViewModel>;
-      var expenseGroupByCurrency = expenseGroup.Select(expense => expense).GroupBy(group => group.Currency);
+      var expenseGroupByCurrency = expenseGroup
+        .Select(expense => expense)
+        .GroupBy(group => group.Currency)
+        .OrderBy(group => group.Key);
 
-      e.RowGroupHeader.PropertyValue = $"{_groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key)}, Total Cost: {string.Join(", ", expenseGroupByCurrency
-        .Select(group => $"{_thousandsSeparatorConverter.Convert(group.Sum(expense => expense.Cost), null, null, null)} {group.Key}"))}";
+      var groupCount = expenseGroupByCurrency.Count();
+      var numberOfCurrencies = ViewModel.NumberOfCurrencies;
+      var costs = new List<(double TotalCost, Currency Currency)?>();
+      for (int i = 0; i < numberOfCurrencies; ++i)
+      {
+        if (i < groupCount)
+        {
+          var group = expenseGroupByCurrency.ElementAt(i);
+          costs.Add((
+            TotalCost: group.Sum(expense => expense.Cost),
+            Currency: group.Key
+          ));
+        }
+        else
+        {
+          costs.Add(null);
+        }
+      }
 
-      DataGrid.RowGroupHeaderPropertyNameAlternative = ViewModel.QueryGroupBy.ToString();
+      void RowGroupHeader_Loaded(object sender, RoutedEventArgs e2)
+      {
+        var rowGroupHeaderRoot = e.RowGroupHeader.FindDescendant("RowGroupHeaderRoot") as DataGridFrozenGrid;
+        if (rowGroupHeaderRoot is null)
+        {
+          return;
+        }
+        e.RowGroupHeader.Loaded -= RowGroupHeader_Loaded;
+
+        var expanderButton = rowGroupHeaderRoot.FindDescendant("ExpanderButton") as ToggleButton;
+        expanderButton.ClearValue(WidthProperty);
+        expanderButton.ClearValue(HeightProperty);
+        expanderButton.ClearValue(MarginProperty);
+
+        var arrow = expanderButton.FindDescendant("Arrow") as FontIcon;
+        arrow.Width = 30;
+        arrow.Height = 30;
+
+        var grid = new Grid();
+        grid.SetValue(Grid.ColumnProperty, 3);
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
+        for (int i = 0; i < numberOfCurrencies; ++i)
+        {
+          grid.ColumnDefinitions.Add(new() { Width = new GridLength(130) });
+        }
+        grid.ColumnDefinitions.Add(new() { Width = new GridLength(200) });
+
+        int index = 0;
+        var groupByValueText = new TextBlock() { Text = _groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key) };
+        groupByValueText.SetValue(Grid.ColumnProperty, index++);
+        groupByValueText.Padding = new Thickness(0, 0, 12, 0);
+        grid.Children.Add(groupByValueText);
+
+        for (int i = 0; i < numberOfCurrencies; ++i)
+        {
+          if (costs[i] is not null)
+          {
+            var totalCostValueText = new TextBlock()
+            {
+              Text = $"{_thousandsSeparatorConverter.Convert(costs[i].Value.TotalCost, null, null, null) as string} {costs[i].Value.Currency}",
+              HorizontalAlignment = HorizontalAlignment.Right,
+              IsTextSelectionEnabled = true
+            };
+            totalCostValueText.SetValue(Grid.ColumnProperty, index);
+            grid.Children.Add(totalCostValueText);
+          }
+          index++;
+        }
+
+        var groupedItemCountText = new TextBlock() { Text = expenseGroup.Count == 1 ? "(1 item)" : $"({expenseGroup.Count} items)" };
+        groupedItemCountText.SetValue(Grid.ColumnProperty, index++);
+        grid.Children.Add(groupedItemCountText);
+
+        rowGroupHeaderRoot.Children[2] = grid;
+      }
+
+      e.RowGroupHeader.Loaded += RowGroupHeader_Loaded;
+      RowGroupHeader_Loaded(null, null);
     }
 
     private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -64,6 +162,62 @@ namespace ZoNo.Views
       foreach (Image image in DataGrid.FindDescendants().Where(x => x is Image))
       {
         image.Opacity = DataGrid.IsEnabled ? 1 : 0.3;
+      }
+    }
+
+    private void ExpandCollapse_Click(object sender, RoutedEventArgs e)
+    {
+      if (ExpandCollapseButton.Content is "Expand All")
+      {
+        ExpandCollapseAll(isExpand: true);
+      }
+      else
+      {
+        ExpandCollapseAll(isExpand: false);
+      }
+    }
+
+    private void ExpandCollapseAll(bool isExpand)
+    {
+      ExpandCollapseButton.Content = isExpand ? "Collapse All" : "Expand All";
+      foreach (var item in ViewModel.ExpenseGroups.View)
+      {
+        var group = DataGrid.GetGroupFromItem(item, 0);
+        if (isExpand)
+        {
+          DataGrid.ExpandRowGroup(group, true);
+        }
+        else
+        {
+          DataGrid.CollapseRowGroup(group, true);
+        }
+      }
+    }
+
+    private void DatePicker_Loaded(object sender, RoutedEventArgs e)
+    {
+      if (sender is DatePicker datePicker)
+      {
+        if (datePicker.FindDescendant("HeaderContentPresenter") is ContentPresenter headerContentPresenter)
+        {
+          headerContentPresenter.Height = 20;
+          headerContentPresenter.Margin = new Thickness(0, 0, 0, 8);
+        }
+        if (datePicker.FindDescendant("FlyoutButton") is Button flyoutButton)
+        {
+          if (flyoutButton.FindDescendant("FlyoutButtonContentGrid") is Grid flyoutButtonContentGrid)
+          {
+            flyoutButtonContentGrid.Height = 30;
+          }
+          if (flyoutButton.FindDescendant("MonthTextBlock") is TextBlock monthTextBlock)
+          {
+            monthTextBlock.VerticalAlignment = VerticalAlignment.Bottom;
+          }
+          if (flyoutButton.FindDescendant("YearTextBlock") is TextBlock yearTextBlock)
+          {
+            yearTextBlock.VerticalAlignment = VerticalAlignment.Bottom;
+          }
+        }
       }
     }
   }
