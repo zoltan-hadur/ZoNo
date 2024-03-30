@@ -118,6 +118,7 @@ namespace ZoNo.Views
         int index = 0;
         var groupByValueText = new TextBlock() { Text = _groupByFormatter[ViewModel.QueryGroupBy](expenseGroup.Key) };
         groupByValueText.SetValue(Grid.ColumnProperty, index++);
+        groupByValueText.Padding = new Thickness(0, 0, 12, 0);
         grid.Children.Add(groupByValueText);
 
         for (int i = 0; i < numberOfCurrencies; ++i)
