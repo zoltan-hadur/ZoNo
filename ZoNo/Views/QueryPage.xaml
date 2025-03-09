@@ -18,7 +18,7 @@
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <StackPanel Spacing="12" Orientation="Horizontal">
+    <controls:WrapPanel HorizontalSpacing="12" VerticalSpacing="12" Orientation="Horizontal">
       <!-- Month and Year picker -->
       <DatePicker Grid.Row="0" DayVisible="False" Header="Date:"
                   Date="{x:Bind ViewModel.DateTime, Mode=TwoWay}"
@@ -55,7 +55,7 @@
               Content="Expand All" VerticalAlignment="Bottom" Width="100"
               Click="ExpandCollapse_Click"
               IsEnabled="{x:Bind ViewModel.IsLoading.Equals(x:False), Mode=OneWay}"/>
-    </StackPanel>
+    </controls:WrapPanel>
     <!-- Grouped Transactions -->
     <Border Grid.Row="1" BorderThickness="1" CornerRadius="8"
             BorderBrush="{ThemeResource SystemControlForegroundListLowBrush}">
