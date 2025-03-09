@@ -42,7 +42,14 @@
     <StackPanel Spacing="12">
       <ListView>
         <ListView.Header>
-          <TextBlock Text="1.2.6.0 / 2023-03-30" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+          <TextBlock Text="1.2.7.0 / 2025-03-09" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        </ListView.Header>
+        <TextBlock Text="Wrong dates in Release Notes page are corrected."/>
+        <TextBlock Text="Controls in Query page are automatically wrapping."/>
+      </ListView>
+      <ListView>
+        <ListView.Header>
+          <TextBlock Text="1.2.6.0 / 2024-03-30" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="TransactionTime tooltip fixed on import page."/>
         <ListView Header="Query page modifications:">
@@ -58,14 +65,14 @@
       </ListView>
       <ListView>
         <ListView.Header>
-          <TextBlock Text="1.2.5.0 / 2023-03-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+          <TextBlock Text="1.2.5.0 / 2024-03-08" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <TextBlock Text="Fix in memory trace size number box color when changing theme to Default."/>
         <TextBlock Text="Query page implemented."/>
       </ListView>
       <ListView>
         <ListView.Header>
-          <TextBlock Text="1.2.4.0 / 2023-02-24" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+          <TextBlock Text="1.2.4.0 / 2024-02-24" Style="{ThemeResource SubtitleTextBlockStyle}"/>
         </ListView.Header>
         <ListView Header="Tracing:">
           <TextBlock Text="In memory and file."/>
